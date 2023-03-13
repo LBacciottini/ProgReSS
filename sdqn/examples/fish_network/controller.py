@@ -497,10 +497,15 @@ def get_dag_factory(node, scenario):
 
 class DummyControllerProtocol(ns.protocols.NodeProtocol):
 
+    NEW_SCENARIO_SIGNAL = "new_scenario"
+    NEW_SCENARIO_EVT_TYPE = ns.pydynaa.EventType("new_scenario", "A new scenario has started")
+
     def __init__(self, node, avg_scenario_period=0.5):
         super().__init__(node=node, name="DummyControllerProtocol")
         self.avg_scenario_period = avg_scenario_period
         self.scenario = 0
+        self.previous_scenario = -1
+        self.add_signal(self.NEW_SCENARIO_SIGNAL, self.NEW_SCENARIO_EVT_TYPE)
 
     def run(self):
 
@@ -542,13 +547,20 @@ class DummyControllerProtocol(ns.protocols.NodeProtocol):
             period = self.avg_scenario_period * 1e9
 
             # send a new DAG to each node
-            for node in range(7):
-                dag_factory = get_dag_factory(node, self.scenario)
-                msg = ReplaceDAGMessage(destination_device=node, dag_factory=dag_factory, topology_id=topology_id)
-                self.node.ports[f"dev_{node}"].tx_output(msg)
+            if self.previous_scenario != self.scenario:
 
-            # wait for the period to expire
-            topology_id += 1
+                # for statistics collection
+                result = (ns.sim_time(), self.scenario, topology_id)
+                self.send_signal(self.NEW_SCENARIO_SIGNAL, result)
+
+                self.previous_scenario = self.scenario
+                for node in range(7):
+                    dag_factory = get_dag_factory(node, self.scenario)
+                    msg = ReplaceDAGMessage(destination_device=node, dag_factory=dag_factory, topology_id=topology_id)
+                    self.node.ports[f"dev_{node}"].tx_output(msg)
+
+                # wait for the period to expire
+                topology_id += 1
             yield self.await_timer(duration=period)
 
 

@@ -3,22 +3,23 @@ import math
 import netsquid as ns
 
 from sdqn.examples.fish_network.controller import DummyController
-from sdqn.examples.fish_network.metrics_collector import TokenUtilizationMetricsCollector
+from sdqn.examples.fish_network.metrics_collector import TokenUtilizationMetricsCollector, FidelityMetricsCollector, \
+    CumulativeMetricsCollector
 from sdqn.hardware.llps.mps import optimistic_parameters_v3, MPSProtocol
 from sdqn.hardware.mps_connection import MPSConnection
 
 from sdqn.device import QNetworkDevice
 
 
-def get_topology(avg_scenario_period=0.5):
+def get_topology(avg_scenario_period=0.5, controller_dist=15, out_of_band=False):
     r"""
     Get the topology of the network.
     """
     qproc_params = {
-        "coherence_time": None,
+        "coherence_time": 5 * 1e6,
         "one_qbit_noise": None, 
         "two_qbit_noise": None,
-        "two_qbit_p_err": 0.000001,
+        "two_qbit_p_err": 0.0000000000005,
         "meas_p_err": 0.,
         "instr_duration": 1.
     }
@@ -60,6 +61,9 @@ def get_topology(avg_scenario_period=0.5):
         "t_clock": optimistic_parameters_v3["t_clock"]
     }
 
+    mps_conn_params_5_6 = mps_conn_params.copy()
+    mps_conn_params_5_6["p_left"] = math.e ** (-link_length / (4 * L_att)) * p_photon * p_bsa
+
     # add the edges to the network
     delay = 1e9*link_length/2e5
     network.add_connection(node1=end_node_0, node2=rep_2, port_name_node1="q_0", port_name_node2="q_0",
@@ -93,7 +97,7 @@ def get_topology(avg_scenario_period=0.5):
                             bidirectional=True, delay=delay, label="CONN_4_5")
 
     network.add_connection(node1=rep_5, node2=end_node_6, port_name_node1="q_0", port_name_node2="q_0",
-                            connection=MPSConnection(name="MPS_CONN_5_6", length=link_length/2, **mps_conn_params))
+                            connection=MPSConnection(name="MPS_CONN_5_6", length=link_length/2, **mps_conn_params_5_6))
     network.add_connection(node1=rep_5, node2=end_node_6, port_name_node1="c_0", port_name_node2="c_0",
                             bidirectional=True, delay=delay/2, label="CONN_5_6")
 
@@ -182,13 +186,23 @@ def get_topology(avg_scenario_period=0.5):
         rep_5,
         end_node_6
     ]
-    for i, node in enumerate(nodes):
-        network.add_connection(node1=controller, node2=node, port_name_node1=f"dev_{i}", port_name_node2="controller",
-                                bidirectional=True, delay=delay)
+
+    if out_of_band:
+        base_delay = 1e9*controller_dist/2e5
+        for i in range(len(nodes)):
+            network.add_connection(node1=controller, node2=nodes[i], port_name_node1=f"dev_{i}", port_name_node2="controller",
+                                    bidirectional=True, delay=base_delay*(i+1))
+    else:
+        controller_delay = 1e9*controller_dist/2e5
+        for i, node in enumerate(nodes):
+            network.add_connection(node1=controller, node2=node, port_name_node1=f"dev_{i}", port_name_node2="controller",
+                                    bidirectional=True, delay=controller_delay)
 
     controller.start()
 
     data_collector = TokenUtilizationMetricsCollector()
+    fid_collector = FidelityMetricsCollector(node_a=6, node_b=0)
+    agg_collector = CumulativeMetricsCollector(node_a=6, node_b=0)
 
-    return network, data_collector
+    return network, data_collector, fid_collector, agg_collector
 

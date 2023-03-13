@@ -8,6 +8,7 @@ import netsquid as ns
 import math
 
 from sdqn.hardware.llps.llp import LinkProtocol
+import sdqn.sdqn_logging as log
 
 __all__ = ['get_processor', 'QHardware', 'QuantumOperationsService']
 
@@ -87,10 +88,10 @@ def get_processor(num_positions, coherence_time=None, one_qbit_noise=None, two_q
                                                phys_instructions=phys_instructions)
     else:
         # Used to apply an initial imperfection to the qubits (F_0 =~ 0.98)
-        models = {'qin_noise_model': ns.components.DepolarNoiseModel(depolar_rate=0.013333333333333334,
+        models = {'qin_noise_model': ns.components.DepolarNoiseModel(depolar_rate=0.03,
                                                                      time_independent=True)}
 
-        mem_noise_model = ns.components.DephaseNoiseModel(dephase_rate=-math.log(0.95)*1e9 / coherence_time)
+        mem_noise_model = ns.components.DephaseNoiseModel(dephase_rate=-math.log(0.98)*1e9 / coherence_time)
         # mem_noise_model = DephaseNoiseModel(dephase_rate=10.0)
 
         qproc = ns.components.QuantumProcessor(name="QuantumProcessor",
@@ -370,6 +371,13 @@ class QuantumOperationsService(ns.protocols.ServiceProtocol):
             The qnic identifier.
         idx : int
             The index of the qubit on the qnic.
+        """
+
+        """
+        # DEBUG
+        log.info("Freeing qubit on qnic %s, index %d" % (qnic, idx),
+                 repeater_id=self.node.supercomponent.device_id,
+                 protocol="QHardware")
         """
         link_protocol = self.node.get_subscribed_llp(qnic)
         if link_protocol is None:

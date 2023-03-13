@@ -5,7 +5,7 @@ import netsquid as ns
 
 from sdqn.hardware.llps.llp import LinkProtocol
 from sdqn.hardware.qhardware import QuantumOperationsService
-from sdqn.sockets import Token, TokenMessage
+from sdqn.sockets import Token, TokenMessage, Socket
 import sdqn.sdqn_logging as log
 
 
@@ -86,6 +86,8 @@ class EntanglementHandlerProtocol(ns.protocols.NodeProtocol):
                 other_end = msg.items[1]
 
                 self.node.socket_table.append(local_end)
+                if len(self.node.socket_table) == self.node.socket_table.maxlen:
+                    log.warning(f"Socket table of Device {self.node.supercomponent.device_id} is full.")
 
                 # generate a token
                 coherence_time = self.node.qhardware.qproc_coherence_time
@@ -187,7 +189,24 @@ class TokenOperationsService(ns.protocols.ServiceProtocol):
         return False
 
     def free(self, token):
+
+        # DEBUG
+        """
+        # check consistency
+        if len(self.node.socket_table) >= self.node.socket_table.maxlen * 4 / 5:
+            consistency = self._check_consistency()
+            if consistency != 0:
+                log.warning(f"Consistency check failed with code {consistency}.", repeater_id=self.node.supercomponent.device_id)
+        """
         self.node.qhardware.put_qop(QuantumOperationsService.req_free(token.socket.qnic, token.socket.idx))
+        # remove the token from the socket table
+        self.node.socket_table.remove(token.socket)
+
+        """ DEBUG
+        if len(self.node.socket_table) >= self.node.socket_table.maxlen*4/5:
+            log.warning(f"The socket table has {len(self.node.socket_table)} sockets out "
+                        f"of {self.node.socket_table.maxlen}.", repeater_id=self.node.supercomponent.device_id)
+        """
 
     def _handle_free(self, request):
         self.free(request.token)
@@ -206,6 +225,10 @@ class TokenOperationsService(ns.protocols.ServiceProtocol):
         assert msg.items[0] == request.id
         self.send_response(response=msg.items[1], name=request.id, request=request)
 
+        # remove the tokens from the socket table
+        self.node.socket_table.remove(token_a.socket)
+        self.node.socket_table.remove(token_b.socket)
+
     def _handle_dejmps(self, request):
         token_a = request.token1
         token_b = request.token2
@@ -219,6 +242,9 @@ class TokenOperationsService(ns.protocols.ServiceProtocol):
         msg = self.node.ports["q_ops"].rx_input()
         assert msg.items[0] == request.id
         self.send_response(response=msg.items[1], name=request.id, request=request)
+
+        # remove the ancilla from the socket table
+        self.node.socket_table.remove(token_b.socket)
 
     def _handle_correct(self, request):
         token = request.token
@@ -244,6 +270,32 @@ class TokenOperationsService(ns.protocols.ServiceProtocol):
         msg = self.node.ports["q_ops"].rx_input()
         assert msg.items[0] == request.id, f"Received message with id {msg.items[0]} but expected {request.id}"
         self.send_response(response=msg.items[1], name=request.id, request=request)
+
+    def _check_consistency(self):
+        """
+        Debug function to check if the socket table is consistent with the qhardware: it checks that the number of
+        sockets in the socket table is equal to the number of qubits allocated in the link layer protocols
+        subscribed to the qhardware.
+
+        Returns
+        -------
+        int
+            The difference between the number of sockets in the socket table and the number of qubits allocated in the
+            link layer protocols.
+        """
+
+        # get the number of qubits allocated in the link layer protocols
+        num_qubits = 0
+        for qnic in range(self.node.qhardware.num_qnics):
+            llp = self.node.qhardware.get_subscribed_llp(qnic)
+            # count the number of non None elements in llp._qubits_status
+            num_qubits += len([x for x in llp._qubits_status if x is not None])
+
+        if len(self.node.socket_table) != num_qubits:
+            log.warning(f"The socket table has {len(self.node.socket_table)} sockets but the qhardware has "
+                      f"{num_qubits} qubits allocated in the link layer protocols.")
+        return len(self.node.socket_table) - num_qubits
+
 
     def send_response(self, response, name=None, request=None):
         r"""
@@ -301,6 +353,13 @@ class TokenOperationsService(ns.protocols.ServiceProtocol):
         if start_time is None:
             start_time = ns.sim_time()
         self.queue.append((start_time, (identifier, request, kwargs)))
+
+        """
+        # DEBUG
+        # check that the queue is not longer than 20 requests
+        if len(self.queue) > 20:
+            log.warning(f"Queue of requests for {self.name} has {len(self.queue)} requests: {self.queue}. ", repeater_id=self.node.supercomponent.device_id)
+        """
         self.send_signal(self._new_req_signal)
         return kwargs
 
@@ -316,6 +375,7 @@ class TokenOperationsService(ns.protocols.ServiceProtocol):
         """
         while True:
             yield self.await_signal(self, self._new_req_signal)
+            # log.warning(f"Hey, you, you are finally awake! The queue has {len(self.queue)} requests!", repeater_id=self.node.supercomponent.device_id)
             while len(self.queue) > 0:
                 start_time, (handler_id, request, kwargs) = self.queue.popleft()
                 if start_time > ns.sim_time():

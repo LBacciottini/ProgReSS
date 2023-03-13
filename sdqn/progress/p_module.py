@@ -43,6 +43,9 @@ class ModuleBehavior(ns.protocols.ServiceProtocol, ABC):
     req_handle_message = namedtuple("req_handle_message", ["sender", "message"])
     req_handle_response = namedtuple("req_handle_response", ["response", "request"])
     req_handle_new_token = namedtuple("req_handle_new_token", ["token"])
+    req_handle_collect_garbage = namedtuple("req_handle_collect_garbage", [])
+
+    GARBAGE_COLLECTOR_PERIOD = 0.5  # ms
 
     def __init__(self, node, qnic=None, name=None):
         if name is None:
@@ -51,7 +54,10 @@ class ModuleBehavior(ns.protocols.ServiceProtocol, ABC):
         self.register_request(self.req_handle_message, self.handle_message)
         self.register_request(self.req_handle_response, self.handle_response)
         self.register_request(self.req_handle_new_token, self.handle_new_token)
+        self.register_request(self.req_handle_collect_garbage, self._collect_garbage)
         self.qnic = qnic
+
+        self.last_garbage_collection = ns.sim_time()
 
 
     @abstractmethod
@@ -120,12 +126,26 @@ class ModuleBehavior(ns.protocols.ServiceProtocol, ABC):
         token : :class:`~sdqn.progress.kernel.p_token.Token`
             The token to free.
         """
+
+        # if the token is stored in the token table, remove it
+        self.node.token_table.pop_token(token.socket, raise_error=False)
+
         if self.token_is_present(token):
             req = self.node.qhal.token_api_service.req_free(token)
             self.node.qhal.token_api_service.put(req)
         else:
             log.warning(f"tried to free a token that is not present: {token}", repeater_id=self.node.device_id,
                         protocol=self.node.name)
+            # log.warning(str(self.node.qhal.socket_table))
+
+    def _collect_garbage(self, _):
+        r"""
+        This method is called periodically to collect garbage from the token table.
+        """
+        self.last_garbage_collection = ns.sim_time()
+        to_remove = self.node.token_table.collect_garbage(current_time=ns.sim_time())
+        for token in to_remove:
+            self.free_token(token)
 
     def terminate(self):
         r"""
@@ -200,6 +220,10 @@ class ProcessingModuleBehavior(ModuleBehavior, ABC):
         """
         req = self.node.qhal.token_api_service.req_dejmps(self.node.module_id, token_a, token_b, role=role)
         self.node.qhal.token_api_service.put(req)
+        """
+        # DEBUG
+        log.info(f"distilling {token_a} and {token_b}", repeater_id=self.node.device_id, protocol=self.name)
+        """
 
     def swap_tokens(self, token_a, token_b):
         r"""
@@ -279,10 +303,13 @@ class ModuleEnvironment(ns.protocols.NodeProtocol):
     - calling behavior handlers
     """
 
+    GARBAGE_COLLECTION_PERIOD = .2  # ms
+
     def __init__(self, node, name=None):
         if name is None:
             name = "ModuleEnvironment for {}".format(node.name)
         super().__init__(node=node, name=name)
+        self.next_garbage_collection = ns.sim_time() + self.GARBAGE_COLLECTION_PERIOD*1e6
 
     def _get_wait_ev_expr(self):
         ev_expr = self.await_port_input(self.node.ports["messages"])
@@ -303,13 +330,16 @@ class ModuleEnvironment(ns.protocols.NodeProtocol):
     def run(self):
         while True:
             # wait for a message on any input port (tokens or messages)
-            ev_expr = yield self._get_wait_ev_expr()
-            port_names = self._get_triggered_ports(ev_expr)
-            for port_name in port_names:
-                if port_name == "messages":
-                    self._handle_message()
-                else:
-                    self._handle_new_token(port_name)
+            ev_expr = yield self._get_wait_ev_expr() | self.await_timer(end_time=self.next_garbage_collection)
+            if ev_expr.first_term.value:
+                port_names = self._get_triggered_ports(ev_expr.first_term)
+                for port_name in port_names:
+                    if port_name == "messages":
+                        self._handle_message()
+                    else:
+                        self._handle_new_token(port_name)
+            else:
+                self._handle_collect_garbage()
 
     def _handle_message(self):
         while len(self.node.ports["messages"].input_queue) > 0:
@@ -329,3 +359,8 @@ class ModuleEnvironment(ns.protocols.NodeProtocol):
             token = msg.token
             req = ModuleBehavior.req_handle_new_token(token=token)
             self.node.behavior.put(req)
+
+    def _handle_collect_garbage(self):
+        req = ModuleBehavior.req_handle_collect_garbage()
+        self.node.behavior.put(req)
+        self.next_garbage_collection = ns.sim_time() + self.GARBAGE_COLLECTION_PERIOD*1e6

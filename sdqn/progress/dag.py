@@ -119,8 +119,8 @@ class DAG:
         Terminate all modules.
         """
         for node in self._nodes.values():
-            node.behavior.terminate()
             node.stop()
+            node.behavior.terminate()
 
     def remove(self):
         r"""

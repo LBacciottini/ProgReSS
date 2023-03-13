@@ -6,6 +6,9 @@ from sdqn.progress.p_module import ProcessingModuleBehavior, SchedulingModuleBeh
 from sdqn.sockets import Token
 import sdqn.sdqn_logging as log
 
+__all__ = ["WaitForSwappingModuleBehavior", "EntanglementSwappingModuleBehavior", "FreeEverythingModuleBehavior",
+           "RoundRobinSchedulingModuleBehavior", "ShortCircuitModuleBehavior", "DEJMPSModuleBehavior"]
+
 
 class EntanglementSwappingModuleBehavior(ProcessingModuleBehavior):
     r"""
@@ -155,15 +158,11 @@ class WaitForSwappingModuleBehavior(SchedulingModuleBehavior):
         super().__init__(name=name, node=node, qnic=qnic)
         self.output_map = output_map
         self.collect_stats = collect_stats
+        self.pending_requests = []
         if collect_stats:
             self.add_signal(self.NEW_TOKEN_SIGNAL, self.NEW_TOKEN_EVT_TYPE)
 
-    def handle_message(self, request):
-        # the message is the outcome of the entanglement swapping protocol
-        # we assert that the message is a swapping outcome
-
-        assert request.message.meta["header"] == "swapping_outcome"
-
+    def _process_request(self, request):
         # get the two ends that were swapped
         end_a = request.message.items[0]
         end_b = request.message.items[1]
@@ -174,7 +173,11 @@ class WaitForSwappingModuleBehavior(SchedulingModuleBehavior):
         # check which end is the remote end
         remote_end = end_a if end_a.node != self.node.device_id else end_b
         # get the token for the local end
-        token = self.node.token_table.get_token(local_end)
+        token = self.node.token_table.get_token(local_end, raise_error=False)
+
+        if token is None:
+            return False
+
         # update the token information
         new_token = Token(socket=local_end, other_end=remote_end, pct=new_pct, purified=0, current_state=new_state,
                           additional_info=token.additional_info)
@@ -184,6 +187,18 @@ class WaitForSwappingModuleBehavior(SchedulingModuleBehavior):
         else:
             self.promote_token(new_token, output_port=self.output_map[remote_end.node])
 
+        return True
+
+    def handle_message(self, request):
+        # the message is the outcome of the entanglement swapping protocol
+        # we assert that the message is a swapping outcome
+
+        assert request.message.meta["header"] == "swapping_outcome"
+
+        result = self._process_request(request)
+        if not result:
+            self.pending_requests.append(request)
+
     def handle_new_token(self, request):
         # simply store the token in the token table
         if self.collect_stats:
@@ -191,6 +206,16 @@ class WaitForSwappingModuleBehavior(SchedulingModuleBehavior):
             self.send_signal(self.NEW_TOKEN_SIGNAL, sig_result)
 
         self.node.token_table.add_token(request.token)
+
+        # check if there are pending requests for this token
+        for pending_request in self.pending_requests:
+            end_a = pending_request.message.items[0]
+            end_b = pending_request.message.items[1]
+            local_end = end_a if end_a.node == self.node.device_id else end_b
+            if local_end == request.token.socket:
+                result = self._process_request(pending_request)
+                if result:
+                    self.pending_requests.remove(pending_request)
 
     def handle_response(self, request):
         raise NotImplementedError("This module does not receive responses")
@@ -263,6 +288,12 @@ class DEJMPSModuleBehavior(ProcessingModuleBehavior):
         other_end_b = request.request.token2.other_end
         local_end_a = request.request.token1.socket
 
+        """
+        # DEBUG
+        log.info(f"DEJMPS outcome for tokens {request.request.token1} and {request.request.token2} is {outcome}",
+                 repeater_id=self.node.device_id)
+        """
+
         if self.is_solicitor:
             # if the module is the solicitor, it must send the outcome to the destination module
             message = ns.components.Message(items=[other_end_a, other_end_b, outcome], header="dejmps_solicitation")
@@ -278,6 +309,11 @@ class DEJMPSModuleBehavior(ProcessingModuleBehavior):
 
             success = (outcome == stored_outcome)
 
+            """
+            # DEBUG
+            log.info(f"DEJMPS {success} outcome for tokens {request.request.token1} and {request.request.token2}",
+                        repeater_id=self.node.device_id)
+            """
             message = ns.components.Message(items=[other_end_a, success], header="dejmps_outcome")
             self.send_message(message=message, dest_device=self.dest_device, dest_module_id=self.dest_module_id)
             # log.info(f"Sending DEJMPS outcome {message} for {other_end_a} to {self.dest_device} {self.dest_module_id}", repeater_id=self.node.device_id)
@@ -286,6 +322,11 @@ class DEJMPSModuleBehavior(ProcessingModuleBehavior):
                 # in case of success we promote the distilled token
                 token = self.node.token_table.get_token(local_end=local_end_a)
                 self.promote_token(token)
+
+            else:
+                # in case of failure we must free the token
+                token = self.node.token_table.pop_token(local_end=local_end_a)
+                self.free_token(token)
 
     def handle_message(self, request):
 
@@ -308,8 +349,18 @@ class DEJMPSModuleBehavior(ProcessingModuleBehavior):
             # the non-solicitor can only receive "dejmps_solicitation" messages
             if request.message.meta["header"] == "dejmps_solicitation":
                 # retrieve the token to be distilled
-                token_a = self.node.token_table.get_token(local_end=request.message.items[0])
-                token_b = self.node.token_table.get_token(local_end=request.message.items[1])
+                token_a = self.node.token_table.get_token(local_end=request.message.items[0], raise_error=False)
+                token_b = self.node.token_table.get_token(local_end=request.message.items[1], raise_error=False)
+
+                if token_a is None or token_b is None:
+                    # if the tokens are not in the token table, there might have been an incostistency due to the
+                    # fact that the controller did not reprogram all devices at the same time. In this case, we
+                    # simply ignore the message and free the tokens
+                    if token_a is not None:
+                        self.free_token(token_a)
+                    if token_b is not None:
+                        self.free_token(token_b)
+                    return
 
                 # log.info(f"Received distillation solicit for tokens {token_a} and {token_b}", repeater_id=self.node.device_id)
 
@@ -401,7 +452,15 @@ class FreeEverythingModuleBehavior(ProcessingModuleBehavior):
     def handle_new_token(self, request):
         # log.info("Freeing token {}".format(request.token), repeater_id=self.node.device_id)
         if self.collect_stats:
-            sig_result = (ns.sim_time(), request.token.other_end.node, request.token.socket.created_at, request.token)
+
+            # peek at the qubits inside the quantum memory (simulation cheat)
+            qhardware = self.node.supercomponent.supercomponent.qhardware
+            position = qhardware.map_info_to_qubit(request.token.socket.qnic, request.token.socket.idx)
+            qubits = qhardware.qmemory.peek(position)[0].qstate.qubits
+            fid_sq = self._compute_fidelity(qubits, request.token.current_state)
+            slot_id = self.node.supercomponent.supercomponent.current_topology_id
+
+            sig_result = (ns.sim_time(), request.token, fid_sq, slot_id)
             self.send_signal(self.FREED_TOKEN_SIGNAL, sig_result)
         self.free_token(request.token)
 
@@ -410,6 +469,42 @@ class FreeEverythingModuleBehavior(ProcessingModuleBehavior):
 
     def handle_message(self, request):
         raise NotImplementedError("This module does not receive messages")
+
+    def _compute_fidelity(self, qubits, bell_state):
+        """
+        Compute the fidelity of the given qubits with the given bell state index reference.
+        """
+        if len(qubits) == 2:
+            if bell_state == 0:
+                fid_sq = ns.qubits.fidelity(
+                    qubits,
+                    reference_state=ns.qubits.ketstates.b00,
+                    squared=True)
+            elif bell_state == 1:
+                fid_sq = ns.qubits.fidelity(
+                    qubits,
+                    reference_state=ns.qubits.ketstates.b01,
+                    squared=True)
+            elif bell_state == 2:
+                fid_sq = ns.qubits.fidelity(
+                    qubits,
+                    reference_state=ns.qubits.ketstates.b10,
+                    squared=True)
+            elif bell_state == 3:
+                fid_sq = ns.qubits.fidelity(
+                    qubits,
+                    reference_state=ns.qubits.ketstates.b11,
+                    squared=True)
+            else:
+                log.error('Unknown bell state {} delivered'.format(bell_state),
+                          repeater_id=self.end_nodes[0])
+                fid_sq = -1
+        else:
+            fid_sq = 0.
+
+        # print("qubits state:", qubits[0].qstate.qrepr, "bell state:", bell_state, "fid:", fid_sq)
+
+        return fid_sq
 
 
 class ShortCircuitModuleBehavior(SchedulingModuleBehavior):
