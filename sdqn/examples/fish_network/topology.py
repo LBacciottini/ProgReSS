@@ -4,14 +4,14 @@ import netsquid as ns
 
 from sdqn.examples.fish_network.controller import DummyController
 from sdqn.examples.fish_network.metrics_collector import TokenUtilizationMetricsCollector, FidelityMetricsCollector, \
-    CumulativeMetricsCollector
+    AggregateMetricsCollector
 from sdqn.hardware.llps.mps import optimistic_parameters_v3, MPSProtocol
 from sdqn.hardware.mps_connection import MPSConnection
 
 from sdqn.device import QNetworkDevice
 
 
-def get_topology(avg_scenario_period=0.5, controller_dist=15, out_of_band=False):
+def get_topology(avg_scenario_period=0.5, controller_dist=15, out_of_band=False, generate_collectors=True):
     r"""
     Get the topology of the network.
     """
@@ -200,9 +200,12 @@ def get_topology(avg_scenario_period=0.5, controller_dist=15, out_of_band=False)
 
     controller.start()
 
-    data_collector = TokenUtilizationMetricsCollector()
-    fid_collector = FidelityMetricsCollector(node_a=6, node_b=0)
-    agg_collector = CumulativeMetricsCollector(node_a=6, node_b=0)
+    if generate_collectors:
+        data_collector = TokenUtilizationMetricsCollector()
+        fid_collector = FidelityMetricsCollector(node_a=6, node_b=0)
+        agg_collector = AggregateMetricsCollector(node_a=6, node_b=0)
 
-    return network, data_collector, fid_collector, agg_collector
+        return network, data_collector, fid_collector, agg_collector
 
+    else:
+        return network

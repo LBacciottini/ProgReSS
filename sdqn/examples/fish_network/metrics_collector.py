@@ -135,7 +135,7 @@ class FidelityMetricsCollector:
         # plot the throughput on the same plot as the fidelity, on the same x-axis but on a different y-axis
         ax2 = ax.twinx()
         throughput.plot(x='time', y='throughput', kind='line', color='red', ax=ax2)
-        ax2.set_ylabel('Throughput (tokens/s)')
+        ax2.set_ylabel('Throughput [tokens/s]')
         ax2.set_ylim(0, 1.5*throughput['throughput'].max())
         # set the color of the y-axis labels to red
         for tl in ax2.get_yticklabels():
@@ -143,16 +143,26 @@ class FidelityMetricsCollector:
         # set the color of the y-axis label to red
         ax2.yaxis.label.set_color('r')
 
-        ax.set_xlabel('Time (s)')
+        ax.set_xlabel('Time [ns]')
         ax.set_ylabel('Fidelity (squared)')
         ax.set_title('Fidelity and throughput of end nodes A-C entanglement')
         ax.grid(True)
         ax.legend().remove()
 
-        ax.figure.show()
+        # increase the font size of the title
+        ax.title.set_fontsize(20)
+
+        # increase the font size of the x-axis and y-axis labels
+        ax.xaxis.label.set_fontsize(16)
+        ax.yaxis.label.set_fontsize(16)
+        ax2.yaxis.label.set_fontsize(16)
+
+        # ax.figure.show()
+        # save the plot as pdf file to out directory
+        ax.figure.savefig('out/simulation_trace.pdf')
 
 
-class CumulativeMetricsCollector:
+class AggregateMetricsCollector:
     """
     This class is responsible for collecting aggregate metrics about end-to-end sockets.
     It collects metrics about tokens between two specified end nodes.
@@ -224,14 +234,29 @@ class CumulativeMetricsCollector:
         print(response_times_23)
         
         # plot fidelities and response times as boxplots
-        fig, ax = plt.subplots(1, 2, figsize=(13, 5))
-        ax[0].boxplot([fidelities_01, fidelities_23], labels=['High Fidelity scenarios', 'Low Fidelity scenarios'],
+        fig, ax = plt.subplots(1, 2, figsize=(8, 5))
+        ax[0].boxplot([fidelities_01, fidelities_23], labels=['High Fidelity', 'Low Fidelity'],
                       sym="", whis=[5, 95])
         ax[0].set_title('Fidelity of A-C entangled states')
-        ax[0].set_ylabel('Fidelity')
-        ax[1].boxplot([response_times_01, response_times_23], labels=['High Fidelity scenarios', 'Low Fidelity scenarios'],
+        ax[0].set_ylabel('Fidelity (squared)')
+        ax[1].boxplot([response_times_01, response_times_23], labels=['High Fidelity', 'Low Fidelity'],
                       sym="", whis=[5, 95])
-        ax[1].set_title('Response time for A-C entanglement')
-        ax[1].set_ylabel('Response time [ns]')
-        plt.show()
+        ax[1].set_title('Latency for A-C entanglement')
+        ax[1].set_ylabel('Latency [ns]')
+
+        ax[0].title.set_fontsize(17)
+        ax[0].xaxis.label.set_fontsize(14)
+        ax[0].yaxis.label.set_fontsize(14)
+
+        ax[1].title.set_fontsize(17)
+        ax[1].xaxis.label.set_fontsize(14)
+        ax[1].yaxis.label.set_fontsize(14)
+
+        # resize the two box plots to fit the figure size
+        fig.tight_layout()
+
+        # save the plot as pdf in the out directory
+        fig.savefig('out/boxplot.pdf', bbox_inches='tight')
+
+
 

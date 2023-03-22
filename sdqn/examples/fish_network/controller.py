@@ -538,7 +538,8 @@ class DummyControllerProtocol(ns.protocols.NodeProtocol):
         while True:
 
             # extract a random scenario between 0 and 3
-            self.scenario = random.randint(0, 3)
+            rng = ns.get_random_state()
+            self.scenario = rng.randint(0, 4)
             # self.scenario = 0
             log.info("Scenario: " + str(self.scenario) + f" started. it will last until {ns.sim_time() + self.avg_scenario_period * 1e9} ns")
 
