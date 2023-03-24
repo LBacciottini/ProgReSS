@@ -468,7 +468,7 @@ class FreeEverythingModuleBehavior(ProcessingModuleBehavior):
         raise NotImplementedError("This module does not receive responses")
 
     def handle_message(self, request):
-        raise NotImplementedError("This module does not receive messages")
+        raise NotImplementedError(f"[Device {self.node.device_id}] This module ({self.node.module_id}) does not receive messages")
 
     def _compute_fidelity(self, qubits, bell_state):
         """

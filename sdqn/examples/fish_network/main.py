@@ -9,11 +9,11 @@ from bulk_executor import TDRCollector
 # the main function
 if __name__ == '__main__':
     in_band_controller_dists = [15, 40]
-    out_of_band_controller_dists = [5, 15]
+    out_of_band_controller_dists = []
     avg_periods = [0.0004, 0.0008, 0.0016, 0.0032, 0.0064, 0.0128]
     seeds = [53, 54, 55, 56, 57, 58, 59, 60, 61, 62]
     results = {15: [], 40: [], 100: []}
-    repetitions = 35
+    repetitions = 7
     """
     for cd in controller_dists:
         ns.set_qstate_formalism(ns.QFormalism.DM)
@@ -40,5 +40,21 @@ if __name__ == '__main__':
                             out_of_band_ctrl_dists=out_of_band_controller_dists,
                             state_periods=avg_periods,
                             repetitions=repetitions)
-    executor.run()
+    # executor.run()
     executor.collect()
+
+    ns.set_qstate_formalism(ns.QFormalism.DM)
+    log.log_to_console(level=logging.INFO)
+    tdr_s = []
+    ns.sim_reset()
+    ns.set_random_state(seed=seeds[0])
+    avg_period = 0.0032
+    cd = 15
+    network, data_collector, fid_collector, agg_collector = get_topology(avg_scenario_period=avg_period,
+                                                                         controller_dist=cd,
+                                                                         out_of_band=False)
+    stats = ns.sim_run(end_time=4096000000)
+    partial, total = data_collector.get_counts()
+    print(f"Controller distance: {cd}, avg period: {avg_period}, TDR: {partial/total}")
+    fid_collector.plot_fidelity()
+    agg_collector.plot_boxes()

@@ -173,7 +173,7 @@ def get_topology(avg_scenario_period=0.5, controller_dist=15, out_of_band=False,
         llp.start()
 
     # add the controller
-    controller = DummyController(avg_scenario_period=avg_scenario_period)
+    controller = DummyController(avg_scenario_period=avg_scenario_period, network=network)
     network.add_node(controller)
 
     # connect the controller to all nodes of the network

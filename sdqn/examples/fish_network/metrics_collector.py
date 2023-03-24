@@ -106,7 +106,8 @@ class FidelityMetricsCollector:
         # changing the backgorund color of the area for the x-axis interval of the scenario
         ax = fidelities.plot(x='time', y='fid_sq', kind='scatter', color='blue', figsize=(10, 5))
         prev_row = None
-        color_map = {0: 'red', 1: 'green', 2: 'blue', 3: 'yellow'}
+        # color_map = {0: 'red', 1: 'green', 2: 'blue', 3: 'yellow'}
+        color_map = {0: 'white', 1: 'white', 2: 'white', 3: 'white', 4: 'cyan'}
         for index, row in scenarios.iterrows():
             if prev_row is not None:
                 ax.axvspan(prev_row['time'], row['time'], facecolor=color_map[prev_row['scenario']], alpha=0.3)
@@ -117,8 +118,8 @@ class FidelityMetricsCollector:
         # create a new dataframe where each entry has a field 'time' and a field 'throughput', where throughput is
         # the number of tokens that were freed in the time interval between 'time' - window_size and 'time' divided
         # by the window size
-        window_size = 10000000
-        step_size = 10000
+        window_size = 3000000
+        step_size = 100000
         throughput = pd.DataFrame(columns=['time', 'throughput'])
         next_time = fidelities['time'].min() + window_size
         max_time = fidelities['time'].max()
