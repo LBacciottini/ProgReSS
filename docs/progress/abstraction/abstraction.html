@@ -5,17 +5,17 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>progress.abstraction &mdash; ProgReSS 1.0.0 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../static/graphviz.css" type="text/css" />
   <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+    <script src="../../static/js/html5shiv.min.js"></script>
+    <![endif]-->
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
-    <script src="../../_static/js/theme.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../static/documentation_options.js"></script>
+        <script src="../../static/doctools.js"></script>
+        <script src="../../static/sphinx_highlight.js"></script>
+    <script src="../../static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="progress.abstraction.qhal" href="qhal.html" />
@@ -77,7 +77,7 @@
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">progress.abstraction</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../_sources/progress/abstraction/abstraction.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../sources/progress/abstraction/abstraction.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -91,7 +91,7 @@
 which is the level that standardizes the interface between the quantum hardware and the NET level.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="progress.abstraction.__init__.QHAL">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.abstraction.__init__.</span></span><span class="sig-name descname"><span class="pre">QHAL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qhardware</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/abstraction/qhal.html#QHAL"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.__init__.QHAL" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.abstraction.__init__.</span></span><span class="sig-name descname"><span class="pre">QHAL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qhardware</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/abstraction/qhal.html#QHAL"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.__init__.QHAL" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></p>
 <p>The Quantum Hardware Abstraction Layer of an SDQN device.</p>
 <dl class="field-list">
@@ -145,7 +145,7 @@ size.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.abstraction.__init__.QHAL.resume_entanglement">
-<span class="sig-name descname"><span class="pre">resume_entanglement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qnic</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/abstraction/qhal.html#QHAL.resume_entanglement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.__init__.QHAL.resume_entanglement" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">resume_entanglement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qnic</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/abstraction/qhal.html#QHAL.resume_entanglement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.__init__.QHAL.resume_entanglement" title="Permalink to this definition"></a></dt>
 <dd><p>Resume the generation of entanglement in the given qnic.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -159,7 +159,7 @@ size.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.abstraction.__init__.QHAL.stop_entanglement">
-<span class="sig-name descname"><span class="pre">stop_entanglement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qnic</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/abstraction/qhal.html#QHAL.stop_entanglement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.__init__.QHAL.stop_entanglement" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">stop_entanglement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qnic</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/abstraction/qhal.html#QHAL.stop_entanglement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.__init__.QHAL.stop_entanglement" title="Permalink to this definition"></a></dt>
 <dd><p>Stop the generation of entanglement in the given qnic.
 Parameters
 ———-

@@ -5,17 +5,17 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>progress.hardware.ep_source &mdash; ProgReSS 1.0.0 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../static/graphviz.css" type="text/css" />
   <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+    <script src="../../static/js/html5shiv.min.js"></script>
+    <![endif]-->
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
-    <script src="../../_static/js/theme.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../static/documentation_options.js"></script>
+        <script src="../../static/doctools.js"></script>
+        <script src="../../static/sphinx_highlight.js"></script>
+    <script src="../../static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="progress.hardware.mps_connection" href="mps_connection.html" />
@@ -86,7 +86,7 @@
           <li class="breadcrumb-item"><a href="hardware.html">progress.hardware</a></li>
       <li class="breadcrumb-item active">progress.hardware.ep_source</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../_sources/progress/hardware/ep_source.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../sources/progress/hardware/ep_source.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -100,7 +100,7 @@
 process of Midpoint Source Protocol.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="progress.hardware.ep_source.MPSSourceNode">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.hardware.ep_source.</span></span><span class="sig-name descname"><span class="pre">MPSSourceNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_positions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_mid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_clock</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/hardware/ep_source.html#MPSSourceNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.ep_source.MPSSourceNode" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.hardware.ep_source.</span></span><span class="sig-name descname"><span class="pre">MPSSourceNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_right</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_positions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_mid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_clock</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/hardware/ep_source.html#MPSSourceNode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.ep_source.MPSSourceNode" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></p>
 <p>This node simulates the whole Midpoint source (MPS) protocols stochastic generation of entanglement.
 It keeps into account all the loss probabilities and only generates a pair when MPS would succeed
@@ -133,7 +133,7 @@ Defaults to 1.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.hardware.ep_source.MPSSourceNode.reset">
-<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">and_restart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/hardware/ep_source.html#MPSSourceNode.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.ep_source.MPSSourceNode.reset" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">and_restart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/hardware/ep_source.html#MPSSourceNode.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.ep_source.MPSSourceNode.reset" title="Permalink to this definition"></a></dt>
 <dd><p>Reset the status of the inner source. Should be called while the inner source is OFF.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -147,7 +147,7 @@ Defaults to 1.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.hardware.ep_source.MPSSourceNode.start">
-<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/hardware/ep_source.html#MPSSourceNode.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.ep_source.MPSSourceNode.start" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/hardware/ep_source.html#MPSSourceNode.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.ep_source.MPSSourceNode.start" title="Permalink to this definition"></a></dt>
 <dd><p>Set the status of the inner source to INTERNAL so that it starts producing entanglement.</p>
 </dd></dl>
 
@@ -167,7 +167,7 @@ Defaults to 1.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.hardware.ep_source.MPSSourceNode.stop">
-<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/hardware/ep_source.html#MPSSourceNode.stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.ep_source.MPSSourceNode.stop" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/hardware/ep_source.html#MPSSourceNode.stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.ep_source.MPSSourceNode.stop" title="Permalink to this definition"></a></dt>
 <dd><p>Set the status of the inner source to OFF so that it stops producing entanglement.</p>
 </dd></dl>
 

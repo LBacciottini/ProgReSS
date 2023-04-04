@@ -5,18 +5,18 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>progress.sockets &mdash; ProgReSS 1.0.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../static/graphviz.css" type="text/css" />
   <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+    <script src="../static/js/html5shiv.min.js"></script>
+    <![endif]-->
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../static/documentation_options.js"></script>
+        <script src="../static/doctools.js"></script>
+        <script src="../static/sphinx_highlight.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script src="../_static/js/theme.js"></script>
+    <script src="../static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="prev" title="progress.pqnet.repository" href="pqnet/repository.html" /> 
@@ -91,7 +91,7 @@
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">progress.sockets</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/progress/sockets.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../sources/progress/sockets.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -106,7 +106,7 @@ that are used to represent qubits. Tokens are the external abstraction of qubits
 A token is created when Link Layer protocols signal the generation of a new entangled pair.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="progress.sockets.Socket">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.sockets.</span></span><span class="sig-name descname"><span class="pre">Socket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qnic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/progress/sockets.html#Socket"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.Socket" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.sockets.</span></span><span class="sig-name descname"><span class="pre">Socket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qnic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../modules/progress/sockets.html#Socket"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.Socket" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A socket is an internal logical abstraction for an entangled qubit. The name derives from the fact that
 the qubit is entangled with (at least) another qubit, and thus it represents one end of the entangling connection.</p>
@@ -189,7 +189,7 @@ resources in a hardware-independent fashion.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="progress.sockets.TokenMessage">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.sockets.</span></span><span class="sig-name descname"><span class="pre">TokenMessage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/progress/sockets.html#TokenMessage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.TokenMessage" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.sockets.</span></span><span class="sig-name descname"><span class="pre">TokenMessage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../modules/progress/sockets.html#TokenMessage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.TokenMessage" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Message</span></code></p>
 <p>A message containing a token. Used to transfer tokens from a module to another.</p>
 <dl class="field-list">
@@ -204,13 +204,13 @@ resources in a hardware-independent fashion.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="progress.sockets.TokenTable">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.sockets.</span></span><span class="sig-name descname"><span class="pre">TokenTable</span></span><a class="reference internal" href="../_modules/progress/sockets.html#TokenTable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.TokenTable" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.sockets.</span></span><span class="sig-name descname"><span class="pre">TokenTable</span></span><a class="reference internal" href="../modules/progress/sockets.html#TokenTable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.TokenTable" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>A table that stores tokens.
 This is used to keep track of the tokens that are currently owned by a specific module.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.sockets.TokenTable.add_token">
-<span class="sig-name descname"><span class="pre">add_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/progress/sockets.html#TokenTable.add_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.TokenTable.add_token" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">add_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../modules/progress/sockets.html#TokenTable.add_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.TokenTable.add_token" title="Permalink to this definition"></a></dt>
 <dd><p>Add a socket descriptor to the socket table.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -224,7 +224,7 @@ This is used to keep track of the tokens that are currently owned by a specific 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.sockets.TokenTable.collect_garbage">
-<span class="sig-name descname"><span class="pre">collect_garbage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_time</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/progress/sockets.html#TokenTable.collect_garbage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.TokenTable.collect_garbage" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">collect_garbage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">current_time</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../modules/progress/sockets.html#TokenTable.collect_garbage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.TokenTable.collect_garbage" title="Permalink to this definition"></a></dt>
 <dd><p>Remove all expired tokens from the token table.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -244,7 +244,7 @@ This is used to keep track of the tokens that are currently owned by a specific 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.sockets.TokenTable.get_snapshot">
-<span class="sig-name descname"><span class="pre">get_snapshot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/progress/sockets.html#TokenTable.get_snapshot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.TokenTable.get_snapshot" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_snapshot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../modules/progress/sockets.html#TokenTable.get_snapshot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.TokenTable.get_snapshot" title="Permalink to this definition"></a></dt>
 <dd><p>Get a snapshot of the socket table.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -258,7 +258,7 @@ This is used to keep track of the tokens that are currently owned by a specific 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.sockets.TokenTable.get_target_token">
-<span class="sig-name descname"><span class="pre">get_target_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other_end_node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_info_filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LRTF'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/progress/sockets.html#TokenTable.get_target_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.TokenTable.get_target_token" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_target_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other_end_node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">additional_info_filters</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'LRTF'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../modules/progress/sockets.html#TokenTable.get_target_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.TokenTable.get_target_token" title="Permalink to this definition"></a></dt>
 <dd><p>Get a token having a specific other end node.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -284,7 +284,7 @@ Currently only “LRTF” (Longest Remaining Time First) is supported.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.sockets.TokenTable.get_token">
-<span class="sig-name descname"><span class="pre">get_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/progress/sockets.html#TokenTable.get_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.TokenTable.get_token" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../modules/progress/sockets.html#TokenTable.get_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.TokenTable.get_token" title="Permalink to this definition"></a></dt>
 <dd><p>Get a token from the table identified by the local_end. Does not remove it from the table.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -306,7 +306,7 @@ Currently only “LRTF” (Longest Remaining Time First) is supported.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.sockets.TokenTable.pop_token">
-<span class="sig-name descname"><span class="pre">pop_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/progress/sockets.html#TokenTable.pop_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.TokenTable.pop_token" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">pop_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../modules/progress/sockets.html#TokenTable.pop_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.TokenTable.pop_token" title="Permalink to this definition"></a></dt>
 <dd><p>Pop a token from the table identified by the local_end.
 If the token is not found, a ValueError is raised.</p>
 <dl class="field-list">
@@ -329,7 +329,7 @@ If the token is not found, a ValueError is raised.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.sockets.TokenTable.replace_token">
-<span class="sig-name descname"><span class="pre">replace_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/progress/sockets.html#TokenTable.replace_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.TokenTable.replace_token" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">replace_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../modules/progress/sockets.html#TokenTable.replace_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.TokenTable.replace_token" title="Permalink to this definition"></a></dt>
 <dd><p>Replace a token in the table identified by its local end.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

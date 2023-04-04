@@ -5,17 +5,17 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>progress.pqnet.messages &mdash; ProgReSS 1.0.0 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../static/graphviz.css" type="text/css" />
   <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+    <script src="../../static/js/html5shiv.min.js"></script>
+    <![endif]-->
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
-    <script src="../../_static/js/theme.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../static/documentation_options.js"></script>
+        <script src="../../static/doctools.js"></script>
+        <script src="../../static/sphinx_highlight.js"></script>
+    <script src="../../static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="progress.pqnet.net_manager" href="net_manager.html" />
@@ -93,7 +93,7 @@
           <li class="breadcrumb-item"><a href="pqnet.html">progress.pqnet</a></li>
       <li class="breadcrumb-item active">progress.pqnet.messages</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../_sources/progress/pqnet/messages.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../sources/progress/pqnet/messages.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -107,7 +107,7 @@
 controller-device communication.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="progress.pqnet.messages.InterModuleMessage">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.pqnet.messages.</span></span><span class="sig-name descname"><span class="pre">InterModuleMessage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender_device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sender_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topology_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/messages.html#InterModuleMessage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.messages.InterModuleMessage" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.pqnet.messages.</span></span><span class="sig-name descname"><span class="pre">InterModuleMessage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender_device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sender_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topology_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/pqnet/messages.html#InterModuleMessage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.messages.InterModuleMessage" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Message</span></code></p>
 <p>A message that is used to communicate between modules.</p>
 <dl class="py property">
@@ -194,7 +194,7 @@ up to date with the current topology (they must receive a new DAG).</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="progress.pqnet.messages.ReplaceDAGMessage">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.pqnet.messages.</span></span><span class="sig-name descname"><span class="pre">ReplaceDAGMessage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">destination_device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dag_factory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topology_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/messages.html#ReplaceDAGMessage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.messages.ReplaceDAGMessage" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.pqnet.messages.</span></span><span class="sig-name descname"><span class="pre">ReplaceDAGMessage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">destination_device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dag_factory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topology_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/pqnet/messages.html#ReplaceDAGMessage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.messages.ReplaceDAGMessage" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Message</span></code></p>
 <p>A message used by the controller to update the DAG of a device</p>
 <dl class="py property">

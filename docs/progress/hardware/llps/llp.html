@@ -5,17 +5,17 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>progress.hardware.llps.llp &mdash; ProgReSS 1.0.0 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../static/graphviz.css" type="text/css" />
   <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+    <script src="../../../static/js/html5shiv.min.js"></script>
+    <![endif]-->
   
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/sphinx_highlight.js"></script>
-    <script src="../../../_static/js/theme.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../static/documentation_options.js"></script>
+        <script src="../../../static/doctools.js"></script>
+        <script src="../../../static/sphinx_highlight.js"></script>
+    <script src="../../../static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="progress.hardware.llps.mps" href="mps.html" />
@@ -87,7 +87,7 @@
           <li class="breadcrumb-item"><a href="llps.html">progress.hardware</a></li>
       <li class="breadcrumb-item active">progress.hardware.llps.llp</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../../_sources/progress/hardware/llps/llp.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../../sources/progress/hardware/llps/llp.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -102,7 +102,7 @@ core services that a link layer protocol must provide to the <code class="xref p
 and to the upper layers in general.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="progress.hardware.llps.llp.LinkProtocol">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.hardware.llps.llp.</span></span><span class="sig-name descname"><span class="pre">LinkProtocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_positions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qnic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other_node_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/progress/hardware/llps/llp.html#LinkProtocol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.llps.llp.LinkProtocol" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.hardware.llps.llp.</span></span><span class="sig-name descname"><span class="pre">LinkProtocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_positions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qnic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">other_node_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../modules/progress/hardware/llps/llp.html#LinkProtocol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.llps.llp.LinkProtocol" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceProtocol</span></code></p>
 <p>This class is an abstract class for a generic link protocol in our architecture. The class sums up the core
 services that a link layer protocol must provide to the QHAL and to pqnet in general.
@@ -152,7 +152,7 @@ it has no effect</p>
 </ol>
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.hardware.llps.llp.LinkProtocol.deliver_new_socket">
-<span class="sig-name descname"><span class="pre">deliver_new_socket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/progress/hardware/llps/llp.html#LinkProtocol.deliver_new_socket"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.llps.llp.LinkProtocol.deliver_new_socket" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">deliver_new_socket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../modules/progress/hardware/llps/llp.html#LinkProtocol.deliver_new_socket"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.llps.llp.LinkProtocol.deliver_new_socket" title="Permalink to this definition"></a></dt>
 <dd><p>This method must be called by implementations of this abstract class when a new entangled pair is generated.
 It signals the new entanglement generation</p>
 <dl class="field-list simple">
@@ -167,7 +167,7 @@ It signals the new entanglement generation</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.hardware.llps.llp.LinkProtocol.free">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">free</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/progress/hardware/llps/llp.html#LinkProtocol.free"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.llps.llp.LinkProtocol.free" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">free</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../modules/progress/hardware/llps/llp.html#LinkProtocol.free"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.llps.llp.LinkProtocol.free" title="Permalink to this definition"></a></dt>
 <dd><p>This method is called when upper layers want to free a qubit for a new entanglement.</p>
 </dd></dl>
 

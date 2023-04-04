@@ -5,18 +5,18 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>progress.abstraction.qhal &mdash; ProgReSS 1.0.0 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../static/graphviz.css" type="text/css" />
   <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+    <script src="../../static/js/html5shiv.min.js"></script>
+    <![endif]-->
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../static/documentation_options.js"></script>
+        <script src="../../static/doctools.js"></script>
+        <script src="../../static/sphinx_highlight.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script src="../../_static/js/theme.js"></script>
+    <script src="../../static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="progress.device" href="../device.html" />
@@ -99,7 +99,7 @@
           <li class="breadcrumb-item"><a href="abstraction.html">progress.abstraction</a></li>
       <li class="breadcrumb-item active">progress.abstraction.qhal</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../_sources/progress/abstraction/qhal.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../sources/progress/abstraction/qhal.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -112,11 +112,11 @@
 <p>This module contains the Quantum Hardware Abstraction Layer implementation.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="progress.abstraction.qhal.EntanglementHandlerProtocol">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.abstraction.qhal.</span></span><span class="sig-name descname"><span class="pre">EntanglementHandlerProtocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/abstraction/qhal.html#EntanglementHandlerProtocol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.EntanglementHandlerProtocol" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.abstraction.qhal.</span></span><span class="sig-name descname"><span class="pre">EntanglementHandlerProtocol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/abstraction/qhal.html#EntanglementHandlerProtocol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.EntanglementHandlerProtocol" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">NodeProtocol</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.abstraction.qhal.EntanglementHandlerProtocol.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/abstraction/qhal.html#EntanglementHandlerProtocol.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.EntanglementHandlerProtocol.run" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/abstraction/qhal.html#EntanglementHandlerProtocol.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.EntanglementHandlerProtocol.run" title="Permalink to this definition"></a></dt>
 <dd><p>Generator or function that runs the protocol.</p>
 <p>Starting the protocol will execute this function.
 If a generator it will run it up to the first yield.
@@ -142,7 +142,7 @@ the generator will be set as the value of
 
 <dl class="py class">
 <dt class="sig sig-object py" id="progress.abstraction.qhal.QHAL">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.abstraction.qhal.</span></span><span class="sig-name descname"><span class="pre">QHAL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qhardware</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/abstraction/qhal.html#QHAL"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.QHAL" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.abstraction.qhal.</span></span><span class="sig-name descname"><span class="pre">QHAL</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qhardware</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/abstraction/qhal.html#QHAL"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.QHAL" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></p>
 <p>The Quantum Hardware Abstraction Layer of an SDQN device.</p>
 <dl class="field-list">
@@ -196,7 +196,7 @@ size.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.abstraction.qhal.QHAL.resume_entanglement">
-<span class="sig-name descname"><span class="pre">resume_entanglement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qnic</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/abstraction/qhal.html#QHAL.resume_entanglement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.QHAL.resume_entanglement" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">resume_entanglement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qnic</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/abstraction/qhal.html#QHAL.resume_entanglement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.QHAL.resume_entanglement" title="Permalink to this definition"></a></dt>
 <dd><p>Resume the generation of entanglement in the given qnic.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -210,7 +210,7 @@ size.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.abstraction.qhal.QHAL.stop_entanglement">
-<span class="sig-name descname"><span class="pre">stop_entanglement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qnic</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/abstraction/qhal.html#QHAL.stop_entanglement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.QHAL.stop_entanglement" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">stop_entanglement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qnic</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/abstraction/qhal.html#QHAL.stop_entanglement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.QHAL.stop_entanglement" title="Permalink to this definition"></a></dt>
 <dd><p>Stop the generation of entanglement in the given qnic.
 Parameters
 ———-
@@ -224,7 +224,7 @@ qnic : int</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="progress.abstraction.qhal.TokenOperationsService">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.abstraction.qhal.</span></span><span class="sig-name descname"><span class="pre">TokenOperationsService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/abstraction/qhal.html#TokenOperationsService"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.TokenOperationsService" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.abstraction.qhal.</span></span><span class="sig-name descname"><span class="pre">TokenOperationsService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/abstraction/qhal.html#TokenOperationsService"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.TokenOperationsService" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceProtocol</span></code></p>
 <p>The Token Operations Service is a service protocol that handles the requests for token operations.
 An instance is automatically loaded in each QHAL node.</p>
@@ -257,7 +257,7 @@ for hardware-independent quantum operations.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.abstraction.qhal.TokenOperationsService.free">
-<span class="sig-name descname"><span class="pre">free</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/abstraction/qhal.html#TokenOperationsService.free"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.TokenOperationsService.free" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">free</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/abstraction/qhal.html#TokenOperationsService.free"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.TokenOperationsService.free" title="Permalink to this definition"></a></dt>
 <dd><p>Free a token from memory. Also free the physical qubit.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -271,7 +271,7 @@ for hardware-independent quantum operations.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.abstraction.qhal.TokenOperationsService.handle_request">
-<span class="sig-name descname"><span class="pre">handle_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/abstraction/qhal.html#TokenOperationsService.handle_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.TokenOperationsService.handle_request" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">handle_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/abstraction/qhal.html#TokenOperationsService.handle_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.TokenOperationsService.handle_request" title="Permalink to this definition"></a></dt>
 <dd><p>Schedule the request on the queue.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -424,7 +424,7 @@ token2 (<a class="reference internal" href="../sockets.html#progress.sockets.Tok
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.abstraction.qhal.TokenOperationsService.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/abstraction/qhal.html#TokenOperationsService.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.TokenOperationsService.run" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/abstraction/qhal.html#TokenOperationsService.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.TokenOperationsService.run" title="Permalink to this definition"></a></dt>
 <dd><p>Wait for a new request signal, then run the requests one by one.</p>
 <p>Assumes request handlers are generators and not functions.</p>
 <p class="rubric">References</p>
@@ -433,13 +433,13 @@ token2 (<a class="reference internal" href="../sockets.html#progress.sockets.Tok
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.abstraction.qhal.TokenOperationsService.send_response">
-<span class="sig-name descname"><span class="pre">send_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/abstraction/qhal.html#TokenOperationsService.send_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.TokenOperationsService.send_response" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">send_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/abstraction/qhal.html#TokenOperationsService.send_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.TokenOperationsService.send_response" title="Permalink to this definition"></a></dt>
 <dd><p>Sends a response to the port <cite>tokens_ops</cite>.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.abstraction.qhal.TokenOperationsService.token_has_socket">
-<span class="sig-name descname"><span class="pre">token_has_socket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/abstraction/qhal.html#TokenOperationsService.token_has_socket"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.TokenOperationsService.token_has_socket" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">token_has_socket</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">raise_error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/abstraction/qhal.html#TokenOperationsService.token_has_socket"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.abstraction.qhal.TokenOperationsService.token_has_socket" title="Permalink to this definition"></a></dt>
 <dd><p>Check if a token is present in the socket table of the QHAL.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

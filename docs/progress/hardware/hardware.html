@@ -5,18 +5,18 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>progress.hardware &mdash; ProgReSS 1.0.0 documentation</title>
-      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../static/graphviz.css" type="text/css" />
   <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+    <script src="../../static/js/html5shiv.min.js"></script>
+    <![endif]-->
   
-        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-        <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/sphinx_highlight.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../static/documentation_options.js"></script>
+        <script src="../../static/doctools.js"></script>
+        <script src="../../static/sphinx_highlight.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script src="../../_static/js/theme.js"></script>
+    <script src="../../static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="progress.hardware" href="llps/llps.html" />
@@ -88,7 +88,7 @@
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">progress.hardware</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../../_sources/progress/hardware/hardware.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../sources/progress/hardware/hardware.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -102,7 +102,7 @@
 It also models the quantum Link Layer protocols to be installed on each qnic of the devices.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="progress.hardware.__init__.MPSConnection">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.hardware.__init__.</span></span><span class="sig-name descname"><span class="pre">MPSConnection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_right</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_mid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_positions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_clock</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/hardware/mps_connection.html#MPSConnection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.__init__.MPSConnection" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.hardware.__init__.</span></span><span class="sig-name descname"><span class="pre">MPSConnection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_left</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_right</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_mid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_positions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_clock</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/hardware/mps_connection.html#MPSConnection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.__init__.MPSConnection" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Connection</span></code></p>
 <p>A quantum connection using a <code class="xref py py-class docutils literal notranslate"><span class="pre">MPSSourceNode</span></code> in the middle.
 It implements a high level simulation of the Midpoint source link layer protocols between the two nodes at the
@@ -136,7 +136,7 @@ Defaults to 1.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.hardware.__init__.MPSConnection.reset">
-<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">and_restart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/hardware/mps_connection.html#MPSConnection.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.__init__.MPSConnection.reset" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">and_restart</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/hardware/mps_connection.html#MPSConnection.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.__init__.MPSConnection.reset" title="Permalink to this definition"></a></dt>
 <dd><p>Reset the status of the inner source. Should be called while the inner source is OFF.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -150,13 +150,13 @@ Defaults to 1.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.hardware.__init__.MPSConnection.start">
-<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/hardware/mps_connection.html#MPSConnection.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.__init__.MPSConnection.start" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/hardware/mps_connection.html#MPSConnection.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.__init__.MPSConnection.start" title="Permalink to this definition"></a></dt>
 <dd><p>Sets the status of the inner source to INTERNAL so that it starts producing entanglement.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.hardware.__init__.MPSConnection.stop">
-<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/hardware/mps_connection.html#MPSConnection.stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.__init__.MPSConnection.stop" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/hardware/mps_connection.html#MPSConnection.stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.__init__.MPSConnection.stop" title="Permalink to this definition"></a></dt>
 <dd><p>Sets the status of the inner source to OFF so that it stops producing entanglement.</p>
 </dd></dl>
 
@@ -164,7 +164,7 @@ Defaults to 1.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="progress.hardware.__init__.QHardware">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.hardware.__init__.</span></span><span class="sig-name descname"><span class="pre">QHardware</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_qnics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_qbits_qnic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qproc_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/hardware/qhardware.html#QHardware"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.__init__.QHardware" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.hardware.__init__.</span></span><span class="sig-name descname"><span class="pre">QHardware</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_qnics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_qbits_qnic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qproc_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/hardware/qhardware.html#QHardware"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.__init__.QHardware" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></p>
 <p>This node contains the quantum hardware of a Quantum Internet node, including the quantum processor and the QNICS.</p>
 <dl class="field-list simple">
@@ -210,7 +210,7 @@ that a new entangled qubit is available.</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.hardware.__init__.QHardware.get_subscribed_llp">
-<span class="sig-name descname"><span class="pre">get_subscribed_llp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qnic</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/hardware/qhardware.html#QHardware.get_subscribed_llp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.__init__.QHardware.get_subscribed_llp" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get_subscribed_llp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qnic</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/hardware/qhardware.html#QHardware.get_subscribed_llp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.__init__.QHardware.get_subscribed_llp" title="Permalink to this definition"></a></dt>
 <dd><p>Returns the Link Layer protocol subscribed to the given QNIC.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -229,13 +229,13 @@ that a new entangled qubit is available.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.hardware.__init__.QHardware.map_info_to_qubit">
-<span class="sig-name descname"><span class="pre">map_info_to_qubit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qnic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/hardware/qhardware.html#QHardware.map_info_to_qubit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.__init__.QHardware.map_info_to_qubit" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">map_info_to_qubit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qnic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/hardware/qhardware.html#QHardware.map_info_to_qubit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.__init__.QHardware.map_info_to_qubit" title="Permalink to this definition"></a></dt>
 <dd><p>Maps the qnic and the index of the qubit to the position in the quantum processor.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.hardware.__init__.QHardware.put_qop">
-<span class="sig-name descname"><span class="pre">put_qop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/hardware/qhardware.html#QHardware.put_qop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.__init__.QHardware.put_qop" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">put_qop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/hardware/qhardware.html#QHardware.put_qop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.__init__.QHardware.put_qop" title="Permalink to this definition"></a></dt>
 <dd><p>Submit a quantum operation request. The response is sent through the port “q_ops” of the node.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -249,7 +249,7 @@ that a new entangled qubit is available.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.hardware.__init__.QHardware.subscribe_llp">
-<span class="sig-name descname"><span class="pre">subscribe_llp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qnic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/hardware/qhardware.html#QHardware.subscribe_llp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.__init__.QHardware.subscribe_llp" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">subscribe_llp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qnic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">llp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/hardware/qhardware.html#QHardware.subscribe_llp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.__init__.QHardware.subscribe_llp" title="Permalink to this definition"></a></dt>
 <dd><p>Subscribe a link layer protocol to the given QNIC.</p>
 <dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
