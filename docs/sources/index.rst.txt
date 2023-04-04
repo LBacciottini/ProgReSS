@@ -6,6 +6,8 @@
 Welcome to ProgReSS' documentation!
 ====================================
 
+You can download and install the ProgReSS package `here <https://github.com/LBacciottini/ProgReSS/>`_.
+
 .. automodule:: progress.__init__
    :members:
    :show-inheritance:
