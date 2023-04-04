@@ -14,18 +14,18 @@ __all__ = ['Socket', 'Token', 'TokenTable', 'TokenMessage']
 # Socket = namedtuple('Socket', ['node', 'interface', 'idx'])
 
 class Socket:
-    """
+    r"""
     A socket is an internal logical abstraction for an entangled qubit. The name derives from the fact that
     the qubit is entangled with (at least) another qubit, and thus it represents one end of the entangling connection.
 
     Parameters
     ----------
-        node : int
-            The node the qubit is located on.
-        qnic : int
-            The interface the qubit is assigned on.
-        idx : int
-            The index of the qubit on the interface.
+    node : int
+        The node the qubit is located on.
+    qnic : int
+        The interface the qubit is assigned on.
+    idx : int
+        The index of the qubit on the interface.
     """
     __name__ = 'Socket'
 
@@ -63,30 +63,36 @@ class Socket:
 
 Token = namedtuple('Token', ['socket', 'other_end', 'current_state', 'pct', 'purified',
                              'additional_info'])
-"""
+r"""
 A token is an external logical abstraction for an entangled qubit. It is used at the NET layer to manage quantum
 resources in a hardware-independent fashion.
 
 Parameters
------------
-    socket (Socket) : The local socket related to this token.
-    other_end (Socket) : The other end of the entangled connection.
-    current_state (int) : The current state of the qubit 
-        (0 -> |beta00>, 1 -> |beta01>, 2 -> |beta10>, 3 -> |beta11>).
-    pct (float) : The Pair Coherence Timeout of the socket pair.
-    purified (int) : Whether or not the socket is purified. 0 -> not purified, 1 -> purified,
-        >1 -> number of purification rounds.
-    additional_info (dict) : Additional information about the socket.
+----------
+socket : :class:`~progress.sockets.Socket`
+    The local socket related to this token.
+other_end : :class:`~progress.sockets.Socket`
+    The other end of the entangled connection.
+current_state : int
+    The current state of the qubit (0 -> :math:`\vert\beta_{00}\rangle`, 1 -> :math:`\vert\beta_{01}\rangle`,
+    2 -> :math:`\vert\beta_{10}\rangle`, 3 -> :math:`\vert\beta_{11}\rangle`).
+pct : float
+    The Pair Coherence Timeout of the socket pair.
+purified : int
+    Whether or not the socket is purified. 0 -> not purified, 1 -> purified, >1 -> number of purification rounds.
+additional_info : dict[any, any]
+    Additional information about the socket.
 """
 
 
 class TokenMessage(ns.components.Message):
-    """
+    r"""
     A message containing a token. Used to transfer tokens from a module to another.
 
     Parameters
     ----------
-        token (Token) : The token to be transmitted along with the message.
+    token : :class:`~progress.sockets.Token`
+        The token to be transmitted along with the message.
     """
     HEADER = "TOKEN MESSAGE"
 
@@ -106,7 +112,7 @@ def have_same_ends(token1, token2):
     Check if two tokens represent sockets that are entangled among the same two devices.
 
     Parameters
-    -----------
+    ----------
     token1 : :class:`~progress.sockets.Token`
         The first token.
     token2 : :class:`~progress.sockets.Token`
@@ -133,7 +139,7 @@ class TokenTable:
         Get a snapshot of the socket table.
 
         Returns
-        ----------
+        -------
         list[:class:`~progress.sockets.Token`]
             The list of tokens in the table.
         """
@@ -143,8 +149,8 @@ class TokenTable:
         r"""
         Add a socket descriptor to the socket table.
 
-        Parameters:
-        ------------
+        Parameters
+        ----------
         token : :class:`~progress.sockets.Token`
             The token to add.
         """
@@ -156,15 +162,14 @@ class TokenTable:
         If the token is not found, a ValueError is raised.
 
         Parameters
-        ----------------
-
+        ----------
         local_end : :class:`~progress.sockets.Socket`
             The local end of the token to pop.
         raise_error : bool
             Whether to raise a ValueError if the token is not found. If False, the function will return None.
 
         Returns
-        ------------
+        -------
         :class:`~progress.sockets.Token`
             The socket descriptor that was popped.
         """
@@ -178,7 +183,7 @@ class TokenTable:
             return None
 
     def get_token(self, local_end, raise_error=True):
-        """
+        r"""
         Get a token from the table identified by the local_end. Does not remove it from the table.
 
         Parameters
@@ -215,7 +220,7 @@ class TokenTable:
             Whether to raise a ValueError if the socket is not found. If False, the function will return False.
 
         Returns
-        ----------
+        -------
         bool
             Whether or not the socket was found and replaced.
         """
@@ -245,7 +250,7 @@ class TokenTable:
             The current time in the simulation. [ns]
 
         Returns
-        ----------
+        -------
         list[:class:`~progress.sockets.Token`]
             The list of tokens that were removed.
         """
@@ -258,7 +263,7 @@ class TokenTable:
         return to_remove
 
     def get_target_token(self, other_end_node, additional_info_filters=None, policy="LRTF"):
-        """
+        r"""
         Get a token having a specific other end node.
 
         Parameters
@@ -273,7 +278,7 @@ class TokenTable:
             Currently only "LRTF" (Longest Remaining Time First) is supported.
 
         Returns
-        ----------
+        -------
         :class:`~progress.sockets.Token` or None
             The socket descriptor with the specified other end node. `None` if not found
         """
@@ -283,7 +288,7 @@ class TokenTable:
             raise ValueError("Policy not supported.")
 
     def _get_target_descriptor_LRTF(self, other_end_node, additional_info_filters=None):
-        """
+        r"""
         Get the token having a specific other end node. In case of multiple choices, the one with the
         highest pct is returned.
 
@@ -296,7 +301,7 @@ class TokenTable:
             A dictionary of filters to apply to the additional info of the token.
 
         Returns
-        ----------
+        -------
         :class:`progress.sockets.Token` or None
             The token with the specified other end node. `None` if not found
         """

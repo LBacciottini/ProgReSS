@@ -15,6 +15,7 @@
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/sphinx_highlight.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -129,17 +130,22 @@ the qubit is entangled with (at least) another qubit, and thus it represents one
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
 <p>A token is an external logical abstraction for an entangled qubit. It is used at the NET layer to manage quantum
 resources in a hardware-independent fashion.</p>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>socket (Socket)</strong><span class="classifier">The local socket related to this token.</span></dt><dd></dd>
-<dt><strong>other_end (Socket)</strong><span class="classifier">The other end of the entangled connection.</span></dt><dd></dd>
-<dt><strong>current_state (int)</strong><span class="classifier">The current state of the qubit</span></dt><dd><p>(0 -&gt; <a href="#id1"><span class="problematic" id="id2">|</span></a>beta00&gt;, 1 -&gt; <a href="#id3"><span class="problematic" id="id4">|</span></a>beta01&gt;, 2 -&gt; <a href="#id5"><span class="problematic" id="id6">|</span></a>beta10&gt;, 3 -&gt; <a href="#id7"><span class="problematic" id="id8">|</span></a>beta11&gt;).</p>
+<dd class="field-odd"><dl>
+<dt><strong>socket</strong><span class="classifier"><a class="reference internal" href="#progress.sockets.Socket" title="progress.sockets.Socket"><code class="xref py py-class docutils literal notranslate"><span class="pre">Socket</span></code></a></span></dt><dd><p>The local socket related to this token.</p>
 </dd>
-<dt><strong>pct (float)</strong><span class="classifier">The Pair Coherence Timeout of the socket pair.</span></dt><dd></dd>
-<dt><strong>purified (int)</strong><span class="classifier">Whether or not the socket is purified. 0 -&gt; not purified, 1 -&gt; purified,</span></dt><dd><p>&gt;1 -&gt; number of purification rounds.</p>
+<dt><strong>other_end</strong><span class="classifier"><a class="reference internal" href="#progress.sockets.Socket" title="progress.sockets.Socket"><code class="xref py py-class docutils literal notranslate"><span class="pre">Socket</span></code></a></span></dt><dd><p>The other end of the entangled connection.</p>
 </dd>
-<dt><strong>additional_info (dict)</strong><span class="classifier">Additional information about the socket.</span></dt><dd></dd>
+<dt><strong>current_state</strong><span class="classifier">int</span></dt><dd><p>The current state of the qubit (0 -&gt; <span class="math notranslate nohighlight">\(\vert\beta_{00}\rangle\)</span>, 1 -&gt; <span class="math notranslate nohighlight">\(\vert\beta_{01}\rangle\)</span>,
+2 -&gt; <span class="math notranslate nohighlight">\(\vert\beta_{10}\rangle\)</span>, 3 -&gt; <span class="math notranslate nohighlight">\(\vert\beta_{11}\rangle\)</span>).</p>
+</dd>
+<dt><strong>pct</strong><span class="classifier">float</span></dt><dd><p>The Pair Coherence Timeout of the socket pair.</p>
+</dd>
+<dt><strong>purified</strong><span class="classifier">int</span></dt><dd><p>Whether or not the socket is purified. 0 -&gt; not purified, 1 -&gt; purified, &gt;1 -&gt; number of purification rounds.</p>
+</dd>
+<dt><strong>additional_info</strong><span class="classifier">dict[any, any]</span></dt><dd><p>Additional information about the socket.</p>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -186,10 +192,11 @@ resources in a hardware-independent fashion.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.sockets.</span></span><span class="sig-name descname"><span class="pre">TokenMessage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/progress/sockets.html#TokenMessage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.TokenMessage" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Message</span></code></p>
 <p>A message containing a token. Used to transfer tokens from a module to another.</p>
-<dl class="field-list simple">
+<dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>token (Token)</strong><span class="classifier">The token to be transmitted along with the message.</span></dt><dd></dd>
+<dd class="field-odd"><dl>
+<dt><strong>token</strong><span class="classifier"><a class="reference internal" href="#progress.sockets.Token" title="progress.sockets.Token"><code class="xref py py-class docutils literal notranslate"><span class="pre">Token</span></code></a></span></dt><dd><p>The token to be transmitted along with the message.</p>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -205,6 +212,14 @@ This is used to keep track of the tokens that are currently owned by a specific 
 <dt class="sig sig-object py" id="progress.sockets.TokenTable.add_token">
 <span class="sig-name descname"><span class="pre">add_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/progress/sockets.html#TokenTable.add_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.sockets.TokenTable.add_token" title="Permalink to this definition"></a></dt>
 <dd><p>Add a socket descriptor to the socket table.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>token</strong><span class="classifier"><a class="reference internal" href="#progress.sockets.Token" title="progress.sockets.Token"><code class="xref py py-class docutils literal notranslate"><span class="pre">Token</span></code></a></span></dt><dd><p>The token to add.</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">

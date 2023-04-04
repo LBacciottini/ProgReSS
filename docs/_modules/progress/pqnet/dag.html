@@ -242,15 +242,15 @@
 <span class="sd">    :class:`~progress.pqnet.kernel.p_module.ModuleBehavior` classes.</span>
 
 <span class="sd">    Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        edges : list[tuple[str, str]]</span>
-<span class="sd">            A list of tuples, where each tuple represents an edge in the DAG. The order of the tuple is important,</span>
-<span class="sd">            as it determines the direction of the edge.</span>
-<span class="sd">        module_behaviors : dict[str, tuple(:class:`~progress.pqnet.kernel.p_module.ModuleBehavior.class`, dict)]</span>
-<span class="sd">            A dictionary mapping the name of each module to a tuple of the module behavior class and a dictionary</span>
-<span class="sd">            of the parameters to pass to the constructor of the module class. The dictionary must have keys that are</span>
-<span class="sd">            numerical strings, so that they can be used to derive the module id. Roots of the DAG must have the optional</span>
-<span class="sd">            integer parameter `&quot;qnic&quot;` to link them to the specific token queue from the QHAL.</span>
+<span class="sd">    ----------</span>
+<span class="sd">    edges : list[tuple[str, str]]</span>
+<span class="sd">        A list of tuples, where each tuple represents an edge in the DAG. The order of the tuple is important,</span>
+<span class="sd">        as it determines the direction of the edge.</span>
+<span class="sd">    module_behaviors : dict[str, tuple(:class:`~progress.pqnet.kernel.p_module.ModuleBehavior.class`, dict)]</span>
+<span class="sd">        A dictionary mapping the name of each module to a tuple of the module behavior class and a dictionary</span>
+<span class="sd">        of the parameters to pass to the constructor of the module class. The dictionary must have keys that are</span>
+<span class="sd">        numerical strings, so that they can be used to derive the module id. Roots of the DAG must have the optional</span>
+<span class="sd">        integer parameter `&quot;qnic&quot;` to link them to the specific token queue from the QHAL.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">module_behaviors</span><span class="p">,</span> <span class="n">device_id</span><span class="p">):</span>
@@ -301,7 +301,7 @@
 <span class="sd">    bricks in the DAG.</span>
 
 <span class="sd">    Parameters</span>
-<span class="sd">    -----------</span>
+<span class="sd">    ----------</span>
 <span class="sd">    dag : :class:`~progress.pqnet.kernel.dag.DAG`</span>
 <span class="sd">        The DAG that the switch is associated with.</span>
 <span class="sd">    name : str or None, optional</span>

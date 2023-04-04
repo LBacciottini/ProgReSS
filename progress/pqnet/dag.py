@@ -166,15 +166,15 @@ class DAGFactory:
     :class:`~progress.pqnet.kernel.p_module.ModuleBehavior` classes.
 
     Parameters
-        ----------
-        edges : list[tuple[str, str]]
-            A list of tuples, where each tuple represents an edge in the DAG. The order of the tuple is important,
-            as it determines the direction of the edge.
-        module_behaviors : dict[str, tuple(:class:`~progress.pqnet.kernel.p_module.ModuleBehavior.class`, dict)]
-            A dictionary mapping the name of each module to a tuple of the module behavior class and a dictionary
-            of the parameters to pass to the constructor of the module class. The dictionary must have keys that are
-            numerical strings, so that they can be used to derive the module id. Roots of the DAG must have the optional
-            integer parameter `"qnic"` to link them to the specific token queue from the QHAL.
+    ----------
+    edges : list[tuple[str, str]]
+        A list of tuples, where each tuple represents an edge in the DAG. The order of the tuple is important,
+        as it determines the direction of the edge.
+    module_behaviors : dict[str, tuple(:class:`~progress.pqnet.kernel.p_module.ModuleBehavior.class`, dict)]
+        A dictionary mapping the name of each module to a tuple of the module behavior class and a dictionary
+        of the parameters to pass to the constructor of the module class. The dictionary must have keys that are
+        numerical strings, so that they can be used to derive the module id. Roots of the DAG must have the optional
+        integer parameter `"qnic"` to link them to the specific token queue from the QHAL.
     """
 
     def __init__(self, edges, module_behaviors, device_id):
@@ -225,7 +225,7 @@ class DAGMessagesSwitch(ns.components.Switch):
     bricks in the DAG.
 
     Parameters
-    -----------
+    ----------
     dag : :class:`~progress.pqnet.kernel.dag.DAG`
         The DAG that the switch is associated with.
     name : str or None, optional
