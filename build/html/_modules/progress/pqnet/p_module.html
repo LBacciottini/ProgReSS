@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>progress.pqnet.p_module &mdash; ProgReSS 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            ProgReSS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/abstraction/abstraction.html">progress.abstraction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/device.html">progress.device</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/hardware/hardware.html">progress.hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/logging.html">progress.progress_logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/messaging/messaging.html">progress.messaging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/pqnet/pqnet.html">progress.pqnet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/sockets.html">progress.sockets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">ProgReSS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">progress.pqnet.p_module</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for progress.pqnet.p_module</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the base class for all progress modules.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">import</span> <span class="nn">progress.progress_logging</span> <span class="k">as</span> <span class="nn">log</span>
+<span class="kn">import</span> <span class="nn">progress.pqnet.messages</span> <span class="k">as</span> <span class="nn">messages</span>
+
+<span class="kn">import</span> <span class="nn">netsquid</span> <span class="k">as</span> <span class="nn">ns</span>
+
+<span class="kn">from</span> <span class="nn">progress.sockets</span> <span class="kn">import</span> <span class="n">TokenTable</span><span class="p">,</span> <span class="n">TokenMessage</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Module&quot;</span><span class="p">,</span> <span class="s2">&quot;ModuleBehavior&quot;</span><span class="p">,</span> <span class="s2">&quot;ProcessingModuleBehavior&quot;</span><span class="p">,</span> <span class="s2">&quot;SchedulingModuleBehavior&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="Module"><a class="viewcode-back" href="../../../progress/pqnet/p_module.html#progress.pqnet.p_module.Module">[docs]</a><span class="k">class</span> <span class="nc">Module</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">Node</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is the base class for all progress modules. It is a node acting as a wrapper for its inner</span>
+<span class="sd">    behavior, which is implemented in a class that inherits from :class:`~progress.pqnet.p_module.ModuleBehavior`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    module_id : int</span>
+<span class="sd">        The id of the module.</span>
+<span class="sd">    device_id : int</span>
+<span class="sd">        The id of the device that the module is running on.</span>
+<span class="sd">    name : str</span>
+<span class="sd">        The name of the module.</span>
+<span class="sd">    num_input : int</span>
+<span class="sd">        The number of input ports.</span>
+<span class="sd">    num_output : int</span>
+<span class="sd">        The number of output ports.</span>
+<span class="sd">    qhal : :class:`~progress.pqnet.qhal.QHAL` or None, optional</span>
+<span class="sd">        A reference to the QHAL running on the device. If `None`, the QHAL must be set before starting the module.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module_id</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">num_input</span><span class="p">,</span> <span class="n">num_output</span><span class="p">,</span> <span class="n">qhal</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">ports</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;in</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_input</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;out</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_output</span><span class="p">)]</span>
+        <span class="n">ports</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">port_names</span><span class="o">=</span><span class="n">ports</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">module_id</span> <span class="o">=</span> <span class="n">module_id</span>
+        <span class="sd">&quot;&quot;&quot;The id of the module.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device_id</span> <span class="o">=</span> <span class="n">device_id</span>
+        <span class="sd">&quot;&quot;&quot;The id of the device that the module is running on.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qhal</span> <span class="o">=</span> <span class="n">qhal</span>
+        <span class="sd">&quot;&quot;&quot;A reference to the QHAL running on the device.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">behavior</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="sd">&quot;&quot;&quot;The behavior of the module.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">environment</span> <span class="o">=</span> <span class="n">ModuleEnvironment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;The environment of the module. It is used to trigger events on the module behavior when needed.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_input</span> <span class="o">=</span> <span class="n">num_input</span>
+        <span class="sd">&quot;&quot;&quot;The number of input ports.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_output</span> <span class="o">=</span> <span class="n">num_output</span>
+        <span class="sd">&quot;&quot;&quot;The number of output ports.&quot;&quot;&quot;</span>
+
+        <span class="c1"># the token table to store and manage owned tokens</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">token_table</span> <span class="o">=</span> <span class="n">TokenTable</span><span class="p">()</span>
+        <span class="sd">&quot;&quot;&quot;The token table to store and manage owned tokens.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Module.start"><a class="viewcode-back" href="../../../progress/pqnet/p_module.html#progress.pqnet.p_module.Module.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Start the module behavior. Should be called after the qhal and behavior have been set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">qhal</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">behavior</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The qhal and behavior must be set before starting the module.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">environment</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Module.stop"><a class="viewcode-back" href="../../../progress/pqnet/p_module.html#progress.pqnet.p_module.Module.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stop the module behavior.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">environment</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="ModuleBehavior"><a class="viewcode-back" href="../../../progress/pqnet/p_module.html#progress.pqnet.p_module.ModuleBehavior">[docs]</a><span class="k">class</span> <span class="nc">ModuleBehavior</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">protocols</span><span class="o">.</span><span class="n">ServiceProtocol</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is the base class for all module behaviors. It follows an event-driven approach, where the</span>
+<span class="sd">    behavior is triggered by events. Such events are listed as the abstract methods of this class.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    node : :class:`~progress.pqnet.p_module.Module`</span>
+<span class="sd">        The module that this behavior is associated with.</span>
+<span class="sd">    qnic : int or None, optional</span>
+<span class="sd">        If not `None`, the module will take as input tokens directly from that qnic&#39;s token queue on its first input</span>
+<span class="sd">        port. Defaults to `None`.</span>
+<span class="sd">    name : str or None, optional</span>
+<span class="sd">        The name of the behavior. If `None`, a default name is used. Defaults to `None`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">req_handle_message</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;req_handle_message&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;sender&quot;</span><span class="p">,</span> <span class="s2">&quot;message&quot;</span><span class="p">])</span>
+    <span class="n">req_handle_response</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;req_handle_response&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;response&quot;</span><span class="p">,</span> <span class="s2">&quot;request&quot;</span><span class="p">])</span>
+    <span class="n">req_handle_new_token</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;req_handle_new_token&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;token&quot;</span><span class="p">])</span>
+    <span class="n">req_handle_collect_garbage</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;req_handle_collect_garbage&quot;</span><span class="p">,</span> <span class="p">[])</span>
+
+    <span class="n">GARBAGE_COLLECTOR_PERIOD</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1"># ms</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">qnic</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ModuleBehaviorProtocol for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="n">node</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_request</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">req_handle_message</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_request</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">req_handle_response</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_response</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_request</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">req_handle_new_token</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_new_token</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_request</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">req_handle_collect_garbage</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_garbage</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qnic</span> <span class="o">=</span> <span class="n">qnic</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_garbage_collection</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">sim_time</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="ModuleBehavior.handle_message"><a class="viewcode-back" href="../../../progress/pqnet/p_module.html#progress.pqnet.p_module.ModuleBehavior.handle_message">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">handle_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is called when a classical message is received from another remote module.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        request : :class:`~progress.pqnet.p_module.ModuleBehavior.req_handle_message`</span>
+<span class="sd">            The request containing the message to handle.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ModuleBehavior.handle_response"><a class="viewcode-back" href="../../../progress/pqnet/p_module.html#progress.pqnet.p_module.ModuleBehavior.handle_response">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">handle_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is called when a response to a previous request is received from the qhal.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        request : :class:`~progress.pqnet.p_module.ModuleBehavior.req_handle_response`</span>
+<span class="sd">            The request containing the QHAL response to handle. The response contains the outcome and the originating</span>
+<span class="sd">            request piggybacked.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ModuleBehavior.handle_new_token"><a class="viewcode-back" href="../../../progress/pqnet/p_module.html#progress.pqnet.p_module.ModuleBehavior.handle_new_token">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">handle_new_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is called when a new token is received as input.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        request : :class:`~progress.pqnet.p_module.ModuleBehavior.req_handle_new_token`</span>
+<span class="sd">            The request containing the new token to handle.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ModuleBehavior.send_message"><a class="viewcode-back" href="../../../progress/pqnet/p_module.html#progress.pqnet.p_module.ModuleBehavior.send_message">[docs]</a>    <span class="k">def</span> <span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">dest_device</span><span class="p">,</span> <span class="n">dest_module_id</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send a classical message to another module.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        message : :class:`~ns.components.Message`</span>
+<span class="sd">            The message to send.</span>
+<span class="sd">        dest_device : int</span>
+<span class="sd">            The device ID of the destination device.</span>
+<span class="sd">        dest_module_id : int</span>
+<span class="sd">            The module ID of the destination module.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">wrapper</span> <span class="o">=</span> <span class="n">messages</span><span class="o">.</span><span class="n">InterModuleMessage</span><span class="p">(</span><span class="n">sender_device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">device_id</span><span class="p">,</span> <span class="n">sender_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">module_id</span><span class="p">,</span>
+                                              <span class="n">destination_device</span><span class="o">=</span><span class="n">dest_device</span><span class="p">,</span> <span class="n">destination_id</span><span class="o">=</span><span class="n">dest_module_id</span><span class="p">,</span>
+                                              <span class="n">inner_message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span> <span class="n">topology_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">supercomponent</span><span class="o">.</span><span class="n">supercomponent</span><span class="o">.</span><span class="n">current_topology_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tx_output</span><span class="p">(</span><span class="n">wrapper</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModuleBehavior.token_is_present"><a class="viewcode-back" href="../../../progress/pqnet/p_module.html#progress.pqnet.p_module.ModuleBehavior.token_is_present">[docs]</a>    <span class="k">def</span> <span class="nf">token_is_present</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if a token is mapped to a physical qubit.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        token : :class:`~progress.sockets.Token`</span>
+<span class="sd">            The token to check.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            `True` if the token is mapped to a physical qubit, `False` otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qhal</span><span class="o">.</span><span class="n">token_api_service</span><span class="o">.</span><span class="n">token_has_socket</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">raise_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModuleBehavior.free_token"><a class="viewcode-back" href="../../../progress/pqnet/p_module.html#progress.pqnet.p_module.ModuleBehavior.free_token">[docs]</a>    <span class="k">def</span> <span class="nf">free_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is called when a token is no longer needed and can be freed (together with the physical qubit).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        token : :class:`~progress.pqnet.kernel.p_token.Token`</span>
+<span class="sd">            The token to free.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># if the token is stored in the token table, remove it</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">token_table</span><span class="o">.</span><span class="n">pop_token</span><span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">socket</span><span class="p">,</span> <span class="n">raise_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">token_is_present</span><span class="p">(</span><span class="n">token</span><span class="p">):</span>
+            <span class="n">req</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qhal</span><span class="o">.</span><span class="n">token_api_service</span><span class="o">.</span><span class="n">req_free</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qhal</span><span class="o">.</span><span class="n">token_api_service</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;tried to free a token that is not present: </span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">repeater_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">device_id</span><span class="p">,</span>
+                        <span class="n">protocol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+            <span class="c1"># log.warning(str(self.node.qhal.socket_table))</span>
+
+    <span class="k">def</span> <span class="nf">_collect_garbage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method is called periodically to collect garbage from the token table. Garbage are tokens that is expired</span>
+<span class="sd">        (each token has an expiration time given by hardware parameters)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_garbage_collection</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">sim_time</span><span class="p">()</span>
+        <span class="n">to_remove</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">token_table</span><span class="o">.</span><span class="n">collect_garbage</span><span class="p">(</span><span class="n">current_time</span><span class="o">=</span><span class="n">ns</span><span class="o">.</span><span class="n">sim_time</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">to_remove</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">free_token</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ModuleBehavior.terminate"><a class="viewcode-back" href="../../../progress/pqnet/p_module.html#progress.pqnet.p_module.ModuleBehavior.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clean up actions before terminating.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># free all tokens</span>
+        <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">token_table</span><span class="o">.</span><span class="n">get_snapshot</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">free_token</span><span class="p">(</span><span class="n">token</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModuleBehavior.start_entanglement_generation"><a class="viewcode-back" href="../../../progress/pqnet/p_module.html#progress.pqnet.p_module.ModuleBehavior.start_entanglement_generation">[docs]</a>    <span class="k">def</span> <span class="nf">start_entanglement_generation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qnic</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Start the entanglement generation process on the given qnic.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        qnic : int</span>
+<span class="sd">            The qnic to start (or resume) the entanglement generation process on.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qhal</span><span class="o">.</span><span class="n">resume_entanglement</span><span class="p">(</span><span class="n">qnic</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModuleBehavior.stop_entanglement_generation"><a class="viewcode-back" href="../../../progress/pqnet/p_module.html#progress.pqnet.p_module.ModuleBehavior.stop_entanglement_generation">[docs]</a>    <span class="k">def</span> <span class="nf">stop_entanglement_generation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qnic</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stop the entanglement generation process on the given qnic.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        qnic : int</span>
+<span class="sd">            The qnic to stop the entanglement generation process on.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qhal</span><span class="o">.</span><span class="n">stop_entanglement</span><span class="p">(</span><span class="n">qnic</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ProcessingModuleBehavior"><a class="viewcode-back" href="../../../progress/pqnet/p_module.html#progress.pqnet.p_module.ProcessingModuleBehavior">[docs]</a><span class="k">class</span> <span class="nc">ProcessingModuleBehavior</span><span class="p">(</span><span class="n">ModuleBehavior</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is extended by those module behaviors that perform some local quantum operations on the input tokens.</span>
+<span class="sd">    Processing modules can have either zero or one output ports, otherwise an exception is raised.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">qnic</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="n">node</span><span class="p">,</span> <span class="n">qnic</span><span class="o">=</span><span class="n">qnic</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">num_output</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Processing modules must have exactly zero or one output&quot;</span>
+
+<div class="viewcode-block" id="ProcessingModuleBehavior.promote_token"><a class="viewcode-back" href="../../../progress/pqnet/p_module.html#progress.pqnet.p_module.ProcessingModuleBehavior.promote_token">[docs]</a>    <span class="k">def</span> <span class="nf">promote_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send out a token out from the output port (to the next module).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        token : :class:`~progress.pqnet.kernel.p_token.Token`</span>
+<span class="sd">            The token to promote.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pop the token from the token table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">token_table</span><span class="o">.</span><span class="n">pop_token</span><span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">socket</span><span class="p">,</span> <span class="n">raise_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">num_output</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;out0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tx_output</span><span class="p">(</span><span class="n">TokenMessage</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot promote a token from a module with no output&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProcessingModuleBehavior.dejmps_tokens"><a class="viewcode-back" href="../../../progress/pqnet/p_module.html#progress.pqnet.p_module.ProcessingModuleBehavior.dejmps_tokens">[docs]</a>    <span class="k">def</span> <span class="nf">dejmps_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token_a</span><span class="p">,</span> <span class="n">token_b</span><span class="p">,</span> <span class="n">role</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply DEJMPS entanglement distillation (the quantum circuit part) on two tokens.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        token_a : :class:`~progress.pqnet.kernel.p_token.Token`</span>
+<span class="sd">            The token to distill.</span>
+<span class="sd">        token_b : :class:`~progress.pqnet.kernel.p_token.Token`</span>
+<span class="sd">            The second token as distillation ancilla.</span>
+<span class="sd">        role : str</span>
+<span class="sd">            The role of the module in the distillation process. Must be one of &quot;A&quot;, &quot;B&quot;. It determines the</span>
+<span class="sd">            initial rotation of the protocol. If the role is &quot;A&quot;, the initial rotation is :math:`\pi/2`, otherwise</span>
+<span class="sd">            it is :math:`-\pi/2`.</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        .. [1] https://arxiv.org/abs/quant-ph/9604039</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qhal</span><span class="o">.</span><span class="n">token_api_service</span><span class="o">.</span><span class="n">req_dejmps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">module_id</span><span class="p">,</span> <span class="n">token_a</span><span class="p">,</span> <span class="n">token_b</span><span class="p">,</span> <span class="n">role</span><span class="o">=</span><span class="n">role</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qhal</span><span class="o">.</span><span class="n">token_api_service</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        # DEBUG</span>
+<span class="sd">        log.info(f&quot;distilling {token_a} and {token_b}&quot;, repeater_id=self.node.device_id, protocol=self.name)</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="ProcessingModuleBehavior.swap_tokens"><a class="viewcode-back" href="../../../progress/pqnet/p_module.html#progress.pqnet.p_module.ProcessingModuleBehavior.swap_tokens">[docs]</a>    <span class="k">def</span> <span class="nf">swap_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token_a</span><span class="p">,</span> <span class="n">token_b</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Swap two tokens.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        token_a : :class:`~progress.pqnet.kernel.p_token.Token`</span>
+<span class="sd">            The first token to swap.</span>
+<span class="sd">        token_b : :class:`~progress.pqnet.kernel.p_token.Token`</span>
+<span class="sd">            The second token to swap.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qhal</span><span class="o">.</span><span class="n">token_api_service</span><span class="o">.</span><span class="n">req_swap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">module_id</span><span class="p">,</span> <span class="n">token_a</span><span class="p">,</span> <span class="n">token_b</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qhal</span><span class="o">.</span><span class="n">token_api_service</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">req</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProcessingModuleBehavior.correct_token"><a class="viewcode-back" href="../../../progress/pqnet/p_module.html#progress.pqnet.p_module.ProcessingModuleBehavior.correct_token">[docs]</a>    <span class="k">def</span> <span class="nf">correct_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply the correction circuit to a token to bring it back to :math:`\vert \phi^+ \rangle` Bell state from</span>
+<span class="sd">        another Bell state which is specified inside the token information.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        token : :class:`~progress.pqnet.kernel.p_token.Token`</span>
+<span class="sd">            The token to correct.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qhal</span><span class="o">.</span><span class="n">token_api_service</span><span class="o">.</span><span class="n">req_correct</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">module_id</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qhal</span><span class="o">.</span><span class="n">token_api_service</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">req</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ProcessingModuleBehavior.apply_qcircuit"><a class="viewcode-back" href="../../../progress/pqnet/p_module.html#progress.pqnet.p_module.ProcessingModuleBehavior.apply_qcircuit">[docs]</a>    <span class="k">def</span> <span class="nf">apply_qcircuit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokens</span><span class="p">,</span> <span class="n">qcircuit</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply a custom quantum circuit to a token.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tokens : list of :class:`~progress.pqnet.kernel.p_token.Token`</span>
+<span class="sd">            The tokens to apply the circuit to.</span>
+<span class="sd">        qcircuit : :class:`~netsquid.components.qprogram.QuantumProgram`</span>
+<span class="sd">            The quantum circuit to apply.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qhal</span><span class="o">.</span><span class="n">token_api_service</span><span class="o">.</span><span class="n">req_apply_qcircuit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">module_id</span><span class="p">,</span> <span class="n">tokens</span><span class="p">,</span> <span class="n">qcircuit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qhal</span><span class="o">.</span><span class="n">token_api_service</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">req</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="SchedulingModuleBehavior"><a class="viewcode-back" href="../../../progress/pqnet/p_module.html#progress.pqnet.p_module.SchedulingModuleBehavior">[docs]</a><span class="k">class</span> <span class="nc">SchedulingModuleBehavior</span><span class="p">(</span><span class="n">ModuleBehavior</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is extended by module behaviors that perform scheduling and routing operations on the input tokens.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">qnic</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="n">node</span><span class="p">,</span> <span class="n">qnic</span><span class="o">=</span><span class="n">qnic</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SchedulingModuleBehavior.promote_token"><a class="viewcode-back" href="../../../progress/pqnet/p_module.html#progress.pqnet.p_module.SchedulingModuleBehavior.promote_token">[docs]</a>    <span class="k">def</span> <span class="nf">promote_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">output_port</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send out a token from a specified port.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        token : :class:`~progress.pqnet.kernel.p_token.Token`</span>
+<span class="sd">            The token to promote.</span>
+<span class="sd">        output_port : int, optional</span>
+<span class="sd">            The index of the output port to use. Defaults to 0.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># pop the token from the token table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">token_table</span><span class="o">.</span><span class="n">pop_token</span><span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">socket</span><span class="p">,</span> <span class="n">raise_error</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">num_output</span> <span class="o">&gt;</span> <span class="n">output_port</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;out</span><span class="si">{</span><span class="n">output_port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tx_output</span><span class="p">(</span><span class="n">TokenMessage</span><span class="p">(</span><span class="n">token</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot promote a token from a non-existing output port&quot;</span><span class="p">)</span></div></div>
+
+
+<span class="k">class</span> <span class="nc">ModuleEnvironment</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">protocols</span><span class="o">.</span><span class="n">NodeProtocol</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the environment for the module. It is responsible for</span>
+<span class="sd">        - receiving messages from the module</span>
+<span class="sd">        - sending messages out of the module</span>
+<span class="sd">        - calling behavior handlers (i.e. triggering its events)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">GARBAGE_COLLECTION_PERIOD</span> <span class="o">=</span> <span class="mf">.2</span>  <span class="c1"># ms</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The period of garbage collection in ms.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ModuleEnvironment for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="n">node</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_garbage_collection</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">sim_time</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">GARBAGE_COLLECTION_PERIOD</span><span class="o">*</span><span class="mf">1e6</span>
+
+    <span class="k">def</span> <span class="nf">_get_wait_ev_expr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ev_expr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_port_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">num_input</span><span class="p">):</span>
+            <span class="n">ev_expr</span> <span class="o">|=</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_port_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;in</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)])</span>
+        <span class="k">return</span> <span class="n">ev_expr</span>
+
+    <span class="k">def</span> <span class="nf">_get_triggered_ports</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ev_expr</span><span class="p">):</span>
+        <span class="n">port_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">num_input</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ev_expr</span><span class="o">.</span><span class="n">second_term</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="n">port_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;in</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+            <span class="n">ev_expr</span> <span class="o">=</span> <span class="n">ev_expr</span><span class="o">.</span><span class="n">first_term</span>
+        <span class="k">if</span> <span class="n">ev_expr</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="n">port_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;messages&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">port_names</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        See :meth:`netsquid.protocols.Protocol.run`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="c1"># wait for a message on any input port (tokens or messages)</span>
+            <span class="n">ev_expr</span> <span class="o">=</span> <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_wait_ev_expr</span><span class="p">()</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_timer</span><span class="p">(</span><span class="n">end_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">next_garbage_collection</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ev_expr</span><span class="o">.</span><span class="n">first_term</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="n">port_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_triggered_ports</span><span class="p">(</span><span class="n">ev_expr</span><span class="o">.</span><span class="n">first_term</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">port_name</span> <span class="ow">in</span> <span class="n">port_names</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">port_name</span> <span class="o">==</span> <span class="s2">&quot;messages&quot;</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_handle_message</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_handle_new_token</span><span class="p">(</span><span class="n">port_name</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_handle_collect_garbage</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_handle_message</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">input_queue</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;messages&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rx_input</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">messages</span><span class="o">.</span><span class="n">InterModuleMessage</span><span class="p">):</span>
+                <span class="n">req</span> <span class="o">=</span> <span class="n">ModuleBehavior</span><span class="o">.</span><span class="n">req_handle_message</span><span class="p">(</span><span class="n">sender</span><span class="o">=</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">sender_device</span><span class="p">,</span> <span class="n">msg</span><span class="o">.</span><span class="n">sender_id</span><span class="p">),</span>
+                                                        <span class="n">message</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">inner_message</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># response from the QHAL</span>
+                <span class="n">req</span> <span class="o">=</span> <span class="n">ModuleBehavior</span><span class="o">.</span><span class="n">req_handle_response</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">request</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">behavior</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_handle_new_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port_name</span><span class="p">):</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="n">port_name</span><span class="p">]</span><span class="o">.</span><span class="n">input_queue</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="n">port_name</span><span class="p">]</span><span class="o">.</span><span class="n">rx_input</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">TokenMessage</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Received a message </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2"> on the token input port that is not a token message&quot;</span><span class="p">)</span>
+            <span class="n">token</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">token</span>
+            <span class="n">req</span> <span class="o">=</span> <span class="n">ModuleBehavior</span><span class="o">.</span><span class="n">req_handle_new_token</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">behavior</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_handle_collect_garbage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">ModuleBehavior</span><span class="o">.</span><span class="n">req_handle_collect_garbage</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">behavior</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">next_garbage_collection</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">sim_time</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">GARBAGE_COLLECTION_PERIOD</span><span class="o">*</span><span class="mf">1e6</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Leonardo Bacciottini.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

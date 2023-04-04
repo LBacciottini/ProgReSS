@@ -11,7 +11,7 @@ from scipy.stats import norm
 from topology import get_topology
 from metrics_collector import TokenUtilizationMetricsCollector
 import netsquid as ns
-import progress.sdqn_logging as log
+import progress.progress_logging as log
 
 
 class TDRCollector:

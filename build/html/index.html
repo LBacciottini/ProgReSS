@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to ProgReSS’ documentation! &mdash; ProgReSS 1.0.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="progress.abstraction" href="progress/abstraction/abstraction.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            ProgReSS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="progress/abstraction/abstraction.html">progress.abstraction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="progress/device.html">progress.device</a></li>
+<li class="toctree-l1"><a class="reference internal" href="progress/hardware/hardware.html">progress.hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="progress/logging.html">progress.progress_logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="progress/messaging/messaging.html">progress.messaging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="progress/pqnet/pqnet.html">progress.pqnet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="progress/sockets.html">progress.sockets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">ProgReSS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Welcome to ProgReSS’ documentation!</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-progress.__init__">
+<span id="welcome-to-progress-documentation"></span><h1>Welcome to ProgReSS’ documentation!<a class="headerlink" href="#module-progress.__init__" title="Permalink to this heading"></a></h1>
+<p>Programmable quantum Network Software Simulator (ProgReSS) is a package that implements a programmable quantum network
+simulation environment.</p>
+<p>It can be used to simulate quantum networks with programmable NET layer. The NET layer is
+implemented using the PQ-NET internal framework. The PQ-NET framework is a framework that allows the user to implement
+custom quantum network protocols by implementing custom modules that can be connected together to form a Directed
+Acyclic Graph (DAG).</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="progress.__init__.QNetworkDevice">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.__init__.</span></span><span class="sig-name descname"><span class="pre">QNetworkDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_qnics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cnics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_qbits_qnic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qproc_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/progress/device.html#QNetworkDevice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.__init__.QNetworkDevice" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></p>
+<p>A quantum network device that can be used as a programmable repeater or end node of the network.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>device_id</strong><span class="classifier">int</span></dt><dd><p>The ID of the device. Should be unique in the network.</p>
+</dd>
+<dt><strong>num_qnics</strong><span class="classifier">int</span></dt><dd><p>The number of QNICs.</p>
+</dd>
+<dt><strong>num_cnics</strong><span class="classifier">int</span></dt><dd><p>The number of classical NICs.</p>
+</dd>
+<dt><strong>num_qbits_qnic</strong><span class="classifier">int</span></dt><dd><p>The number of memory qubits allocated to each QNIC.</p>
+</dd>
+<dt><strong>qproc_params</strong><span class="classifier">dict[str, any] or None, optional</span></dt><dd><p>The parameters of the quantum processor of this device. See <a class="reference internal" href="progress/hardware/qhardware.html#progress.hardware.qhardware.get_processor" title="progress.hardware.qhardware.get_processor"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_processor()</span></code></a>
+for details. If <cite>None</cite>, a default processor is created. Defaults to <cite>None</cite>. The field <cite>num_positions</cite> can be
+omitted, as it is set to <cite>num_qnics * num_qbits_qnic</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<dl class="simple">
+<dt>The device architecture is composed of the following layers (bottom-up):</dt><dd><ul class="simple">
+<li><p>Physical layer: The quantum hardware (quantum memory, processor, QNICs, etc.)</p></li>
+<li><p>Link Layer Protocols: The clasical control protocols to generate robust entanglement over each QNIC.</p></li>
+<li><p>Quantum Hardware Abstraction Layer: The QHAL (see <a class="reference internal" href="progress/abstraction/qhal.html#progress.abstraction.qhal.QHAL" title="progress.abstraction.qhal.QHAL"><code class="xref py py-class docutils literal notranslate"><span class="pre">QHAL</span></code></a>). It abstracts the
+quantum hardware resources and provides a unified interface for the NET layer.</p></li>
+<li><p>NET layer: The NET layer is responsible for processing link-generated entanglement and delivering long-range
+entanglement to the applications. We implemented the NET layer as a programmable framework called PQ-NET
+(see <a class="reference internal" href="progress/pqnet/pqnet.html#module-progress.pqnet.__init__" title="progress.pqnet.__init__"><code class="xref py py-class docutils literal notranslate"><span class="pre">__init__</span></code></a>).</p></li>
+</ul>
+</dd>
+<dt>Ports:</dt><dd><ul class="simple">
+<li><p>q_{i}: The i-th QNIC of this device.</p></li>
+<li><p>c_{i}: The i-th classical NIC of this device.</p></li>
+<li><p>controller: The controller port of this device. It is used for controller-device communication.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>device_id</strong><span class="classifier">int</span></dt><dd><p>The ID of the device.</p>
+</dd>
+<dt><strong>num_qnics</strong><span class="classifier">int</span></dt><dd><p>The number of QNICs of this device.</p>
+</dd>
+<dt><strong>num_cnics</strong><span class="classifier">int</span></dt><dd><p>The number of classical NICs of this device.</p>
+</dd>
+<dt><strong>qhardware</strong><span class="classifier"><a class="reference internal" href="progress/hardware/qhardware.html#progress.hardware.qhardware.QHardware" title="progress.hardware.qhardware.QHardware"><code class="xref py py-class docutils literal notranslate"><span class="pre">QHardware</span></code></a></span></dt><dd><p>The quantum hardware of this device.</p>
+</dd>
+<dt><strong>qhal</strong><span class="classifier"><a class="reference internal" href="progress/abstraction/qhal.html#progress.abstraction.qhal.QHAL" title="progress.abstraction.qhal.QHAL"><code class="xref py py-class docutils literal notranslate"><span class="pre">QHAL</span></code></a></span></dt><dd><p>The QHAL of this device.</p>
+</dd>
+<dt><strong>net_manager</strong><span class="classifier"><a class="reference internal" href="progress/pqnet/net_manager.html#progress.pqnet.net_manager.NetManagerProtocol" title="progress.pqnet.net_manager.NetManagerProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">NetManagerProtocol</span></code></a></span></dt><dd><p>The NET manager installed on this device.</p>
+</dd>
+<dt><strong>message_router</strong><span class="classifier"><a class="reference internal" href="progress/messaging/router.html#progress.messaging.router.MessageRoutingService" title="progress.messaging.router.MessageRoutingService"><code class="xref py py-class docutils literal notranslate"><span class="pre">MessageRoutingService</span></code></a></span></dt><dd><p>The message router installed on this device.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="progress/abstraction/abstraction.html">progress.abstraction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="progress/abstraction/abstraction.html#progress.abstraction.__init__.QHAL"><code class="docutils literal notranslate"><span class="pre">QHAL</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/abstraction/qhal.html">progress.abstraction.qhal</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="progress/device.html">progress.device</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="progress/device.html#progress.device.QNetworkDevice"><code class="docutils literal notranslate"><span class="pre">QNetworkDevice</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="progress/hardware/hardware.html">progress.hardware</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="progress/hardware/hardware.html#progress.hardware.__init__.MPSConnection"><code class="docutils literal notranslate"><span class="pre">MPSConnection</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/hardware/hardware.html#progress.hardware.__init__.QHardware"><code class="docutils literal notranslate"><span class="pre">QHardware</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/hardware/llps/llps.html">progress.hardware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/hardware/ep_source.html">progress.hardware.ep_source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/hardware/mps_connection.html">progress.hardware.mps_connection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/hardware/qhardware.html">progress.hardware.qhardware</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="progress/logging.html">progress.progress_logging</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="progress/logging.html#progress.progress_logging.critical"><code class="docutils literal notranslate"><span class="pre">critical()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/logging.html#progress.progress_logging.debug"><code class="docutils literal notranslate"><span class="pre">debug()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/logging.html#progress.progress_logging.error"><code class="docutils literal notranslate"><span class="pre">error()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/logging.html#progress.progress_logging.info"><code class="docutils literal notranslate"><span class="pre">info()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/logging.html#progress.progress_logging.log_to_console"><code class="docutils literal notranslate"><span class="pre">log_to_console()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/logging.html#progress.progress_logging.log_to_file"><code class="docutils literal notranslate"><span class="pre">log_to_file()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/logging.html#progress.progress_logging.remove_console_log"><code class="docutils literal notranslate"><span class="pre">remove_console_log()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/logging.html#progress.progress_logging.set_log_level"><code class="docutils literal notranslate"><span class="pre">set_log_level()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/logging.html#progress.progress_logging.warning"><code class="docutils literal notranslate"><span class="pre">warning()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="progress/messaging/messaging.html">progress.messaging</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="progress/messaging/messaging.html#progress.messaging.__init__.ClassicalRoutingTableMessage"><code class="docutils literal notranslate"><span class="pre">ClassicalRoutingTableMessage</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/messaging/messaging.html#progress.messaging.__init__.MessageRoutingService"><code class="docutils literal notranslate"><span class="pre">MessageRoutingService</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/messaging/messages.html">progress.messaging.messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/messaging/router.html">progress.messaging.router</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="progress/pqnet/pqnet.html">progress.pqnet</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="progress/pqnet/dag.html">progress.pqnet.dag</a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/pqnet/messages.html">progress.pqnet.messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/pqnet/net_manager.html">progress.pqnet.net_manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/pqnet/p_module.html">progress.pqnet.p_module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/pqnet/repository.html">progress.pqnet.repository</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="progress/sockets.html">progress.sockets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="progress/sockets.html#progress.sockets.Socket"><code class="docutils literal notranslate"><span class="pre">Socket</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/sockets.html#progress.sockets.Token"><code class="docutils literal notranslate"><span class="pre">Token</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/sockets.html#progress.sockets.TokenMessage"><code class="docutils literal notranslate"><span class="pre">TokenMessage</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="progress/sockets.html#progress.sockets.TokenTable"><code class="docutils literal notranslate"><span class="pre">TokenTable</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="progress/abstraction/abstraction.html" class="btn btn-neutral float-right" title="progress.abstraction" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Leonardo Bacciottini.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

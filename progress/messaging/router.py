@@ -1,13 +1,13 @@
 """
-A service that routes classical messages incoming and outgoing from the device. It listens to all classical ports and
-routes messages to the correct inner layer. If the message is meant for another device, it is routed to the correct
-output port.
+This module contains aservice that routes classical messages incoming and outgoing from the device.
+It listens to all classical ports and routes messages to the correct inner layer.
+If the message is meant for another device, it is routed to the correct output port.
 """
 
 import netsquid as ns
 from progress.messaging.messages import ClassicalRoutingTableMessage
-from progress.net.messages import InterModuleMessage, ReplaceDAGMessage
-from progress import sdqn_logging as log
+from progress.pqnet.messages import InterModuleMessage, ReplaceDAGMessage
+from progress import progress_logging as log
 
 
 class MessageRoutingService(ns.protocols.NodeProtocol):

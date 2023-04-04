@@ -1,15 +1,21 @@
+"""
+This module contains the classes that are used to represent sockets and tokens. Sockets are an internal abstraction
+that are used to represent qubits. Tokens are the external abstraction of qubits that is used at the NET layer.
+A token is created when Link Layer protocols signal the generation of a new entangled pair.
+"""
+
 from collections import namedtuple
 
 import netsquid as ns
 
-__all__ = ['Socket', 'Token', 'TokenTable']
+__all__ = ['Socket', 'Token', 'TokenTable', 'TokenMessage']
 
 
 # Socket = namedtuple('Socket', ['node', 'interface', 'idx'])
 
 class Socket:
     """
-    A socket is a logical abstraction for a qubit. The name derives from the fact that
+    A socket is an internal logical abstraction for an entangled qubit. The name derives from the fact that
     the qubit is entangled with (at least) another qubit, and thus it represents one end of the entangling connection.
 
     Parameters
@@ -58,8 +64,8 @@ class Socket:
 Token = namedtuple('Token', ['socket', 'other_end', 'current_state', 'pct', 'purified',
                              'additional_info'])
 """
-A token for a socket. The owner of an instance of this class is the only owner of the socket. The token
-also contains information about the state of the socket and its entangled connection.
+A token is an external logical abstraction for an entangled qubit. It is used at the NET layer to manage quantum
+resources in a hardware-independent fashion.
 
 Parameters
 -----------
@@ -72,6 +78,7 @@ Parameters
         >1 -> number of purification rounds.
     additional_info (dict) : Additional information about the socket.
 """
+
 
 class TokenMessage(ns.components.Message):
     """
@@ -100,9 +107,9 @@ def have_same_ends(token1, token2):
 
     Parameters
     -----------
-    token1 : :class:`~sdqn.sockets.Token`
+    token1 : :class:`~progress.sockets.Token`
         The first token.
-    token2 : :class:`~sdqn.sockets.Token`
+    token2 : :class:`~progress.sockets.Token`
         The second token.
 
     Returns
@@ -127,7 +134,7 @@ class TokenTable:
 
         Returns
         ----------
-        list[:class:`~sdqn.sockets.Token`]
+        list[:class:`~progress.sockets.Token`]
             The list of tokens in the table.
         """
         return self._table.copy()
@@ -151,14 +158,14 @@ class TokenTable:
         Parameters
         ----------------
 
-        local_end : :class:`~sdqn.sockets.Socket`
+        local_end : :class:`~progress.sockets.Socket`
             The local end of the token to pop.
         raise_error : bool
             Whether to raise a ValueError if the token is not found. If False, the function will return None.
 
         Returns
         ------------
-        :class:`~sdqn.sockets.Token`
+        :class:`~progress.sockets.Token`
             The socket descriptor that was popped.
         """
         for descriptor in self._table:
@@ -176,14 +183,14 @@ class TokenTable:
 
         Parameters
         ----------
-        local_end : :class:`~sdqn.sockets.Socket`
+        local_end : :class:`~progress.sockets.Socket`
             The local end of the token to get.
         raise_error : bool
             Whether to raise a ValueError if the token is not found. If False, the function will return None.
 
         Returns
         -------
-        :class:`~sdqn.sockets.Token` or None
+        :class:`~progress.sockets.Token` or None
             The token that was found. None if the token was not found and raise_error is False.
         """
         for token in self._table:
@@ -200,9 +207,9 @@ class TokenTable:
 
         Parameters
         ----------
-        local_end : :class:`~sdqn.sockets.Socket`
+        local_end : :class:`~progress.sockets.Socket`
             The local end of the socket descriptor to replace.
-        new_token : :class:`~sdqn.sockets.Token`
+        new_token : :class:`~progress.sockets.Token`
             The new descriptor to replace the old one with.
         raise_error : bool
             Whether to raise a ValueError if the socket is not found. If False, the function will return False.
@@ -230,7 +237,7 @@ class TokenTable:
 
     def collect_garbage(self, current_time):
         r"""
-        Remove all expired sockets from the socket table.
+        Remove all expired tokens from the token table.
 
         Parameters
         ----------
@@ -239,7 +246,7 @@ class TokenTable:
 
         Returns
         ----------
-        list[:class:`~sdqn.sockets.Token`]
+        list[:class:`~progress.sockets.Token`]
             The list of tokens that were removed.
         """
         to_remove = []
@@ -267,7 +274,7 @@ class TokenTable:
 
         Returns
         ----------
-        :class:`~sdqn.sockets.Token` or None
+        :class:`~progress.sockets.Token` or None
             The socket descriptor with the specified other end node. `None` if not found
         """
         if policy == "LRTF":
@@ -290,7 +297,7 @@ class TokenTable:
 
         Returns
         ----------
-        :class:`~sdqn.sockets.Token` or None
+        :class:`progress.sockets.Token` or None
             The token with the specified other end node. `None` if not found
         """
         if isinstance(other_end_node, int):

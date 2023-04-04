@@ -2,7 +2,7 @@ import netsquid as ns
 import pandas as pd
 import matplotlib.pyplot as plt
 
-import progress.net.repository
+import progress.pqnet.repository
 
 
 class TokenUtilizationMetricsCollector:
@@ -15,31 +15,31 @@ class TokenUtilizationMetricsCollector:
         self.data_collector = ns.util.DataCollector(get_data_function=self.handle_trigger)
 
         ev_expr_new_token = ns.pydynaa.core.EventExpression(
-            event_type=progress.net.repository.WaitForSwappingModuleBehavior.NEW_TOKEN_EVT_TYPE)
+            event_type=progress.pqnet.repository.WaitForSwappingModuleBehavior.NEW_TOKEN_EVT_TYPE)
 
         freed_token = ns.pydynaa.core.EventExpression(
-            event_type=progress.net.repository.FreeEverythingModuleBehavior.FREED_TOKEN_EVT_TYPE)
+            event_type=progress.pqnet.repository.FreeEverythingModuleBehavior.FREED_TOKEN_EVT_TYPE)
 
         self.data_collector.collect_on(triggers=[ev_expr_new_token, freed_token], combine_rule="OR")
 
     @staticmethod
     def handle_new_token(ev_expr):
         protocol = ev_expr.triggered_events[-1].source
-        result = protocol.get_signal_result(progress.net.repository.WaitForSwappingModuleBehavior.NEW_TOKEN_SIGNAL)
+        result = protocol.get_signal_result(progress.pqnet.repository.WaitForSwappingModuleBehavior.NEW_TOKEN_SIGNAL)
         return {'time': result[0], 'type': 'new_token'}
 
     @staticmethod
     def handle_freed_token(ev_expr):
         protocol = ev_expr.triggered_events[-1].source
-        result = protocol.get_signal_result(progress.net.repository.FreeEverythingModuleBehavior.FREED_TOKEN_SIGNAL)
+        result = protocol.get_signal_result(progress.pqnet.repository.FreeEverythingModuleBehavior.FREED_TOKEN_SIGNAL)
         return {'time': result[0], 'type': 'freed_token'}
 
     def handle_trigger(self, ev_expr):
         protocol = ev_expr.triggered_events[-1].source
 
-        if isinstance(protocol, progress.net.repository.WaitForSwappingModuleBehavior):
+        if isinstance(protocol, progress.pqnet.repository.WaitForSwappingModuleBehavior):
             return self.handle_new_token(ev_expr)
-        elif isinstance(protocol, progress.net.repository.FreeEverythingModuleBehavior):
+        elif isinstance(protocol, progress.pqnet.repository.FreeEverythingModuleBehavior):
             return self.handle_freed_token(ev_expr)
 
     def get_counts(self):
@@ -69,7 +69,7 @@ class FidelityMetricsCollector:
             event_type=progress.examples.fish_network.controller.DummyControllerProtocol.NEW_SCENARIO_EVT_TYPE)
 
         freed_token = ns.pydynaa.core.EventExpression(
-            event_type=progress.net.repository.FreeEverythingModuleBehavior.FREED_TOKEN_EVT_TYPE)
+            event_type=progress.pqnet.repository.FreeEverythingModuleBehavior.FREED_TOKEN_EVT_TYPE)
 
         self.data_collector.collect_on(triggers=[new_scenario, freed_token], combine_rule="OR")
 
@@ -81,7 +81,7 @@ class FidelityMetricsCollector:
 
     def handle_freed_token(self, ev_expr):
         protocol = ev_expr.triggered_events[-1].source
-        result = protocol.get_signal_result(progress.net.repository.FreeEverythingModuleBehavior.FREED_TOKEN_SIGNAL)
+        result = protocol.get_signal_result(progress.pqnet.repository.FreeEverythingModuleBehavior.FREED_TOKEN_SIGNAL)
         if result[1].socket.node == self.node_a and result[1].other_end.node == self.node_b:
             return {'time': result[0], 'type': 'freed_token', 'fid_sq': result[2]}
 
@@ -90,7 +90,7 @@ class FidelityMetricsCollector:
 
         if isinstance(protocol, progress.examples.fish_network.controller.DummyControllerProtocol):
             return self.handle_new_scenario(ev_expr)
-        elif isinstance(protocol, progress.net.repository.FreeEverythingModuleBehavior):
+        elif isinstance(protocol, progress.pqnet.repository.FreeEverythingModuleBehavior):
             return self.handle_freed_token(ev_expr)
 
     def plot_fidelity(self, sample_dots=False):
@@ -186,7 +186,7 @@ class AggregateMetricsCollector:
             event_type=progress.examples.fish_network.controller.DummyControllerProtocol.NEW_SCENARIO_EVT_TYPE)
 
         freed_token = ns.pydynaa.core.EventExpression(
-            event_type=progress.net.repository.FreeEverythingModuleBehavior.FREED_TOKEN_EVT_TYPE)
+            event_type=progress.pqnet.repository.FreeEverythingModuleBehavior.FREED_TOKEN_EVT_TYPE)
 
         self.data_collector.collect_on(triggers=[new_scenario, freed_token], combine_rule="OR")
 
@@ -198,7 +198,7 @@ class AggregateMetricsCollector:
 
     def handle_freed_token(self, ev_expr):
         protocol = ev_expr.triggered_events[-1].source
-        result = protocol.get_signal_result(progress.net.repository.FreeEverythingModuleBehavior.FREED_TOKEN_SIGNAL)
+        result = protocol.get_signal_result(progress.pqnet.repository.FreeEverythingModuleBehavior.FREED_TOKEN_SIGNAL)
         if result[1].socket.node == self.node_a and result[1].other_end.node == self.node_b:
             return {'time': result[0], 'type': 'freed_token', 'fid_sq': result[2], 'slot_id': result[3]}
 
@@ -207,7 +207,7 @@ class AggregateMetricsCollector:
 
         if isinstance(protocol, progress.examples.fish_network.controller.DummyControllerProtocol):
             return self.handle_new_scenario(ev_expr)
-        elif isinstance(protocol, progress.net.repository.FreeEverythingModuleBehavior):
+        elif isinstance(protocol, progress.pqnet.repository.FreeEverythingModuleBehavior):
             return self.handle_freed_token(ev_expr)
 
     def plot_boxes(self):

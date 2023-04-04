@@ -2,10 +2,10 @@
 A dummy controller that has some pre-loaded DAGS and can send them to the devices
 """
 from progress.messaging.messages import ClassicalRoutingTableMessage
-from progress.net.messages import ReplaceDAGMessage
-from progress.net.repository import *
-from progress.net.dag import DAGFactory
-from progress import sdqn_logging as log
+from progress.pqnet.messages import ReplaceDAGMessage
+from progress.pqnet.repository import *
+from progress.pqnet.dag import DAGFactory
+from progress import progress_logging as log
 
 import netsquid as ns
 

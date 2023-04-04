@@ -3,7 +3,7 @@ import logging
 import netsquid as ns
 
 from progress.examples.fish_network.topology import get_topology
-import progress.sdqn_logging as log
+import progress.progress_logging as log
 from bulk_executor import TDRCollector
 
 # the main function

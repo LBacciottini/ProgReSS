@@ -15,7 +15,7 @@ import netsquid as ns
 __all__ = ["MPSSourceNode"]
 
 from progress.hardware.llps.mps import MPSSourceProtocol
-from progress import sdqn_logging as log
+from progress import progress_logging as log
 
 
 class MPSSource(QSource):

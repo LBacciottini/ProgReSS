@@ -7,7 +7,7 @@ in the middle of the physical link between the two nodes.
 
 from netsquid.components import Message, SourceStatus
 from netsquid.protocols.nodeprotocols import NodeProtocol
-import progress.sdqn_logging as qilog
+import progress.progress_logging as qilog
 import netsquid as ns
 
 __all__ = ["MPSProtocol", "MPSSourceProtocol"]
@@ -89,7 +89,7 @@ class MPSProtocol(LinkProtocol):
     def run(self):
         r"""
         References
-        -----------
+        ----------
 
         See :meth:`netsquid.protocols.Protocol.run`.
         """
@@ -194,7 +194,7 @@ class MPSSourceProtocol(NodeProtocol):
     def start(self):
         r"""
         References
-        -----------
+        ----------
 
         See :meth:`netsquid.protocols.Protocol.start`.
         """

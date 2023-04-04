@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>progress.pqnet.repository &mdash; ProgReSS 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="progress.sockets" href="../sockets.html" />
+    <link rel="prev" title="progress.pqnet.p_module" href="p_module.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            ProgReSS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../abstraction/abstraction.html">progress.abstraction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../device.html">progress.device</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hardware/hardware.html">progress.hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../logging.html">progress.progress_logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../messaging/messaging.html">progress.messaging</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="pqnet.html">progress.pqnet</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="dag.html">progress.pqnet.dag</a></li>
+<li class="toctree-l2"><a class="reference internal" href="messages.html">progress.pqnet.messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="net_manager.html">progress.pqnet.net_manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="p_module.html">progress.pqnet.p_module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">progress.pqnet.repository</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#progress.pqnet.repository.DEJMPSModuleBehavior"><code class="docutils literal notranslate"><span class="pre">DEJMPSModuleBehavior</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.repository.DEJMPSModuleBehavior.handle_message"><code class="docutils literal notranslate"><span class="pre">DEJMPSModuleBehavior.handle_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.repository.DEJMPSModuleBehavior.handle_new_token"><code class="docutils literal notranslate"><span class="pre">DEJMPSModuleBehavior.handle_new_token()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.repository.DEJMPSModuleBehavior.handle_response"><code class="docutils literal notranslate"><span class="pre">DEJMPSModuleBehavior.handle_response()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#progress.pqnet.repository.EntanglementSwappingModuleBehavior"><code class="docutils literal notranslate"><span class="pre">EntanglementSwappingModuleBehavior</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.repository.EntanglementSwappingModuleBehavior.handle_message"><code class="docutils literal notranslate"><span class="pre">EntanglementSwappingModuleBehavior.handle_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.repository.EntanglementSwappingModuleBehavior.handle_new_token"><code class="docutils literal notranslate"><span class="pre">EntanglementSwappingModuleBehavior.handle_new_token()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.repository.EntanglementSwappingModuleBehavior.handle_response"><code class="docutils literal notranslate"><span class="pre">EntanglementSwappingModuleBehavior.handle_response()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#progress.pqnet.repository.FreeEverythingModuleBehavior"><code class="docutils literal notranslate"><span class="pre">FreeEverythingModuleBehavior</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.repository.FreeEverythingModuleBehavior.FREED_TOKEN_EVT_TYPE"><code class="docutils literal notranslate"><span class="pre">FreeEverythingModuleBehavior.FREED_TOKEN_EVT_TYPE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.repository.FreeEverythingModuleBehavior.handle_message"><code class="docutils literal notranslate"><span class="pre">FreeEverythingModuleBehavior.handle_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.repository.FreeEverythingModuleBehavior.handle_new_token"><code class="docutils literal notranslate"><span class="pre">FreeEverythingModuleBehavior.handle_new_token()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.repository.FreeEverythingModuleBehavior.handle_response"><code class="docutils literal notranslate"><span class="pre">FreeEverythingModuleBehavior.handle_response()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#progress.pqnet.repository.RoundRobinSchedulingModuleBehavior"><code class="docutils literal notranslate"><span class="pre">RoundRobinSchedulingModuleBehavior</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.repository.RoundRobinSchedulingModuleBehavior.handle_message"><code class="docutils literal notranslate"><span class="pre">RoundRobinSchedulingModuleBehavior.handle_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.repository.RoundRobinSchedulingModuleBehavior.handle_new_token"><code class="docutils literal notranslate"><span class="pre">RoundRobinSchedulingModuleBehavior.handle_new_token()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.repository.RoundRobinSchedulingModuleBehavior.handle_response"><code class="docutils literal notranslate"><span class="pre">RoundRobinSchedulingModuleBehavior.handle_response()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#progress.pqnet.repository.ShortCircuitModuleBehavior"><code class="docutils literal notranslate"><span class="pre">ShortCircuitModuleBehavior</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.repository.ShortCircuitModuleBehavior.handle_message"><code class="docutils literal notranslate"><span class="pre">ShortCircuitModuleBehavior.handle_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.repository.ShortCircuitModuleBehavior.handle_new_token"><code class="docutils literal notranslate"><span class="pre">ShortCircuitModuleBehavior.handle_new_token()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.repository.ShortCircuitModuleBehavior.handle_response"><code class="docutils literal notranslate"><span class="pre">ShortCircuitModuleBehavior.handle_response()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#progress.pqnet.repository.WaitForSwappingModuleBehavior"><code class="docutils literal notranslate"><span class="pre">WaitForSwappingModuleBehavior</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.repository.WaitForSwappingModuleBehavior.NEW_TOKEN_EVT_TYPE"><code class="docutils literal notranslate"><span class="pre">WaitForSwappingModuleBehavior.NEW_TOKEN_EVT_TYPE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.repository.WaitForSwappingModuleBehavior.handle_message"><code class="docutils literal notranslate"><span class="pre">WaitForSwappingModuleBehavior.handle_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.repository.WaitForSwappingModuleBehavior.handle_new_token"><code class="docutils literal notranslate"><span class="pre">WaitForSwappingModuleBehavior.handle_new_token()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.repository.WaitForSwappingModuleBehavior.handle_response"><code class="docutils literal notranslate"><span class="pre">WaitForSwappingModuleBehavior.handle_response()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../sockets.html">progress.sockets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ProgReSS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="pqnet.html">progress.pqnet</a></li>
+      <li class="breadcrumb-item active">progress.pqnet.repository</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/progress/pqnet/repository.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-progress.pqnet.repository">
+<span id="progress-pqnet-repository"></span><h1>progress.pqnet.repository<a class="headerlink" href="#module-progress.pqnet.repository" title="Permalink to this heading"></a></h1>
+<p>Some popular, ready-to-use, module behaviors for the DAG</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="progress.pqnet.repository.DEJMPSModuleBehavior">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.pqnet.repository.</span></span><span class="sig-name descname"><span class="pre">DEJMPSModuleBehavior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest_device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest_module_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_solicitor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qnic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#DEJMPSModuleBehavior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.DEJMPSModuleBehavior" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="p_module.html#progress.pqnet.p_module.ProcessingModuleBehavior" title="progress.pqnet.p_module.ProcessingModuleBehavior"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessingModuleBehavior</span></code></a></p>
+<p>This class implements the behavior of a module that performs the DEJMPS protocol.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>module_id</strong><span class="classifier">int</span></dt><dd><p>The ID of the module</p>
+</dd>
+<dt><strong>dest_device</strong><span class="classifier">int</span></dt><dd><p>The ID of the device that the distillation outcome must be sent to</p>
+</dd>
+<dt><strong>dest_module_id</strong><span class="classifier">int</span></dt><dd><p>The ID of the module on the destination device that the distillation outcome must be sent to</p>
+</dd>
+<dt><strong>is_solicitor</strong><span class="classifier">bool</span></dt><dd><p>Whether the module is the solicitor or not</p>
+</dd>
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>The name of the module</p>
+</dd>
+<dt><strong>node</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></span></dt><dd><p>The module that this behavior is attached to</p>
+</dd>
+<dt><strong>qnic</strong><span class="classifier">int or None, optional</span></dt><dd><p>See <a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior" title="progress.pqnet.p_module.ModuleBehavior"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleBehavior</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.repository.DEJMPSModuleBehavior.handle_message">
+<span class="sig-name descname"><span class="pre">handle_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#DEJMPSModuleBehavior.handle_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.DEJMPSModuleBehavior.handle_message" title="Permalink to this definition"></a></dt>
+<dd><p>If the module is the solicitor, it receives distillation outcomes from the solicited module.
+If the module is not the solicitor, it receives distillation solicitations from the solicitor.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle_message()</span></code></dt><dd></dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.repository.DEJMPSModuleBehavior.handle_new_token">
+<span class="sig-name descname"><span class="pre">handle_new_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#DEJMPSModuleBehavior.handle_new_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.DEJMPSModuleBehavior.handle_new_token" title="Permalink to this definition"></a></dt>
+<dd><p>If the module is the solicitor, it must check whether a new distillation can be carried out.
+If the module is not the solicitor, it must wait for a message from the solicitor, and just stores the token.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle_new_token()</span></code></dt><dd></dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.repository.DEJMPSModuleBehavior.handle_response">
+<span class="sig-name descname"><span class="pre">handle_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#DEJMPSModuleBehavior.handle_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.DEJMPSModuleBehavior.handle_response" title="Permalink to this definition"></a></dt>
+<dd><p>If the module is the solicitor, it must send the distillation outcome to the solicited module.
+If the module is not the solicitor, it must check whether the distillation was successful and tell
+the solicitor.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle_response()</span></code></dt><dd></dd>
+</dl>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="progress.pqnet.repository.EntanglementSwappingModuleBehavior">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.pqnet.repository.</span></span><span class="sig-name descname"><span class="pre">EntanglementSwappingModuleBehavior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dest_devices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest_module_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qnic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#EntanglementSwappingModuleBehavior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.EntanglementSwappingModuleBehavior" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="p_module.html#progress.pqnet.p_module.ProcessingModuleBehavior" title="progress.pqnet.p_module.ProcessingModuleBehavior"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessingModuleBehavior</span></code></a></p>
+<p>This class implements the behavior of a module that performs the entanglement swapping protocol.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.repository.EntanglementSwappingModuleBehavior.handle_message">
+<span class="sig-name descname"><span class="pre">handle_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#EntanglementSwappingModuleBehavior.handle_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.EntanglementSwappingModuleBehavior.handle_message" title="Permalink to this definition"></a></dt>
+<dd><p>This method is called when a classical message is received from another remote module.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>request</strong><span class="classifier"><a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior.req_handle_message" title="progress.pqnet.p_module.ModuleBehavior.req_handle_message"><code class="xref py py-class docutils literal notranslate"><span class="pre">req_handle_message</span></code></a></span></dt><dd><p>The request containing the message to handle.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.repository.EntanglementSwappingModuleBehavior.handle_new_token">
+<span class="sig-name descname"><span class="pre">handle_new_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#EntanglementSwappingModuleBehavior.handle_new_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.EntanglementSwappingModuleBehavior.handle_new_token" title="Permalink to this definition"></a></dt>
+<dd><p>This method is called when a new token is received as input.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>request</strong><span class="classifier"><a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior.req_handle_new_token" title="progress.pqnet.p_module.ModuleBehavior.req_handle_new_token"><code class="xref py py-class docutils literal notranslate"><span class="pre">req_handle_new_token</span></code></a></span></dt><dd><p>The request containing the new token to handle.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.repository.EntanglementSwappingModuleBehavior.handle_response">
+<span class="sig-name descname"><span class="pre">handle_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#EntanglementSwappingModuleBehavior.handle_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.EntanglementSwappingModuleBehavior.handle_response" title="Permalink to this definition"></a></dt>
+<dd><p>This method is called when a response to a previous request is received from the qhal.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>request</strong><span class="classifier"><a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior.req_handle_response" title="progress.pqnet.p_module.ModuleBehavior.req_handle_response"><code class="xref py py-class docutils literal notranslate"><span class="pre">req_handle_response</span></code></a></span></dt><dd><p>The request containing the QHAL response to handle. The response contains the outcome and the originating
+request piggybacked.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="progress.pqnet.repository.FreeEverythingModuleBehavior">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.pqnet.repository.</span></span><span class="sig-name descname"><span class="pre">FreeEverythingModuleBehavior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qnic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collect_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#FreeEverythingModuleBehavior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.FreeEverythingModuleBehavior" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="p_module.html#progress.pqnet.p_module.ProcessingModuleBehavior" title="progress.pqnet.p_module.ProcessingModuleBehavior"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProcessingModuleBehavior</span></code></a></p>
+<p>This class implements the behavior of a dummy module that frees all tokens.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>The name of the module</p>
+</dd>
+<dt><strong>node</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></span></dt><dd><p>The module that this behavior is attached to</p>
+</dd>
+<dt><strong>qnic</strong><span class="classifier">int or None, optional</span></dt><dd><p>See <a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior" title="progress.pqnet.p_module.ModuleBehavior"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleBehavior</span></code></a>.</p>
+</dd>
+<dt><strong>collect_stats</strong><span class="classifier">bool, optional</span></dt><dd><p>Whether to collect statistics about the freed tokens.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>FREED_TOKEN_SIGNAL</strong><span class="classifier">str</span></dt><dd><p>Label used to signal that a token has been freed. Only used if <code class="docutils literal notranslate"><span class="pre">collect_stats</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+</dd>
+<dt><strong>FREED_TOKEN_EVT_TYPE</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">pydynaa.core.EventType</span></code></span></dt><dd><p>Event type used to signal that a token has been freed. Only used if <code class="docutils literal notranslate"><span class="pre">collect_stats</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="progress.pqnet.repository.FreeEverythingModuleBehavior.FREED_TOKEN_EVT_TYPE">
+<span class="sig-name descname"><span class="pre">FREED_TOKEN_EVT_TYPE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pydynaa.core.EventType</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#progress.pqnet.repository.FreeEverythingModuleBehavior.FREED_TOKEN_EVT_TYPE" title="Permalink to this definition"></a></dt>
+<dd><p>Label used to signal that a token has been freed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.repository.FreeEverythingModuleBehavior.handle_message">
+<span class="sig-name descname"><span class="pre">handle_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#FreeEverythingModuleBehavior.handle_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.FreeEverythingModuleBehavior.handle_message" title="Permalink to this definition"></a></dt>
+<dd><p>Raises an error if called. This module does not receive messages.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior.handle_message" title="progress.pqnet.p_module.ModuleBehavior.handle_message"><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle_message()</span></code></a></dt><dd></dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.repository.FreeEverythingModuleBehavior.handle_new_token">
+<span class="sig-name descname"><span class="pre">handle_new_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#FreeEverythingModuleBehavior.handle_new_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.FreeEverythingModuleBehavior.handle_new_token" title="Permalink to this definition"></a></dt>
+<dd><p>Free the token.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><code class="xref py py-meth docutils literal notranslate"><span class="pre">progress.pqnet.p_module.ProcessingModuleBehavior.handle_new_token()</span></code></dt><dd></dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.repository.FreeEverythingModuleBehavior.handle_response">
+<span class="sig-name descname"><span class="pre">handle_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#FreeEverythingModuleBehavior.handle_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.FreeEverythingModuleBehavior.handle_response" title="Permalink to this definition"></a></dt>
+<dd><p>Raises an error if called. This module does not receive responses.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior.handle_response" title="progress.pqnet.p_module.ModuleBehavior.handle_response"><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle_response()</span></code></a></dt><dd></dd>
+</dl>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="progress.pqnet.repository.RoundRobinSchedulingModuleBehavior">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.pqnet.repository.</span></span><span class="sig-name descname"><span class="pre">RoundRobinSchedulingModuleBehavior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qnic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#RoundRobinSchedulingModuleBehavior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.RoundRobinSchedulingModuleBehavior" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="p_module.html#progress.pqnet.p_module.SchedulingModuleBehavior" title="progress.pqnet.p_module.SchedulingModuleBehavior"><code class="xref py py-class docutils literal notranslate"><span class="pre">SchedulingModuleBehavior</span></code></a></p>
+<p>This class implements the behavior of a module that performs a simple, non-blocking, round-robin
+scheduling of tokens among output ports.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.repository.RoundRobinSchedulingModuleBehavior.handle_message">
+<span class="sig-name descname"><span class="pre">handle_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#RoundRobinSchedulingModuleBehavior.handle_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.RoundRobinSchedulingModuleBehavior.handle_message" title="Permalink to this definition"></a></dt>
+<dd><p>Raise an error when called. This module does not receive messages.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior.handle_message" title="progress.pqnet.p_module.ModuleBehavior.handle_message"><code class="xref py py-meth docutils literal notranslate"><span class="pre">progress.pqnet.p_module.ModuleBehavior.handle_message()</span></code></a></dt><dd></dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.repository.RoundRobinSchedulingModuleBehavior.handle_new_token">
+<span class="sig-name descname"><span class="pre">handle_new_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#RoundRobinSchedulingModuleBehavior.handle_new_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.RoundRobinSchedulingModuleBehavior.handle_new_token" title="Permalink to this definition"></a></dt>
+<dd><p>Promote the token to the next output port.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior.handle_new_token" title="progress.pqnet.p_module.ModuleBehavior.handle_new_token"><code class="xref py py-meth docutils literal notranslate"><span class="pre">progress.pqnet.p_module.ModuleBehavior.handle_new_token()</span></code></a></dt><dd></dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.repository.RoundRobinSchedulingModuleBehavior.handle_response">
+<span class="sig-name descname"><span class="pre">handle_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#RoundRobinSchedulingModuleBehavior.handle_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.RoundRobinSchedulingModuleBehavior.handle_response" title="Permalink to this definition"></a></dt>
+<dd><p>Raise an error when called. This module does not receive responses.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior.handle_response" title="progress.pqnet.p_module.ModuleBehavior.handle_response"><code class="xref py py-meth docutils literal notranslate"><span class="pre">progress.pqnet.p_module.ModuleBehavior.handle_response()</span></code></a></dt><dd></dd>
+</dl>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="progress.pqnet.repository.ShortCircuitModuleBehavior">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.pqnet.repository.</span></span><span class="sig-name descname"><span class="pre">ShortCircuitModuleBehavior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qnic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#ShortCircuitModuleBehavior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.ShortCircuitModuleBehavior" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="p_module.html#progress.pqnet.p_module.SchedulingModuleBehavior" title="progress.pqnet.p_module.SchedulingModuleBehavior"><code class="xref py py-class docutils literal notranslate"><span class="pre">SchedulingModuleBehavior</span></code></a></p>
+<p>This class implements the behavior of a dummy module that promotes all tokens to its first output port.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>The name of the module</p>
+</dd>
+<dt><strong>node</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></span></dt><dd><p>The module that this behavior is attached to</p>
+</dd>
+<dt><strong>qnic</strong><span class="classifier">int or None, optional</span></dt><dd><p>See <a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior" title="progress.pqnet.p_module.ModuleBehavior"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleBehavior</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.repository.ShortCircuitModuleBehavior.handle_message">
+<span class="sig-name descname"><span class="pre">handle_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#ShortCircuitModuleBehavior.handle_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.ShortCircuitModuleBehavior.handle_message" title="Permalink to this definition"></a></dt>
+<dd><p>Raises an error if called. This module does not receive messages.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior.handle_message" title="progress.pqnet.p_module.ModuleBehavior.handle_message"><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle_message()</span></code></a></dt><dd></dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.repository.ShortCircuitModuleBehavior.handle_new_token">
+<span class="sig-name descname"><span class="pre">handle_new_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#ShortCircuitModuleBehavior.handle_new_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.ShortCircuitModuleBehavior.handle_new_token" title="Permalink to this definition"></a></dt>
+<dd><p>Simply promotes the token to the first output port.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior.handle_new_token" title="progress.pqnet.p_module.ModuleBehavior.handle_new_token"><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle_new_token()</span></code></a></dt><dd></dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.repository.ShortCircuitModuleBehavior.handle_response">
+<span class="sig-name descname"><span class="pre">handle_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#ShortCircuitModuleBehavior.handle_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.ShortCircuitModuleBehavior.handle_response" title="Permalink to this definition"></a></dt>
+<dd><p>Raises an error if called. This module does not receive responses.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior.handle_response" title="progress.pqnet.p_module.ModuleBehavior.handle_response"><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle_response()</span></code></a></dt><dd></dd>
+</dl>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="progress.pqnet.repository.WaitForSwappingModuleBehavior">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.pqnet.repository.</span></span><span class="sig-name descname"><span class="pre">WaitForSwappingModuleBehavior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qnic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">collect_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#WaitForSwappingModuleBehavior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.WaitForSwappingModuleBehavior" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="p_module.html#progress.pqnet.p_module.SchedulingModuleBehavior" title="progress.pqnet.p_module.SchedulingModuleBehavior"><code class="xref py py-class docutils literal notranslate"><span class="pre">SchedulingModuleBehavior</span></code></a></p>
+<p>This class implements the behavior of a module that waits for the outcome of the entanglement swapping protocol.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="progress.pqnet.repository.WaitForSwappingModuleBehavior.NEW_TOKEN_EVT_TYPE">
+<span class="sig-name descname"><span class="pre">NEW_TOKEN_EVT_TYPE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;pydynaa.core.EventType</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#progress.pqnet.repository.WaitForSwappingModuleBehavior.NEW_TOKEN_EVT_TYPE" title="Permalink to this definition"></a></dt>
+<dd><p>Label used to signal that a token has been captured.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.repository.WaitForSwappingModuleBehavior.handle_message">
+<span class="sig-name descname"><span class="pre">handle_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#WaitForSwappingModuleBehavior.handle_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.WaitForSwappingModuleBehavior.handle_message" title="Permalink to this definition"></a></dt>
+<dd><p>This method is called when a classical message is received from another remote module.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>request</strong><span class="classifier"><a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior.req_handle_message" title="progress.pqnet.p_module.ModuleBehavior.req_handle_message"><code class="xref py py-class docutils literal notranslate"><span class="pre">req_handle_message</span></code></a></span></dt><dd><p>The request containing the message to handle.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.repository.WaitForSwappingModuleBehavior.handle_new_token">
+<span class="sig-name descname"><span class="pre">handle_new_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#WaitForSwappingModuleBehavior.handle_new_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.WaitForSwappingModuleBehavior.handle_new_token" title="Permalink to this definition"></a></dt>
+<dd><p>This method is called when a new token is received as input.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>request</strong><span class="classifier"><a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior.req_handle_new_token" title="progress.pqnet.p_module.ModuleBehavior.req_handle_new_token"><code class="xref py py-class docutils literal notranslate"><span class="pre">req_handle_new_token</span></code></a></span></dt><dd><p>The request containing the new token to handle.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.repository.WaitForSwappingModuleBehavior.handle_response">
+<span class="sig-name descname"><span class="pre">handle_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/repository.html#WaitForSwappingModuleBehavior.handle_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.repository.WaitForSwappingModuleBehavior.handle_response" title="Permalink to this definition"></a></dt>
+<dd><p>This method is called when a response to a previous request is received from the qhal.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>request</strong><span class="classifier"><a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior.req_handle_response" title="progress.pqnet.p_module.ModuleBehavior.req_handle_response"><code class="xref py py-class docutils literal notranslate"><span class="pre">req_handle_response</span></code></a></span></dt><dd><p>The request containing the QHAL response to handle. The response contains the outcome and the originating
+request piggybacked.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="p_module.html" class="btn btn-neutral float-left" title="progress.pqnet.p_module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../sockets.html" class="btn btn-neutral float-right" title="progress.sockets" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Leonardo Bacciottini.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

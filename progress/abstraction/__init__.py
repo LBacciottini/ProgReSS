@@ -1,6 +1,6 @@
 """
-This package contains the Quantum Hardware Abstraction Layer (QHAL) which is the interface that standardizes the
-interface with the quantum hardware.
+This sub-package contains an implementation of the Quantum Hardware Abstraction Layer (QHAL),
+which is the level that standardizes the interface between the quantum hardware and the NET level.
 """
 
 from progress.abstraction.qhal import QHAL

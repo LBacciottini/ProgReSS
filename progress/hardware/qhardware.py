@@ -8,7 +8,7 @@ import netsquid as ns
 import math
 
 from progress.hardware.llps.llp import LinkProtocol
-import progress.sdqn_logging as log
+import progress.progress_logging as log
 
 __all__ = ['get_processor', 'QHardware', 'QuantumOperationsService']
 
@@ -28,7 +28,7 @@ def get_processor(num_positions, coherence_time=None, one_qbit_noise=None, two_q
     r"""Get an operational quantum processor
 
     Parameters
-    -----------
+    ----------
     num_positions : int
         The number of qubits in the quantum memory of this processor.
     coherence_time : int or None, optional
@@ -115,21 +115,31 @@ class QHardware(ns.nodes.Node):
         The number of QNICS of this device. Defaults to 2.
     num_qbits_qnic : int, optional
         The number of physical qubits assigned to each QNIC of this device. Defaults to 1.
-    qproc_params : dict, optional
+    qproc_params : dict[str, any] or None, optional
         The parameters of the quantum processor of this device. See :func:`~progress.hardware.qhardware.get_processor`
         for details. If `None`, a default processor is created. Defaults to `None`. The field `num_positions` can be
         omitted, as it is set to `num_qnics * num_qbits_qnic`.
 
+    Attributes
+    ----------
+    qproc_params : dict[str, any]
+        The parameters of the quantum processor of this device.
+    num_qnics : int
+        The number of QNICS of this device.
+    num_qbits_qnic : int
+        The number of physical qubits assigned to each QNIC of this device.
+    qmemory : :class:`netsquid.components.qprocessor.QuantumProcessor`
+        The quantum processor of this device.
+
     Notes
-    ------
+    -----
     Ports:
 
-    1. qnic{0..[num_qnics-1]}
-        The QNICS of this device.
-    3. q_ops
-        Used to request quantum operations to the quantum processor.
-    4. new_entanglements
-        Used to signal to the outside that a new entangled qubit is available.
+        - "qnic{0..[num_qnics-1]}" (in/out): The QNICS of this device.
+          These ports are forwarded to the "q{i}" ports of the quantum device.
+        - "q_ops" (output): Used to send out responses and outcomes for requested quantum operations.
+        - "new_entanglements" (output): Used to signal to the outside (typically to the QHAL)
+          that a new entangled qubit is available.
     """
     
     def __init__(self, name, num_qnics=2, num_qbits_qnic=1, qproc_params=None):
@@ -220,7 +230,7 @@ class QHardware(ns.nodes.Node):
 class QuantumOperationsService(ns.protocols.ServiceProtocol):
     r"""
     This protocol is used to request quantum operations to the quantum processor.
-    It sends the measurement outcomes (if present) out from the port `q_ops`.
+    It sends the measurement outcomes (if present) out from the port `q_ops` of the quantum hardware.
 
     Parameters
     ----------
@@ -329,7 +339,7 @@ class QuantumOperationsService(ns.protocols.ServiceProtocol):
         Assumes request handlers are generators and not functions.
 
         References
-        -----------
+        ----------
 
         See :meth:`~netsquid.protocols.Protocol.run`.
         """

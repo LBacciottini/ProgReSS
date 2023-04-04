@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>progress.pqnet.dag &mdash; ProgReSS 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="progress.pqnet.messages" href="messages.html" />
+    <link rel="prev" title="progress.pqnet" href="pqnet.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            ProgReSS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../abstraction/abstraction.html">progress.abstraction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../device.html">progress.device</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hardware/hardware.html">progress.hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../logging.html">progress.progress_logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../messaging/messaging.html">progress.messaging</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="pqnet.html">progress.pqnet</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">progress.pqnet.dag</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#progress.pqnet.dag.DAG"><code class="docutils literal notranslate"><span class="pre">DAG</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.dag.DAG.get_dag_node"><code class="docutils literal notranslate"><span class="pre">DAG.get_dag_node()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.dag.DAG.get_nodes"><code class="docutils literal notranslate"><span class="pre">DAG.get_nodes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.dag.DAG.remove"><code class="docutils literal notranslate"><span class="pre">DAG.remove()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.dag.DAG.set_qhal"><code class="docutils literal notranslate"><span class="pre">DAG.set_qhal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.dag.DAG.start"><code class="docutils literal notranslate"><span class="pre">DAG.start()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.dag.DAG.terminate"><code class="docutils literal notranslate"><span class="pre">DAG.terminate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.dag.DAG.wrapping_node"><code class="docutils literal notranslate"><span class="pre">DAG.wrapping_node</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#progress.pqnet.dag.DAGFactory"><code class="docutils literal notranslate"><span class="pre">DAGFactory</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.dag.DAGFactory.create_dag"><code class="docutils literal notranslate"><span class="pre">DAGFactory.create_dag()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#progress.pqnet.dag.DAGMessagesSwitch"><code class="docutils literal notranslate"><span class="pre">DAGMessagesSwitch</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.dag.DAGMessagesSwitch.routing_table"><code class="docutils literal notranslate"><span class="pre">DAGMessagesSwitch.routing_table()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="messages.html">progress.pqnet.messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="net_manager.html">progress.pqnet.net_manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="p_module.html">progress.pqnet.p_module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="repository.html">progress.pqnet.repository</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../sockets.html">progress.sockets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ProgReSS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="pqnet.html">progress.pqnet</a></li>
+      <li class="breadcrumb-item active">progress.pqnet.dag</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/progress/pqnet/dag.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-progress.pqnet.dag">
+<span id="progress-pqnet-dag"></span><h1>progress.pqnet.dag<a class="headerlink" href="#module-progress.pqnet.dag" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="progress.pqnet.dag.DAG">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.pqnet.dag.</span></span><span class="sig-name descname"><span class="pre">DAG</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edges</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/dag.html#DAG"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.dag.DAG" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class is a representation of a Directed Acyclic Graph (DAG), where each node is assigned with an instance of
+the class <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code>. The DAG is used to represent the input/output
+relationship between modules, that determines the order in which the modules process the tokens.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>nodes</strong><span class="classifier">dict[str, <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code>]</span></dt><dd><p>A dictionary that maps the name of each node to its corresponding module.</p>
+</dd>
+<dt><strong>edges</strong><span class="classifier">list[tuple[str, str]]</span></dt><dd><p>A list of tuples, where each tuple represents an edge in the DAG. The order of the tuple is important,
+as it determines the direction of the edge.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<dl class="simple">
+<dt>The Ports of the wrapping node are:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>“token_in_[0..roots]”: The input port for tokens from the i-th QNIC. Tokens are delivered to the i-th root of</dt><dd><p>the DAG. The i-th root is the i-th node in <cite>nodes</cite> that has no predecessors.</p>
+</dd>
+</dl>
+</li>
+<li><p>“messages”: The input/output port for classical messages.</p></li>
+<li><p>“tokens_ops_in”: The input port for responses from the quantum hardware for operations on the tokens.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list">
+<dt class="field-odd">Attributes<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>wrapping_node</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">netsquid.nodes.Node</span></code></span></dt><dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">netsquid.nodes.Node</span></code> that wraps the DAG. This node is used to connect the DAG to the rest of the
+components of the quantum network device.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.dag.DAG.get_dag_node">
+<span class="sig-name descname"><span class="pre">get_dag_node</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/dag.html#DAG.get_dag_node"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.dag.DAG.get_dag_node" title="Permalink to this definition"></a></dt>
+<dd><p>Get the netsquid node that wraps the DAG.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.dag.DAG.get_nodes">
+<span class="sig-name descname"><span class="pre">get_nodes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/dag.html#DAG.get_nodes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.dag.DAG.get_nodes" title="Permalink to this definition"></a></dt>
+<dd><p>Get a list of the nodes of the DAG, where each element is the module identifier.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>list[str]</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.dag.DAG.remove">
+<span class="sig-name descname"><span class="pre">remove</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/dag.html#DAG.remove"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.dag.DAG.remove" title="Permalink to this definition"></a></dt>
+<dd><p>Remove all modules.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.dag.DAG.set_qhal">
+<span class="sig-name descname"><span class="pre">set_qhal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qhal</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/dag.html#DAG.set_qhal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.dag.DAG.set_qhal" title="Permalink to this definition"></a></dt>
+<dd><p>Set the QHAL instance on all modules.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>qhal</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">QHAL</span></code></span></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.dag.DAG.start">
+<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/dag.html#DAG.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.dag.DAG.start" title="Permalink to this definition"></a></dt>
+<dd><p>Start all modules.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.dag.DAG.terminate">
+<span class="sig-name descname"><span class="pre">terminate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/dag.html#DAG.terminate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.dag.DAG.terminate" title="Permalink to this definition"></a></dt>
+<dd><p>Terminate all modules.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="progress.pqnet.dag.DAG.wrapping_node">
+<span class="sig-name descname"><span class="pre">wrapping_node</span></span><a class="headerlink" href="#progress.pqnet.dag.DAG.wrapping_node" title="Permalink to this definition"></a></dt>
+<dd><p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">netsquid.nodes.Node</span></code> that wraps the DAG. This node is used to connect the DAG to the rest of the
+components of the device.</p>
+<p class="rubric">Notes</p>
+<p>The ports of this node are:
+1. token_in_[0..roots]: The input port for tokens of the i-th root of the DAG.</p>
+<blockquote>
+<div><p>The i-th root is the i-th node in <cite>nodes</cite> that has no predecessors.</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>messages: The input/output port for classical messages.</p></li>
+<li><p>tokens_ops_in: The input port for responses from the quantum hardware for operations on the tokens.</p></li>
+</ol>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="progress.pqnet.dag.DAGFactory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.pqnet.dag.</span></span><span class="sig-name descname"><span class="pre">DAGFactory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edges</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module_behaviors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/dag.html#DAGFactory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.dag.DAGFactory" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class is a factory that creates a DAG from a list of edges and a dictionary of
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleBehavior</span></code> classes.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>edges</strong><span class="classifier">list[tuple[str, str]]</span></dt><dd><p>A list of tuples, where each tuple represents an edge in the DAG. The order of the tuple is important,
+as it determines the direction of the edge.</p>
+</dd>
+<dt><strong>module_behaviors</strong><span class="classifier">dict[str, tuple(<code class="xref py py-class docutils literal notranslate"><span class="pre">class</span></code>, dict)]</span></dt><dd><p>A dictionary mapping the name of each module to a tuple of the module behavior class and a dictionary
+of the parameters to pass to the constructor of the module class. The dictionary must have keys that are
+numerical strings, so that they can be used to derive the module id. Roots of the DAG must have the optional
+integer parameter <cite>“qnic”</cite> to link them to the specific token queue from the QHAL.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.dag.DAGFactory.create_dag">
+<span class="sig-name descname"><span class="pre">create_dag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/dag.html#DAGFactory.create_dag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.dag.DAGFactory.create_dag" title="Permalink to this definition"></a></dt>
+<dd><p>Create a DAG.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><code class="xref py py-class docutils literal notranslate"><span class="pre">DAG</span></code></dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="progress.pqnet.dag.DAGMessagesSwitch">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.pqnet.dag.</span></span><span class="sig-name descname"><span class="pre">DAGMessagesSwitch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/pqnet/dag.html#DAGMessagesSwitch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.dag.DAGMessagesSwitch" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Switch</span></code></p>
+<p>This class abstracts a virtual switch that routes incoming messages to the correct module in the DAG
+using <cite>module_id</cite> as routing key. It also acts as a multiplexer for all outgoing messages from
+bricks in the DAG.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>dag</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">DAG</span></code></span></dt><dd><p>The DAG that the switch is associated with.</p>
+</dd>
+<dt><strong>name</strong><span class="classifier">str or None, optional</span></dt><dd><p>The name of the switch instance. If <cite>None</cite>, a default name is used. Defaults to <cite>None</cite>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.pqnet.dag.DAGMessagesSwitch.routing_table">
+<span class="sig-name descname"><span class="pre">routing_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_port</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">[(&lt;class</span> <span class="pre">'netsquid.components.component.Message'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;)]</span></span></span><a class="reference internal" href="../../_modules/progress/pqnet/dag.html#DAGMessagesSwitch.routing_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.dag.DAGMessagesSwitch.routing_table" title="Permalink to this definition"></a></dt>
+<dd><p>See <code class="xref py py-class docutils literal notranslate"><span class="pre">Switch</span></code> for more information.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="pqnet.html" class="btn btn-neutral float-left" title="progress.pqnet" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="messages.html" class="btn btn-neutral float-right" title="progress.pqnet.messages" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Leonardo Bacciottini.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

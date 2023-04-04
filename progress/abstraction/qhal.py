@@ -1,3 +1,7 @@
+"""
+This module contains the Quantum Hardware Abstraction Layer implementation.
+"""
+
 import collections
 from collections import namedtuple
 
@@ -6,7 +10,9 @@ import netsquid as ns
 from progress.hardware.llps.llp import LinkProtocol
 from progress.hardware.qhardware import QuantumOperationsService
 from progress.sockets import Token, TokenMessage
-import progress.sdqn_logging as log
+import progress.progress_logging as log
+
+__all__ = ["QHAL", "EntanglementHandlerProtocol", "TokenOperationsService"]
 
 
 class QHAL(ns.nodes.Node):
@@ -21,10 +27,37 @@ class QHAL(ns.nodes.Node):
         The name of this node.
     qhardware : :class:`~progress.hardware.qhardware.QHardware`
         A reference to the QHardware placed in the same device (for easy access to its services).
+
+    Attributes
+    ----------
+    qhardware : :class:`~progress.hardware.qhardware.QHardware`
+        A reference to the quantum hardware placed in the same device.
+    token_api_service : :class:`~progress.hardware.qhardware.QuantumOperationsService`
+        The token operations service of the QHardware. It is used to request quantum operations with a
+        hardware-independent interface.
+    entanglement_handler : :class:`~progress.abstraction.qhal.EntanglementHandlerProtocol`
+        The entanglement handler protocol of this QHAL. It is responsible for processing signals
+        sent by the link layer protocols and allocating tokens in the queues for the NET layer.
+    token_out_ports : list[:class:`netsquid.components.Port`]
+        A shortcut to the output ports of this module. Each port is used to send tokens to the NET layer from a
+        specific QNIC queue. The index of the port in the list is the index of the QNIC it is connected to.
+    socket_table : collections.deque
+        A table that keeps track of all tokens currently allocated. The table is implemented as a deque with a fixed
+        size.
+
+    Notes
+    -----
+
+    Ports:
+        - "q_ops" (input): The port on which the Physical layer sends responses and outcomes for quantum operations.
+        - "new_entanglement" (input): The port on which the link layer protocols send signals about new entanglement.
+        - "tokens_ops" (input): The port on which the NET layer sends requests for token operations.
+        - "token_out_{i}" (output): The port on which the QHAL sends tokens to the NET layer. The index of the port
+          is the index of the QNIC token queue it is connected to.
     """
 
     def __init__(self, device_id, name, qhardware):
-        ports = ["q_ops", "new_entanglement", "ll_mgmt", "tokens_ops"]
+        ports = ["q_ops", "new_entanglement", "tokens_ops"]
         ports += [f"token_out_{i}" for i in range(qhardware.num_qnics)]
         super().__init__(name=name, port_names=ports)
         self.token_out_ports = [self.ports[f"token_out_{i}"] for i in range(qhardware.num_qnics)]
@@ -117,6 +150,24 @@ class TokenOperationsService(ns.protocols.ServiceProtocol):
     The Token Operations Service is a service protocol that handles the requests for token operations.
     An instance is automatically loaded in each QHAL node.
 
+    Notes
+    -----
+    The requests types exposed by this service (see Attributes) are very important as they compose the unified interface
+    for hardware-independent quantum operations.
+
+    Attributes
+    ----------
+    req_free : collections.namedtuple
+        Request to free a token from memory. See :meth:`~progress.abstraction.qhal.TokenOperationsService.req_free`.
+    req_swap : collections.namedtuple
+        Request to perform entanglement swapping on two tokens.
+        See :meth:`~progress.abstraction.qhal.TokenOperationsService.req_swap`.
+    req_dejmps : collections.namedtuple
+        Request to perform de-JMPs on a token. See :meth:`~progress.abstraction.qhal.TokenOperationsService.req_dejmps`.
+    req_qcirc : collections.namedtuple
+        Request to perform quantum circuit operations on a token.
+        See :meth:`~progress.abstraction.qhal.TokenOperationsService.req_qcirc`.
+
     Parameters
     ----------
         node : :class:`~progress.abstraction.qhal.QHAL`
@@ -204,6 +255,14 @@ class TokenOperationsService(ns.protocols.ServiceProtocol):
         return False
 
     def free(self, token):
+        r"""
+        Free a token from memory. Also free the physical qubit.
+
+        Parameters
+        ----------
+        token : :class:`~sdqn.sockets.Token`
+            The token to free.
+        """
 
         # DEBUG
         """
@@ -384,9 +443,9 @@ class TokenOperationsService(ns.protocols.ServiceProtocol):
         Assumes request handlers are generators and not functions.
 
         References
-        -----------
+        ----------
 
-        See :meth:`~netsquid.protocols.Protocol.run`.
+        See :meth:`netsquid.protocols.Protocol.run`.
         """
         while True:
             yield self.await_signal(self, self._new_req_signal)

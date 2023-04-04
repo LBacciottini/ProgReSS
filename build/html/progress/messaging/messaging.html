@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>progress.messaging &mdash; ProgReSS 1.0.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="progress.messaging.messages" href="messages.html" />
+    <link rel="prev" title="progress.progress_logging" href="../logging.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            ProgReSS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../abstraction/abstraction.html">progress.abstraction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../device.html">progress.device</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../hardware/hardware.html">progress.hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../logging.html">progress.progress_logging</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">progress.messaging</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#progress.messaging.__init__.ClassicalRoutingTableMessage"><code class="docutils literal notranslate"><span class="pre">ClassicalRoutingTableMessage</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#progress.messaging.__init__.MessageRoutingService"><code class="docutils literal notranslate"><span class="pre">MessageRoutingService</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#progress.messaging.__init__.MessageRoutingService.run"><code class="docutils literal notranslate"><span class="pre">MessageRoutingService.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="messages.html">progress.messaging.messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="router.html">progress.messaging.router</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../pqnet/pqnet.html">progress.pqnet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../sockets.html">progress.sockets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ProgReSS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">progress.messaging</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/progress/messaging/messaging.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-progress.messaging.__init__">
+<span id="progress-messaging"></span><h1>progress.messaging<a class="headerlink" href="#module-progress.messaging.__init__" title="Permalink to this heading"></a></h1>
+<p>This package provides the services required to manage classical communications between devices.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="progress.messaging.__init__.ClassicalRoutingTableMessage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.messaging.__init__.</span></span><span class="sig-name descname"><span class="pre">ClassicalRoutingTableMessage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dest_device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">routing_table</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/messaging/messages.html#ClassicalRoutingTableMessage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.messaging.__init__.ClassicalRoutingTableMessage" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Message</span></code></p>
+<p>This message encapsulates a classical routing table shaped as a dictionary indexed by host IDs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>dest_device</strong><span class="classifier">int</span></dt><dd><p>The ID of the device that the routing table is for.</p>
+</dd>
+<dt><strong>routing_table</strong><span class="classifier">dict[int, int]</span></dt><dd><p>The routing table.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="progress.messaging.__init__.MessageRoutingService">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.messaging.__init__.</span></span><span class="sig-name descname"><span class="pre">MessageRoutingService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/messaging/router.html#MessageRoutingService"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.messaging.__init__.MessageRoutingService" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">NodeProtocol</span></code></p>
+<p>A service that routes classical messages incoming and outgoing from the device.
+It listens to all classical port inputs and routes messages depending on their destination:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>If the message is meant for another device, it is routed to the correct output port.</p></li>
+<li><p>If the message is meant for the device, it is handled by the service and delivered to the correct
+layer of the device architecture (either Link or NET layers in the current version of ProgReSS).</p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>The name of the protocol.</p>
+</dd>
+<dt><strong>node</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">netsquid.nodes.Node</span></code></span></dt><dd><p>The node that the protocol is running on.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="progress.messaging.__init__.MessageRoutingService.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/progress/messaging/router.html#MessageRoutingService.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.messaging.__init__.MessageRoutingService.run" title="Permalink to this definition"></a></dt>
+<dd><p class="rubric">References</p>
+<p>See <code class="xref py py-meth docutils literal notranslate"><span class="pre">netsquid.protocols.Protocol.run()</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="messages.html">progress.messaging.messages</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="messages.html#progress.messaging.messages.ClassicalRoutingTableMessage"><code class="docutils literal notranslate"><span class="pre">ClassicalRoutingTableMessage</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="router.html">progress.messaging.router</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="router.html#progress.messaging.router.MessageRoutingService"><code class="docutils literal notranslate"><span class="pre">MessageRoutingService</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../logging.html" class="btn btn-neutral float-left" title="progress.progress_logging" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="messages.html" class="btn btn-neutral float-right" title="progress.messaging.messages" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Leonardo Bacciottini.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

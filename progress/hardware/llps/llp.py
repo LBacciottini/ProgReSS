@@ -19,7 +19,7 @@ from progress.sockets import Socket
 class LinkProtocol(ABC, ServiceProtocol):
     r"""
     This class is an abstract class for a generic link protocol in our architecture. The class sums up the core
-    services that a link layer protocol must provide to the QHAL and to net in general.
+    services that a link layer protocol must provide to the QHAL and to pqnet in general.
     When a new entangled pair is generated, the link protocol signals the event to the QHAL, which will handle the new
     resource.
     Each link protocol usually depends on the hardware it is running on, also involving the connection to the other
@@ -43,7 +43,7 @@ class LinkProtocol(ABC, ServiceProtocol):
         The name of the instance, defaults to the class name.
 
     Notes
-    ------
+    -----
     Link protocols also act as a service to the physical service. It supports three request types:
 
     1. :class:`~progress.mps.protocols.mps_protocol.req_reset`
