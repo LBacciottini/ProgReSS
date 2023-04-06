@@ -4,10 +4,11 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to ProgReSS’ documentation! &mdash; ProgReSS 1.0.0 documentation</title>
+  <title>ProgReSS &mdash; ProgReSS alpha-1.0 documentation</title>
       <link rel="stylesheet" href="static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="static/graphviz.css" type="text/css" />
+    <link rel="shortcut icon" href="static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="static/js/html5shiv.min.js"></script>
     <![endif]-->
@@ -31,6 +32,7 @@
           
           <a href="#" class="icon icon-home">
             ProgReSS
+              <img src="static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -65,7 +67,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Welcome to ProgReSS’ documentation!</li>
+      <li class="breadcrumb-item active">ProgReSS</li>
       <li class="wy-breadcrumbs-aside">
             <a href="sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -75,84 +77,55 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="welcome-to-progress-documentation">
-<h1>Welcome to ProgReSS’ documentation!<a class="headerlink" href="#welcome-to-progress-documentation" title="Permalink to this heading"></a></h1>
+  <section id="progress">
+<h1>ProgReSS<a class="headerlink" href="#progress" title="Permalink to this heading"></a></h1>
+<p>Welcome to the documentation of <strong>P</strong>rogrammable quantum <strong>R</strong>epeaters <strong>S</strong>oftware <strong>S</strong>imulator (<strong>ProgReSS</strong>),
+a Python package for the simulation of programmable quantum networks, built on top of
+<a class="reference external" href="https://netsquid.org/">NetSquid</a>.</p>
 <p>You can download and install the ProgReSS package <a class="reference external" href="https://github.com/LBacciottini/ProgReSS/">here</a>.</p>
-<span class="target" id="module-progress.__init__"></span><p>Programmable quantum Network Software Simulator (ProgReSS) is a package that implements a programmable quantum network
-simulation environment.</p>
-<p>It can be used to simulate quantum networks with programmable NET layer. The NET layer is
-implemented using the PQ-NET internal framework. The PQ-NET framework is a framework that allows the user to implement
-custom quantum network protocols by implementing custom modules that can be connected together to form a Directed
-Acyclic Graph (DAG).</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="progress.__init__.QNetworkDevice">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.__init__.</span></span><span class="sig-name descname"><span class="pre">QNetworkDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_qnics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cnics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_qbits_qnic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qproc_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="modules/progress/device.html#QNetworkDevice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.__init__.QNetworkDevice" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></p>
-<p>A quantum network device that can be used as a programmable repeater or end node of the network.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>device_id</strong><span class="classifier">int</span></dt><dd><p>The ID of the device. Should be unique in the network.</p>
-</dd>
-<dt><strong>num_qnics</strong><span class="classifier">int</span></dt><dd><p>The number of QNICs.</p>
-</dd>
-<dt><strong>num_cnics</strong><span class="classifier">int</span></dt><dd><p>The number of classical NICs.</p>
-</dd>
-<dt><strong>num_qbits_qnic</strong><span class="classifier">int</span></dt><dd><p>The number of memory qubits allocated to each QNIC.</p>
-</dd>
-<dt><strong>qproc_params</strong><span class="classifier">dict[str, any] or None, optional</span></dt><dd><p>The parameters of the quantum processor of this device. See <a class="reference internal" href="progress/hardware/qhardware.html#progress.hardware.qhardware.get_processor" title="progress.hardware.qhardware.get_processor"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_processor()</span></code></a>
-for details. If <cite>None</cite>, a default processor is created. Defaults to <cite>None</cite>. The field <cite>num_positions</cite> can be
-omitted, as it is set to <cite>num_qnics * num_qbits_qnic</cite>.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
+<p>The package is organized as follows:</p>
+<a class="reference internal image-reference" href="images/progress_structure.png"><img alt="_images/progress_structure.png" class="align-center" src="images/progress_structure.png" style="width: 650px;" /></a>
 <dl class="simple">
-<dt>The device architecture is composed of the following layers (bottom-up):</dt><dd><ul class="simple">
-<li><p>Physical layer: The quantum hardware (quantum memory, processor, QNICs, etc.)</p></li>
-<li><p>Link Layer Protocols: The clasical control protocols to generate robust entanglement over each QNIC.</p></li>
-<li><p>Quantum Hardware Abstraction Layer: The QHAL (see <a class="reference internal" href="progress/abstraction/qhal.html#progress.abstraction.qhal.QHAL" title="progress.abstraction.qhal.QHAL"><code class="xref py py-class docutils literal notranslate"><span class="pre">QHAL</span></code></a>). It abstracts the
-quantum hardware resources and provides a unified interface for the NET layer.</p></li>
-<li><p>NET layer: The NET layer is responsible for processing link-generated entanglement and delivering long-range
-entanglement to the applications. We implemented the NET layer as a programmable framework called PQ-NET
-(see <a class="reference internal" href="progress/pqnet/pqnet.html#module-progress.pqnet.__init__" title="progress.pqnet.__init__"><code class="xref py py-class docutils literal notranslate"><span class="pre">__init__</span></code></a>).</p></li>
+<dt>where</dt><dd><ul class="simple">
+<li><p>The Quantum Internet Protocol Stack in the picture is the one proposed by
+<a class="reference external" href="https://dl.acm.org/doi/10.1145/3341302.3342070">Dahlberg et al.</a>.</p></li>
+<li><p>The <strong>hardware</strong> package contains the classes that model the quantum hardware of the devices
+(e.g. quantum processors, optical fibers, QNICs etc.) and the Link Layer Protocols (LLPs).
+For this reason, it is linked to the <strong>Physical</strong> and <strong>Link</strong> layers of the reference stack.</p></li>
+<li><p>The <strong>abstraction</strong> package contains the Quantum Hardware Abstraction Layer (QHAL) class.
+Its role is to provide a unified interface to the <strong>Network</strong> layer for what concerns quantum
+resources and quantum hardware operations. As such, it can be seen as an adaptation layer
+placed between the <strong>Link</strong> and <strong>Network</strong> layers of the reference stack.</p></li>
+<li><p>The <strong>pqnet</strong> package (<strong>P</strong>rogrammable <strong>Q</strong>uantum <strong>NET</strong>work) is the core of ProgReSS
+It is our implementation of the <strong>Network</strong> layer,
+and it contains a framework to realize a completely programmable quantum network.</p></li>
+<li><p>The <strong>device</strong> module is built on top of the underlying packages and it contains the QNetworkDevice
+class, which models a configurable, programmable quantum network device ready to be installed in
+the user’s custom topology.</p></li>
+<li><p>The <strong>examples</strong> package contains some examples of how to use the ProgReSS package to simulate
+and test programmable quantum network topologies.</p></li>
+<li><p>Some utility modules (<strong>logging</strong>, <strong>sockets</strong>) are used across the whole package.</p></li>
 </ul>
 </dd>
-<dt>Ports:</dt><dd><ul class="simple">
-<li><p>q_{i}: The i-th QNIC of this device.</p></li>
-<li><p>c_{i}: The i-th classical NIC of this device.</p></li>
-<li><p>controller: The controller port of this device. It is used for controller-device communication.</p></li>
-</ul>
-</dd>
 </dl>
-<dl class="field-list">
-<dt class="field-odd">Attributes<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>device_id</strong><span class="classifier">int</span></dt><dd><p>The ID of the device.</p>
-</dd>
-<dt><strong>num_qnics</strong><span class="classifier">int</span></dt><dd><p>The number of QNICs of this device.</p>
-</dd>
-<dt><strong>num_cnics</strong><span class="classifier">int</span></dt><dd><p>The number of classical NICs of this device.</p>
-</dd>
-<dt><strong>qhardware</strong><span class="classifier"><a class="reference internal" href="progress/hardware/qhardware.html#progress.hardware.qhardware.QHardware" title="progress.hardware.qhardware.QHardware"><code class="xref py py-class docutils literal notranslate"><span class="pre">QHardware</span></code></a></span></dt><dd><p>The quantum hardware of this device.</p>
-</dd>
-<dt><strong>qhal</strong><span class="classifier"><a class="reference internal" href="progress/abstraction/qhal.html#progress.abstraction.qhal.QHAL" title="progress.abstraction.qhal.QHAL"><code class="xref py py-class docutils literal notranslate"><span class="pre">QHAL</span></code></a></span></dt><dd><p>The QHAL of this device.</p>
-</dd>
-<dt><strong>net_manager</strong><span class="classifier"><a class="reference internal" href="progress/pqnet/net_manager.html#progress.pqnet.net_manager.NetManagerProtocol" title="progress.pqnet.net_manager.NetManagerProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">NetManagerProtocol</span></code></a></span></dt><dd><p>The NET manager installed on this device.</p>
-</dd>
-<dt><strong>message_router</strong><span class="classifier"><a class="reference internal" href="progress/messaging/router.html#progress.messaging.router.MessageRoutingService" title="progress.messaging.router.MessageRoutingService"><code class="xref py py-class docutils literal notranslate"><span class="pre">MessageRoutingService</span></code></a></span></dt><dd><p>The message router installed on this device.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
+<p>Since ProgReSS simulates a programmable quantum network, we propose a network architectural model
+where the data plane of the Network layer (i.e. the operations carried out by quantum repeaters
+at this level) is programmed by a centralized <strong>Quantum Network Controller (QNC)</strong>.
+In the picture below, we show our model:</p>
+<a class="reference internal image-reference" href="images/prog_net.png"><img alt="_images/prog_net.png" class="align-center" src="images/prog_net.png" style="width: 450px;" /></a>
+<p>From top to bottom: Applications (APP) are provided with end-to-end
+entanglement without any knowledge about the
+underlying infrastructure. This service is obtained
+thanks to a set of Virtual Quantum Network Functions (VQNFs),
+that are requested to the centralized network controller through the northbound
+interface. The controller exploits the southbound
+interface to program all the infrastructure devices
+at the Network (NET) level to realize the specified
+VQNFs.</p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="progress/abstraction/abstraction.html">progress.abstraction</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="progress/abstraction/abstraction.html#progress.abstraction.__init__.QHAL"><code class="docutils literal notranslate"><span class="pre">QHAL</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="progress/abstraction/qhal.html">progress.abstraction.qhal</a></li>
 </ul>
 </li>
@@ -161,8 +134,6 @@ entanglement to the applications. We implemented the NET layer as a programmable
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="progress/hardware/hardware.html">progress.hardware</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="progress/hardware/hardware.html#progress.hardware.__init__.MPSConnection"><code class="docutils literal notranslate"><span class="pre">MPSConnection</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="progress/hardware/hardware.html#progress.hardware.__init__.QHardware"><code class="docutils literal notranslate"><span class="pre">QHardware</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="progress/hardware/llps/llps.html">progress.hardware</a></li>
 <li class="toctree-l2"><a class="reference internal" href="progress/hardware/ep_source.html">progress.hardware.ep_source</a></li>
 <li class="toctree-l2"><a class="reference internal" href="progress/hardware/mps_connection.html">progress.hardware.mps_connection</a></li>
@@ -182,8 +153,6 @@ entanglement to the applications. We implemented the NET layer as a programmable
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="progress/messaging/messaging.html">progress.messaging</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="progress/messaging/messaging.html#progress.messaging.__init__.ClassicalRoutingTableMessage"><code class="docutils literal notranslate"><span class="pre">ClassicalRoutingTableMessage</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="progress/messaging/messaging.html#progress.messaging.__init__.MessageRoutingService"><code class="docutils literal notranslate"><span class="pre">MessageRoutingService</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="progress/messaging/messages.html">progress.messaging.messages</a></li>
 <li class="toctree-l2"><a class="reference internal" href="progress/messaging/router.html">progress.messaging.router</a></li>
 </ul>

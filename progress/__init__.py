@@ -7,7 +7,3 @@ implemented using the PQ-NET internal framework. The PQ-NET framework is a frame
 custom quantum network protocols by implementing custom modules that can be connected together to form a Directed
 Acyclic Graph (DAG).
 """
-
-from progress.device import QNetworkDevice
-
-__all__ = ["QNetworkDevice"]

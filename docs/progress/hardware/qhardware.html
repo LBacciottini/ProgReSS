@@ -4,10 +4,11 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>progress.hardware.qhardware &mdash; ProgReSS 1.0.0 documentation</title>
+  <title>progress.hardware.qhardware &mdash; ProgReSS alpha-1.0 documentation</title>
       <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../static/graphviz.css" type="text/css" />
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="../../static/js/html5shiv.min.js"></script>
     <![endif]-->
@@ -33,6 +34,7 @@
           
           <a href="../../index.html" class="icon icon-home">
             ProgReSS
+              <img src="../../static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -47,8 +49,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../abstraction/abstraction.html">progress.abstraction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../device.html">progress.device</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="hardware.html">progress.hardware</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="hardware.html#progress.hardware.__init__.MPSConnection"><code class="docutils literal notranslate"><span class="pre">MPSConnection</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="hardware.html#progress.hardware.__init__.QHardware"><code class="docutils literal notranslate"><span class="pre">QHardware</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="llps/llps.html">progress.hardware</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ep_source.html">progress.hardware.ep_source</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mps_connection.html">progress.hardware.mps_connection</a></li>
@@ -171,7 +171,7 @@ that a new entangled qubit is available.</p></li>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt><code class="xref py py-class docutils literal notranslate"><span class="pre">LinkProtocol</span></code> or None</dt><dd></dd>
+<dt><a class="reference internal" href="llps/llp.html#progress.hardware.llps.llp.LinkProtocol" title="progress.hardware.llps.llp.LinkProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinkProtocol</span></code></a> or None</dt><dd></dd>
 </dl>
 </dd>
 </dl>
@@ -206,7 +206,7 @@ that a new entangled qubit is available.</p></li>
 <dd class="field-odd"><dl>
 <dt><strong>qnic</strong><span class="classifier">int or str</span></dt><dd><p>The QNIC to subscribe the link protocol to. Can be either the qnic’s name or its index.</p>
 </dd>
-<dt><strong>llp</strong><span class="classifier">:class:<a href="#id1"><span class="problematic" id="id2">`</span></a>~sdqn.hardware.llps.llp.LinkProtocol</span></dt><dd><p>The link layer protocol to subscribe.</p>
+<dt><strong>llp</strong><span class="classifier"><a class="reference internal" href="llps/llp.html#progress.hardware.llps.llp.LinkProtocol" title="progress.hardware.llps.llp.LinkProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinkProtocol</span></code></a></span></dt><dd><p>The link layer protocol to subscribe.</p>
 </dd>
 </dl>
 </dd>
@@ -235,7 +235,7 @@ It sends the measurement outcomes (if present) out from the port <cite>q_ops</ci
 <dt class="sig sig-object py" id="progress.hardware.qhardware.QuantumOperationsService.CorrectProgram">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CorrectProgram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_qubits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubit_mapping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/hardware/qhardware.html#QuantumOperationsService.CorrectProgram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.hardware.qhardware.QuantumOperationsService.CorrectProgram" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QuantumProgram</span></code></p>
-<p>Quantum processor program that applies corrections to restore the <a href="#id3"><span class="problematic" id="id4">|</span></a>beta00&gt; state.</p>
+<p>Quantum processor program that applies corrections to restore the <a href="#id1"><span class="problematic" id="id2">|</span></a>beta00&gt; state.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="progress.hardware.qhardware.QuantumOperationsService.CorrectProgram.default_num_qubits">
 <span class="sig-name descname"><span class="pre">default_num_qubits</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#progress.hardware.qhardware.QuantumOperationsService.CorrectProgram.default_num_qubits" title="Permalink to this definition"></a></dt>

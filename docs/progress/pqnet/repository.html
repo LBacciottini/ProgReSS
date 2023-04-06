@@ -4,10 +4,11 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>progress.pqnet.repository &mdash; ProgReSS 1.0.0 documentation</title>
+  <title>progress.pqnet.repository &mdash; ProgReSS alpha-1.0 documentation</title>
       <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../static/graphviz.css" type="text/css" />
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="../../static/js/html5shiv.min.js"></script>
     <![endif]-->
@@ -32,6 +33,7 @@
           
           <a href="../../index.html" class="icon icon-home">
             ProgReSS
+              <img src="../../static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -145,7 +147,7 @@
 </dd>
 <dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>The name of the module</p>
 </dd>
-<dt><strong>node</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></span></dt><dd><p>The module that this behavior is attached to</p>
+<dt><strong>node</strong><span class="classifier"><a class="reference internal" href="p_module.html#progress.pqnet.p_module.Module" title="progress.pqnet.p_module.Module"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></a></span></dt><dd><p>The module that this behavior is attached to</p>
 </dd>
 <dt><strong>qnic</strong><span class="classifier">int or None, optional</span></dt><dd><p>See <a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior" title="progress.pqnet.p_module.ModuleBehavior"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleBehavior</span></code></a>.</p>
 </dd>
@@ -160,7 +162,7 @@ If the module is not the solicitor, it receives distillation solicitations from 
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle_message()</span></code></dt><dd></dd>
+<dt><a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior.handle_message" title="progress.pqnet.p_module.ModuleBehavior.handle_message"><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle_message()</span></code></a></dt><dd></dd>
 </dl>
 </div>
 </dd></dl>
@@ -173,7 +175,7 @@ If the module is not the solicitor, it must wait for a message from the solicito
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle_new_token()</span></code></dt><dd></dd>
+<dt><a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior.handle_new_token" title="progress.pqnet.p_module.ModuleBehavior.handle_new_token"><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle_new_token()</span></code></a></dt><dd></dd>
 </dl>
 </div>
 </dd></dl>
@@ -187,7 +189,7 @@ the solicitor.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle_response()</span></code></dt><dd></dd>
+<dt><a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior.handle_response" title="progress.pqnet.p_module.ModuleBehavior.handle_response"><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle_response()</span></code></a></dt><dd></dd>
 </dl>
 </div>
 </dd></dl>
@@ -254,7 +256,7 @@ request piggybacked.</p>
 <dd class="field-odd"><dl>
 <dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>The name of the module</p>
 </dd>
-<dt><strong>node</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></span></dt><dd><p>The module that this behavior is attached to</p>
+<dt><strong>node</strong><span class="classifier"><a class="reference internal" href="p_module.html#progress.pqnet.p_module.Module" title="progress.pqnet.p_module.Module"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></a></span></dt><dd><p>The module that this behavior is attached to</p>
 </dd>
 <dt><strong>qnic</strong><span class="classifier">int or None, optional</span></dt><dd><p>See <a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior" title="progress.pqnet.p_module.ModuleBehavior"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleBehavior</span></code></a>.</p>
 </dd>
@@ -369,7 +371,7 @@ scheduling of tokens among output ports.</p>
 <dd class="field-odd"><dl>
 <dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>The name of the module</p>
 </dd>
-<dt><strong>node</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></span></dt><dd><p>The module that this behavior is attached to</p>
+<dt><strong>node</strong><span class="classifier"><a class="reference internal" href="p_module.html#progress.pqnet.p_module.Module" title="progress.pqnet.p_module.Module"><code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></a></span></dt><dd><p>The module that this behavior is attached to</p>
 </dd>
 <dt><strong>qnic</strong><span class="classifier">int or None, optional</span></dt><dd><p>See <a class="reference internal" href="p_module.html#progress.pqnet.p_module.ModuleBehavior" title="progress.pqnet.p_module.ModuleBehavior"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleBehavior</span></code></a>.</p>
 </dd>

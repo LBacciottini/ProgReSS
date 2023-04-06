@@ -1,17 +1,3 @@
-r"""
-This module contains the quantum network device class.
-It is a ready-to-use quantum network device that can be used as a programmable repeater or end node of the network.
-The device architecture is composed of the following layers (bottom-up):
-
-    - Physical layer: The quantum hardware (quantum memory, processor, QNICs, etc.)
-    - Link Layer Protocols: The clasical control protocols to generate robust entanglement over each QNIC.
-    - Quantum Hardware Abstraction Layer: The QHAL (see :class:`~progress.abstraction.qhal.QHAL`). It abstracts the
-      quantum hardware resources and provides a unified interface for the NET layer.
-    - NET layer: The NET layer is responsible for processing link-generated entanglement and delivering long-range
-      entanglement to the applications. We implemented the NET layer as a programmable framework called PQ-NET
-      (see :class:`~progress.pqnet.__init__`).
-"""
-
 import netsquid as ns
 
 from progress.abstraction.qhal import QHAL

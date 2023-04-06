@@ -31,7 +31,7 @@ class EntanglementSwappingModuleBehavior(ProcessingModuleBehavior):
             They are supposed to be instances of :class:`~progress.pqnet.repository.WaitForSwappingModuleBehavior`.
         name : str
             The name of the module
-        node : :class:`~progress.progress.p_module.Module`
+        node : :class:`~progress.pqnet.p_module.Module`
             The module that this behavior is attached to
         qnic : int or None, optional
             See :class:`~progress.pqnet.p_module.ModuleBehavior`.
@@ -145,7 +145,7 @@ class WaitForSwappingModuleBehavior(SchedulingModuleBehavior):
         ----------
         name : str
             The name of the module
-        node : :class:`~progress.progress.p_module.Module`
+        node : :class:`~progress.pqnet.p_module.Module`
             The module that this behavior is attached to
         output_map : dict or None, optional
             A dictionary that maps each possible new remote entangled node to a different output port
@@ -237,7 +237,7 @@ class DEJMPSModuleBehavior(ProcessingModuleBehavior):
         Whether the module is the solicitor or not
     name : str
         The name of the module
-    node : :class:`~progress.progress.p_module.Module`
+    node : :class:`~progress.pqnet.p_module.Module`
         The module that this behavior is attached to
     qnic : int or None, optional
         See :class:`~progress.pqnet.p_module.ModuleBehavior`.
@@ -258,7 +258,7 @@ class DEJMPSModuleBehavior(ProcessingModuleBehavior):
 
         See Also
         --------
-        :meth:`~progress.progress.p_module.ModuleBehavior.handle_new_token`
+        :meth:`~progress.pqnet.p_module.ModuleBehavior.handle_new_token`
         """
         token = request.token
         if not self.is_solicitor:
@@ -290,7 +290,7 @@ class DEJMPSModuleBehavior(ProcessingModuleBehavior):
 
         See Also
         --------
-        :meth:`~progress.progress.p_module.ModuleBehavior.handle_response`
+        :meth:`~progress.pqnet.p_module.ModuleBehavior.handle_response`
         """
         # the response is the outcome of the DEJMPS protocol
         # we assert that the response is a DEJMPS outcome
@@ -349,7 +349,7 @@ class DEJMPSModuleBehavior(ProcessingModuleBehavior):
 
         See Also
         --------
-        :meth:`~progress.progress.p_module.ModuleBehavior.handle_message`
+        :meth:`~progress.pqnet.p_module.ModuleBehavior.handle_message`
         """
         if self.is_solicitor:
             # the solicitor can only receive "dejmps_outcome" messages
@@ -410,7 +410,7 @@ class RoundRobinSchedulingModuleBehavior(SchedulingModuleBehavior):
         ----------
         name : str
             The name of the module
-        node : :class:`~progress.progress.p_module.Module`
+        node : :class:`~progress.pqnet.p_module.Module`
             The module that this behavior is attached to
         qnic : int or None, optional
             See :class:`~progress.pqnet.p_module.ModuleBehavior`.
@@ -475,7 +475,7 @@ class FreeEverythingModuleBehavior(ProcessingModuleBehavior):
     ----------
     name : str
         The name of the module
-    node : :class:`~progress.progress.p_module.Module`
+    node : :class:`~progress.pqnet.p_module.Module`
         The module that this behavior is attached to
     qnic : int or None, optional
         See :class:`~progress.pqnet.p_module.ModuleBehavior`.
@@ -582,7 +582,7 @@ class ShortCircuitModuleBehavior(SchedulingModuleBehavior):
     ----------
     name : str
         The name of the module
-    node : :class:`~progress.progress.p_module.Module`
+    node : :class:`~progress.pqnet.p_module.Module`
         The module that this behavior is attached to
     qnic : int or None, optional
         See :class:`~progress.pqnet.p_module.ModuleBehavior`.

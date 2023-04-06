@@ -4,10 +4,11 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>progress.pqnet.p_module &mdash; ProgReSS 1.0.0 documentation</title>
+  <title>progress.pqnet.p_module &mdash; ProgReSS alpha-1.0 documentation</title>
       <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../static/graphviz.css" type="text/css" />
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="../../static/js/html5shiv.min.js"></script>
     <![endif]-->
@@ -33,6 +34,7 @@
           
           <a href="../../index.html" class="icon icon-home">
             ProgReSS
+              <img src="../../static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -55,16 +57,8 @@
 <li class="toctree-l2"><a class="reference internal" href="net_manager.html">progress.pqnet.net_manager</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">progress.pqnet.p_module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#progress.pqnet.p_module.Module"><code class="docutils literal notranslate"><span class="pre">Module</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.p_module.Module.behavior"><code class="docutils literal notranslate"><span class="pre">Module.behavior</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.p_module.Module.device_id"><code class="docutils literal notranslate"><span class="pre">Module.device_id</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.p_module.Module.environment"><code class="docutils literal notranslate"><span class="pre">Module.environment</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.p_module.Module.module_id"><code class="docutils literal notranslate"><span class="pre">Module.module_id</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.p_module.Module.num_input"><code class="docutils literal notranslate"><span class="pre">Module.num_input</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.p_module.Module.num_output"><code class="docutils literal notranslate"><span class="pre">Module.num_output</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.p_module.Module.qhal"><code class="docutils literal notranslate"><span class="pre">Module.qhal</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.p_module.Module.start"><code class="docutils literal notranslate"><span class="pre">Module.start()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.p_module.Module.stop"><code class="docutils literal notranslate"><span class="pre">Module.stop()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#progress.pqnet.p_module.Module.token_table"><code class="docutils literal notranslate"><span class="pre">Module.token_table</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#progress.pqnet.p_module.ModuleBehavior"><code class="docutils literal notranslate"><span class="pre">ModuleBehavior</span></code></a><ul>
@@ -154,49 +148,27 @@ behavior, which is implemented in a class that inherits from <a class="reference
 </dd>
 </dl>
 </dd>
+<dt class="field-even">Attributes<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt><strong>module_id</strong><span class="classifier">int</span></dt><dd><p>The id of the module.</p>
+</dd>
+<dt><strong>device_id</strong><span class="classifier">int</span></dt><dd><p>The id of the device that the module is running on.</p>
+</dd>
+<dt><strong>qhal</strong><span class="classifier"><a class="reference internal" href="../abstraction/qhal.html#progress.abstraction.qhal.QHAL" title="progress.abstraction.qhal.QHAL"><code class="xref py py-class docutils literal notranslate"><span class="pre">QHAL</span></code></a> or None, optional</span></dt><dd><p>A reference to the QHAL running on the device. Should be set before starting the module.</p>
+</dd>
+<dt><strong>behavior</strong><span class="classifier"><a class="reference internal" href="#progress.pqnet.p_module.ModuleBehavior" title="progress.pqnet.p_module.ModuleBehavior"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleBehavior</span></code></a> or None, optional</span></dt><dd><p>The behavior of the module. Should be set before starting the module.</p>
+</dd>
+<dt><strong>environment</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleEnvironment</span></code></span></dt><dd><p>The environment of the module. It is used to trigger events on the module behavior when needed.</p>
+</dd>
+<dt><strong>num_input</strong><span class="classifier">int</span></dt><dd><p>The number of input ports for tokens. It matches the number of incoming edges of this module in the DAG.</p>
+</dd>
+<dt><strong>num_output</strong><span class="classifier">int</span></dt><dd><p>The number of output ports for tokens. It matches the number of outgoing edges of this module in the DAG.</p>
+</dd>
+<dt><strong>token_table</strong><span class="classifier"><a class="reference internal" href="../sockets.html#progress.sockets.TokenTable" title="progress.sockets.TokenTable"><code class="xref py py-class docutils literal notranslate"><span class="pre">TokenTable</span></code></a></span></dt><dd><p>The token table to store and manage owned tokens.</p>
+</dd>
 </dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="progress.pqnet.p_module.Module.behavior">
-<span class="sig-name descname"><span class="pre">behavior</span></span><a class="headerlink" href="#progress.pqnet.p_module.Module.behavior" title="Permalink to this definition"></a></dt>
-<dd><p>The behavior of the module.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="progress.pqnet.p_module.Module.device_id">
-<span class="sig-name descname"><span class="pre">device_id</span></span><a class="headerlink" href="#progress.pqnet.p_module.Module.device_id" title="Permalink to this definition"></a></dt>
-<dd><p>The id of the device that the module is running on.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="progress.pqnet.p_module.Module.environment">
-<span class="sig-name descname"><span class="pre">environment</span></span><a class="headerlink" href="#progress.pqnet.p_module.Module.environment" title="Permalink to this definition"></a></dt>
-<dd><p>The environment of the module. It is used to trigger events on the module behavior when needed.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="progress.pqnet.p_module.Module.module_id">
-<span class="sig-name descname"><span class="pre">module_id</span></span><a class="headerlink" href="#progress.pqnet.p_module.Module.module_id" title="Permalink to this definition"></a></dt>
-<dd><p>The id of the module.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="progress.pqnet.p_module.Module.num_input">
-<span class="sig-name descname"><span class="pre">num_input</span></span><a class="headerlink" href="#progress.pqnet.p_module.Module.num_input" title="Permalink to this definition"></a></dt>
-<dd><p>The number of input ports.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="progress.pqnet.p_module.Module.num_output">
-<span class="sig-name descname"><span class="pre">num_output</span></span><a class="headerlink" href="#progress.pqnet.p_module.Module.num_output" title="Permalink to this definition"></a></dt>
-<dd><p>The number of output ports.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="progress.pqnet.p_module.Module.qhal">
-<span class="sig-name descname"><span class="pre">qhal</span></span><a class="headerlink" href="#progress.pqnet.p_module.Module.qhal" title="Permalink to this definition"></a></dt>
-<dd><p>A reference to the QHAL running on the device.</p>
-</dd></dl>
-
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="progress.pqnet.p_module.Module.start">
 <span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/pqnet/p_module.html#Module.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.p_module.Module.start" title="Permalink to this definition"></a></dt>
@@ -207,12 +179,6 @@ behavior, which is implemented in a class that inherits from <a class="reference
 <dt class="sig sig-object py" id="progress.pqnet.p_module.Module.stop">
 <span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/pqnet/p_module.html#Module.stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.pqnet.p_module.Module.stop" title="Permalink to this definition"></a></dt>
 <dd><p>Stop the module behavior.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="progress.pqnet.p_module.Module.token_table">
-<span class="sig-name descname"><span class="pre">token_table</span></span><a class="headerlink" href="#progress.pqnet.p_module.Module.token_table" title="Permalink to this definition"></a></dt>
-<dd><p>The token table to store and manage owned tokens.</p>
 </dd></dl>
 
 </dd></dl>

@@ -4,10 +4,11 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>progress.messaging &mdash; ProgReSS 1.0.0 documentation</title>
+  <title>progress.messaging &mdash; ProgReSS alpha-1.0 documentation</title>
       <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../static/graphviz.css" type="text/css" />
+    <link rel="shortcut icon" href="../../static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="../../static/js/html5shiv.min.js"></script>
     <![endif]-->
@@ -32,6 +33,7 @@
           
           <a href="../../index.html" class="icon icon-home">
             ProgReSS
+              <img src="../../static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
@@ -48,11 +50,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../hardware/hardware.html">progress.hardware</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../logging.html">progress.progress_logging</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">progress.messaging</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#progress.messaging.__init__.ClassicalRoutingTableMessage"><code class="docutils literal notranslate"><span class="pre">ClassicalRoutingTableMessage</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#progress.messaging.__init__.MessageRoutingService"><code class="docutils literal notranslate"><span class="pre">MessageRoutingService</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#progress.messaging.__init__.MessageRoutingService.run"><code class="docutils literal notranslate"><span class="pre">MessageRoutingService.run()</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="messages.html">progress.messaging.messages</a></li>
 <li class="toctree-l2"><a class="reference internal" href="router.html">progress.messaging.router</a></li>
 </ul>
@@ -88,55 +85,6 @@
   <section id="module-progress.messaging.__init__">
 <span id="progress-messaging"></span><h1>progress.messaging<a class="headerlink" href="#module-progress.messaging.__init__" title="Permalink to this heading"></a></h1>
 <p>This package provides the services required to manage classical communications between devices.</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="progress.messaging.__init__.ClassicalRoutingTableMessage">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.messaging.__init__.</span></span><span class="sig-name descname"><span class="pre">ClassicalRoutingTableMessage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dest_device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">routing_table</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/messaging/messages.html#ClassicalRoutingTableMessage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.messaging.__init__.ClassicalRoutingTableMessage" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Message</span></code></p>
-<p>This message encapsulates a classical routing table shaped as a dictionary indexed by host IDs.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>dest_device</strong><span class="classifier">int</span></dt><dd><p>The ID of the device that the routing table is for.</p>
-</dd>
-<dt><strong>routing_table</strong><span class="classifier">dict[int, int]</span></dt><dd><p>The routing table.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="progress.messaging.__init__.MessageRoutingService">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.messaging.__init__.</span></span><span class="sig-name descname"><span class="pre">MessageRoutingService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/messaging/router.html#MessageRoutingService"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.messaging.__init__.MessageRoutingService" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">NodeProtocol</span></code></p>
-<p>A service that routes classical messages incoming and outgoing from the device.
-It listens to all classical port inputs and routes messages depending on their destination:</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>If the message is meant for another device, it is routed to the correct output port.</p></li>
-<li><p>If the message is meant for the device, it is handled by the service and delivered to the correct
-layer of the device architecture (either Link or NET layers in the current version of ProgReSS).</p></li>
-</ul>
-</div></blockquote>
-<dl class="field-list">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl>
-<dt><strong>name</strong><span class="classifier">str</span></dt><dd><p>The name of the protocol.</p>
-</dd>
-<dt><strong>node</strong><span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">netsquid.nodes.Node</span></code></span></dt><dd><p>The node that the protocol is running on.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="progress.messaging.__init__.MessageRoutingService.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../modules/progress/messaging/router.html#MessageRoutingService.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.messaging.__init__.MessageRoutingService.run" title="Permalink to this definition"></a></dt>
-<dd><p class="rubric">References</p>
-<p>See <code class="xref py py-meth docutils literal notranslate"><span class="pre">netsquid.protocols.Protocol.run()</span></code>.</p>
-</dd></dl>
-
-</dd></dl>
-
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Modules:</span></p>
 <ul>

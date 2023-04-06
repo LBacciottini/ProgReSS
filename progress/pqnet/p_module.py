@@ -33,6 +33,25 @@ class Module(ns.nodes.Node):
         The number of output ports.
     qhal : :class:`~progress.pqnet.qhal.QHAL` or None, optional
         A reference to the QHAL running on the device. If `None`, the QHAL must be set before starting the module.
+
+    Attributes
+    ----------
+    module_id : int
+        The id of the module.
+    device_id : int
+        The id of the device that the module is running on.
+    qhal : :class:`~progress.abstraction.qhal.QHAL` or None, optional
+        A reference to the QHAL running on the device. Should be set before starting the module.
+    behavior : :class:`~progress.pqnet.p_module.ModuleBehavior` or None, optional
+        The behavior of the module. Should be set before starting the module.
+    environment : :class:`~progress.pqnet.p_module.ModuleEnvironment`
+        The environment of the module. It is used to trigger events on the module behavior when needed.
+    num_input : int
+        The number of input ports for tokens. It matches the number of incoming edges of this module in the DAG.
+    num_output : int
+        The number of output ports for tokens. It matches the number of outgoing edges of this module in the DAG.
+    token_table : :class:`~progress.sockets.TokenTable`
+        The token table to store and manage owned tokens.
     """
 
     def __init__(self, module_id, device_id, name, num_input, num_output, qhal=None):
@@ -42,23 +61,23 @@ class Module(ns.nodes.Node):
         super().__init__(name=name, port_names=ports)
 
         self.module_id = module_id
-        """The id of the module."""
+        # """The id of the module."""
         self.device_id = device_id
-        """The id of the device that the module is running on."""
+        # """The id of the device that the module is running on."""
         self.qhal = qhal
-        """A reference to the QHAL running on the device."""
+        # """A reference to the QHAL running on the device."""
         self.behavior = None
-        """The behavior of the module."""
+        # """The behavior of the module."""
         self.environment = ModuleEnvironment(self)
-        """The environment of the module. It is used to trigger events on the module behavior when needed."""
+        # """The environment of the module. It is used to trigger events on the module behavior when needed."""
         self.num_input = num_input
-        """The number of input ports."""
+        # """The number of input ports."""
         self.num_output = num_output
-        """The number of output ports."""
+        # """The number of output ports."""
 
         # the token table to store and manage owned tokens
         self.token_table = TokenTable()
-        """The token table to store and manage owned tokens."""
+        # """The token table to store and manage owned tokens."""
 
     def start(self):
         """

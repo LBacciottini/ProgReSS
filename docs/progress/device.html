@@ -4,10 +4,11 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>progress.device &mdash; ProgReSS 1.0.0 documentation</title>
+  <title>progress.device &mdash; ProgReSS alpha-1.0 documentation</title>
       <link rel="stylesheet" href="../static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../static/graphviz.css" type="text/css" />
+    <link rel="shortcut icon" href="../static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="../static/js/html5shiv.min.js"></script>
     <![endif]-->
@@ -32,6 +33,7 @@
           
           <a href="../index.html" class="icon icon-home">
             ProgReSS
+              <img src="../static/logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -79,11 +81,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-progress.device">
-<span id="progress-device"></span><h1>progress.device<a class="headerlink" href="#module-progress.device" title="Permalink to this heading"></a></h1>
+  <section id="progress-device">
+<h1>progress.device<a class="headerlink" href="#progress-device" title="Permalink to this heading"></a></h1>
 <p>This module contains the quantum network device class.
-It is a ready-to-use quantum network device that can be used as a programmable repeater or end node of the network.
-The device architecture is composed of the following layers (bottom-up):</p>
+It is a ready-to-use quantum network device that can be used as a programmable repeater or end node of the network.</p>
+<p>We show below the layered architecture of a quantum network device in our architectural model:</p>
+<a class="reference internal image-reference" href="../images/repeater.png"><img alt="../_images/repeater.png" class="align-center" src="../images/repeater.png" style="width: 350px;" /></a>
+<p>The device architecture is composed of the following layers (bottom-up):</p>
 <blockquote>
 <div><ul class="simple">
 <li><p>Physical layer: The quantum hardware (quantum memory, processor, QNICs, etc.)</p></li>
@@ -95,7 +99,10 @@ entanglement to the applications. We implemented the NET layer as a programmable
 (see <a class="reference internal" href="pqnet/pqnet.html#module-progress.pqnet.__init__" title="progress.pqnet.__init__"><code class="xref py py-class docutils literal notranslate"><span class="pre">__init__</span></code></a>).</p></li>
 </ul>
 </div></blockquote>
-<dl class="py class">
+<p>We point out that from the Link Layer up, all the processing and the information exchange is done via classical
+communication. The Physical layer is the only layer that is responsible for quantum computation.
+The NET layer can request quantum operations to the Physical layer through the API exposed by the QHAL.</p>
+<span class="target" id="module-progress.device"></span><dl class="py class">
 <dt class="sig sig-object py" id="progress.device.QNetworkDevice">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">progress.device.</span></span><span class="sig-name descname"><span class="pre">QNetworkDevice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_qnics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cnics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_qbits_qnic</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qproc_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../modules/progress/device.html#QNetworkDevice"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#progress.device.QNetworkDevice" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></p>

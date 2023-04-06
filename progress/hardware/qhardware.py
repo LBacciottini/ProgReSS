@@ -187,7 +187,7 @@ class QHardware(ns.nodes.Node):
 
         Returns
         -------
-        :class:`~sdqn.hardware.llps.llp.LinkProtocol` or None
+        :class:`~progress.hardware.llps.llp.LinkProtocol` or None
         """
 
         # get the qnic as an integer
@@ -205,7 +205,7 @@ class QHardware(ns.nodes.Node):
         qnic : int or str
             The QNIC to subscribe the link protocol to. Can be either the qnic's name or its index.
 
-        llp : :class:`~sdqn.hardware.llps.llp.LinkProtocol
+        llp : :class:`~progress.hardware.llps.llp.LinkProtocol`
             The link layer protocol to subscribe.
         """
 

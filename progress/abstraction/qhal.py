@@ -86,6 +86,7 @@ class QHAL(ns.nodes.Node):
     def stop_entanglement(self, qnic):
         """
         Stop the generation of entanglement in the given qnic.
+
         Parameters
         ----------
         qnic : int
