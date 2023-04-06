@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>progress.hardware.ep_source &mdash; ProgReSS alpha-1.0 documentation</title>
+      <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../static/js/html5shiv.min.js"></script>
+    <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../static/documentation_options.js"></script>
+        <script src="../../../static/doctools.js"></script>
+        <script src="../../../static/sphinx_highlight.js"></script>
+    <script src="../../../static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            ProgReSS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/abstraction/abstraction.html">progress.abstraction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/device.html">progress.device</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/hardware/hardware.html">progress.hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/logging.html">progress.progress_logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/messaging/messaging.html">progress.messaging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/pqnet/pqnet.html">progress.pqnet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/sockets.html">progress.sockets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">ProgReSS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">progress.hardware.ep_source</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for progress.hardware.ep_source</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module implements a source of entangled bell pairs which generates pairs according to the stochastic generation</span>
+<span class="sd">process of Midpoint Source Protocol.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">from</span> <span class="nn">netsquid.components.qsource</span> <span class="kn">import</span> <span class="n">QSource</span><span class="p">,</span> <span class="n">SourceStatus</span>
+<span class="kn">from</span> <span class="nn">netsquid.components.models.delaymodels</span> <span class="kn">import</span> <span class="n">DelayModel</span>
+<span class="kn">import</span> <span class="nn">netsquid.qubits.ketstates</span> <span class="k">as</span> <span class="nn">ks</span>
+<span class="kn">from</span> <span class="nn">netsquid.nodes</span> <span class="kn">import</span> <span class="n">Node</span>
+<span class="kn">from</span> <span class="nn">netsquid.util.simtools</span> <span class="kn">import</span> <span class="n">get_random_state</span>
+<span class="kn">from</span> <span class="nn">netsquid.qubits</span> <span class="kn">import</span> <span class="n">StateSampler</span>
+<span class="kn">import</span> <span class="nn">netsquid</span> <span class="k">as</span> <span class="nn">ns</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;MPSSourceNode&quot;</span><span class="p">]</span>
+
+<span class="kn">from</span> <span class="nn">progress.hardware.llps.mps</span> <span class="kn">import</span> <span class="n">MPSSourceProtocol</span>
+<span class="kn">from</span> <span class="nn">progress</span> <span class="kn">import</span> <span class="n">progress_logging</span> <span class="k">as</span> <span class="n">log</span>
+
+
+<span class="k">class</span> <span class="nc">MPSSource</span><span class="p">(</span><span class="n">QSource</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;This source implements the Midpoint source (MS) protocols stochastic generation of entanglement. This class</span>
+<span class="sd">    should be used only inside :class:`~qi_simulation.mps.components.ep_source.MPSSourceNode`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        The name of this component.</span>
+<span class="sd">    source : :class:`~qi_simulation.mps.components.ep_source.MPSSourceNode`</span>
+<span class="sd">        The mid-point source that this instance is serving.</span>
+<span class="sd">    p_left : float</span>
+<span class="sd">        The probability of successfully latching the emitted qubit on the left with the components on that side.</span>
+<span class="sd">        It should keep into account the loss probability on the link and the probability of failure at the components,</span>
+<span class="sd">        which is due to frequency conversion and partial BSA in the case of standard MS,</span>
+<span class="sd">        or due to imperfect nDPD and absorption in the case of AFC-enhanced MS.</span>
+<span class="sd">    p_right : float, optional</span>
+<span class="sd">        The probability of successfully latching the emitted qubit on the right with the components on that side.</span>
+<span class="sd">        If ``None``, it is set equal to ``p_left``. Defaults to ``None``.</span>
+<span class="sd">    p_mid : float, optional</span>
+<span class="sd">        The probability that the midpoint entangled pair source successfully emits a pair at a given clock cycle.</span>
+<span class="sd">        Defaults to 1.</span>
+<span class="sd">    num_positions : int, optional</span>
+<span class="sd">        The number of modes of the repeaters&#39; quantum memories attached to the link. Defaults to 1.</span>
+<span class="sd">    t_clock : int or float, optional</span>
+<span class="sd">        The clock period of the MS protocols. Defaults to 1. [ns]</span>
+<span class="sd">    t_link : int or float</span>
+<span class="sd">        The total transmission time of the link between the two repeaters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">class</span> <span class="nc">MPSDelayModel</span><span class="p">(</span><span class="n">DelayModel</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This stateful delay model determines the time between the generation of two consecutive entangled pairs</span>
+<span class="sd">        in MPS protocol. It should only be used inside its parent class</span>
+<span class="sd">        :class:`~qi_simulation.mps.components.ep_source.MPSSource`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span>  <span class="n">p_left</span><span class="p">,</span> <span class="n">p_right</span><span class="p">,</span> <span class="n">num_positions</span><span class="p">,</span> <span class="n">p_mid</span><span class="p">,</span> <span class="n">t_clock</span><span class="p">,</span> <span class="n">t_link</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_p_left</span> <span class="o">=</span> <span class="n">p_left</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_p_right</span> <span class="o">=</span> <span class="n">p_right</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_positions</span> <span class="o">=</span> <span class="n">num_positions</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_p_mid</span> <span class="o">=</span> <span class="n">p_mid</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_t_clock</span> <span class="o">=</span> <span class="n">t_clock</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_length</span> <span class="o">=</span> <span class="p">(</span><span class="n">t_link</span><span class="o">/</span><span class="mf">1e9</span><span class="p">)</span><span class="o">*</span><span class="mi">200000</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_K</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">3</span><span class="o">/</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">p_left</span><span class="p">,</span> <span class="n">p_right</span><span class="p">)</span><span class="o">*</span><span class="n">p_mid</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_t_link</span> <span class="o">=</span> <span class="n">t_link</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_t_round</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_t_link</span> <span class="o">+</span> <span class="n">num_positions</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_K</span> <span class="o">*</span> <span class="n">t_clock</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_bin_and_trial</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_source</span> <span class="o">=</span> <span class="n">source</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_successful_pairs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_successful_pairs</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_first_time</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">def</span> <span class="nf">generate_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_successful_pairs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">bin_idx</span><span class="p">,</span> <span class="n">trial_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_successful_pairs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">last_bin</span><span class="p">,</span> <span class="n">last_trial</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_bin_and_trial</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_last_bin_and_trial</span> <span class="o">=</span> <span class="p">(</span><span class="n">bin_idx</span><span class="p">,</span> <span class="n">trial_idx</span><span class="p">)</span>
+
+                <span class="c1"># this is ugly but efficient to inform the node about the position of the generated entanglement</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">subcomponents</span><span class="p">[</span><span class="s2">&quot;qsource&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">output_meta</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bin_idx</span>
+                <span class="c1"># this keeps the t_link updated on receiving nodes</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">subcomponents</span><span class="p">[</span><span class="s2">&quot;qsource&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">output_meta</span><span class="p">[</span><span class="s2">&quot;time_sent&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">sim_time</span><span class="p">()</span>
+
+                <span class="c1"># update status of qubit</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">pos_status_list</span><span class="p">[</span><span class="n">bin_idx</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;busy&quot;</span>
+
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_inter_time</span><span class="p">(</span>
+                    <span class="n">old_bin</span><span class="o">=</span><span class="n">last_bin</span><span class="p">,</span> <span class="n">old_trial</span><span class="o">=</span><span class="n">last_trial</span><span class="p">,</span> <span class="n">new_bin</span><span class="o">=</span><span class="n">bin_idx</span><span class="p">,</span> <span class="n">new_trial</span><span class="o">=</span><span class="n">trial_idx</span>
+                <span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_successful_pairs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_successful_pairs</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_successful_pairs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+
+                    <span class="c1"># used to inform that there was no successful trial in this round</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">subcomponents</span><span class="p">[</span><span class="s2">&quot;qsource&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">output_meta</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+                    <span class="n">last_bin</span><span class="p">,</span> <span class="n">last_trial</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_bin_and_trial</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_last_bin_and_trial</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+                    <span class="c1"># used to notify that no trial was successful in the last round</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">subcomponents</span><span class="p">[</span><span class="s2">&quot;qsource&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">output_meta</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+                    <span class="k">if</span> <span class="n">last_bin</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">last_trial</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_round_time</span><span class="p">()</span>
+
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_time_left_in_round</span><span class="p">(</span><span class="n">last_bin</span><span class="p">,</span> <span class="n">last_trial</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_round_time</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">bin_idx</span><span class="p">,</span> <span class="n">trial_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_successful_pairs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="n">last_bin</span><span class="p">,</span> <span class="n">last_trial</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_bin_and_trial</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_last_bin_and_trial</span> <span class="o">=</span> <span class="p">(</span><span class="n">bin_idx</span><span class="p">,</span> <span class="n">trial_idx</span><span class="p">)</span>
+
+                    <span class="c1"># this is ugly but efficient to inform the node about the position of the generated entanglement</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">subcomponents</span><span class="p">[</span><span class="s2">&quot;qsource&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">output_meta</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bin_idx</span>
+
+                    <span class="c1"># update status of qubit</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">pos_status_list</span><span class="p">[</span><span class="n">bin_idx</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;busy&quot;</span>
+
+                    <span class="n">delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_time_left_in_round</span><span class="p">(</span><span class="n">last_bin</span><span class="p">,</span> <span class="n">last_trial</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_inter_time</span><span class="p">(</span>
+                        <span class="n">old_bin</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">old_trial</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">new_bin</span><span class="o">=</span><span class="n">bin_idx</span><span class="p">,</span> <span class="n">new_trial</span><span class="o">=</span><span class="n">trial_idx</span>
+                    <span class="p">)</span>
+
+                    <span class="k">return</span> <span class="n">delay</span>
+
+        <span class="k">def</span> <span class="nf">_get_time_left_in_round</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bin_idx</span><span class="p">,</span> <span class="n">trial_idx</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">bin_idx</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">trial_idx</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">0</span>
+            <span class="n">full_bins_left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_positions</span> <span class="o">-</span> <span class="n">bin_idx</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">trials_in_bin_left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_K</span> <span class="o">-</span> <span class="n">trial_idx</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">trials_in_bin_left</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_K</span><span class="o">*</span><span class="n">full_bins_left</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_t_clock</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_t_link</span>
+
+        <span class="k">def</span> <span class="nf">_get_round_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_K</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_positions</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_t_clock</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_t_link</span>
+
+        <span class="k">def</span> <span class="nf">_get_inter_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_bin</span><span class="p">,</span> <span class="n">old_trial</span><span class="p">,</span> <span class="n">new_bin</span><span class="p">,</span> <span class="n">new_trial</span><span class="p">):</span>
+            <span class="n">trials_in_bin_left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_K</span> <span class="o">-</span> <span class="n">old_trial</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">full_bins_left</span> <span class="o">=</span> <span class="n">new_bin</span> <span class="o">-</span> <span class="n">old_bin</span> <span class="o">-</span> <span class="mi">1</span>
+
+            <span class="c1"># no successes in last round, we behave as if we are at the beginning of the round</span>
+            <span class="k">if</span> <span class="n">old_bin</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">old_trial</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">trials_in_bin_left</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="n">ret</span> <span class="o">=</span> <span class="p">(</span><span class="n">trials_in_bin_left</span> <span class="o">+</span> <span class="n">full_bins_left</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_K</span> <span class="o">+</span> <span class="n">new_trial</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_t_clock</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_first_time</span><span class="p">:</span>
+                <span class="c1"># because there is t_link/2 latency given by the qchannel and another t_link/2 must be added &quot;manually&quot;</span>
+                <span class="n">ret</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_t_link</span><span class="o">/</span><span class="mi">2</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_first_time</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="n">ret</span>
+
+        <span class="k">def</span> <span class="nf">_get_successful_pairs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            counter = 0</span>
+<span class="sd">            for pairs in self._source.pos_status_list:</span>
+<span class="sd">                if pairs == &quot;free&quot;:</span>
+<span class="sd">                    counter += 1</span>
+<span class="sd">            if self._source.ID == 13:</span>
+<span class="sd">                qilog.debug(&quot;{} free pairs found. Status are {}&quot;.format(counter, self._source.pos_status_list))</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+
+            <span class="n">successful_pairs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">rng</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rng</span>
+            <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">rng</span> <span class="o">=</span> <span class="n">get_random_state</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_positions</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">pos_status_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;free&quot;</span><span class="p">:</span>
+                    <span class="n">trials_left</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">geometric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_p_left</span><span class="p">)</span>
+                    <span class="n">trials_right</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">geometric</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_p_right</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">trials_left</span> <span class="o">==</span> <span class="n">trials_right</span><span class="p">:</span>
+                        <span class="n">gen_failures</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">negative_binomial</span><span class="p">(</span><span class="n">trials_right</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_p_mid</span><span class="p">)</span>
+                        <span class="n">gen_trials</span> <span class="o">=</span> <span class="n">gen_failures</span> <span class="o">+</span> <span class="n">trials_right</span>
+                        <span class="k">if</span> <span class="n">gen_trials</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_K</span><span class="p">:</span>
+                            <span class="n">successful_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">gen_trials</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>  <span class="c1"># bin_index and trial_index</span>
+            <span class="k">return</span> <span class="n">successful_pairs</span>
+
+        <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_bin_and_trial</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">subcomponents</span><span class="p">[</span><span class="s2">&quot;qsource&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">output_meta</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">pos_status_list</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">pos_status_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;free&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_successful_pairs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_successful_pairs</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">t_link</span><span class="p">,</span> <span class="n">p_left</span><span class="p">,</span> <span class="n">p_right</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">p_mid</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">num_positions</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">t_clock</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">p_right</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">p_right</span> <span class="o">=</span> <span class="n">p_left</span>
+
+        <span class="n">state_sampler</span> <span class="o">=</span> <span class="n">StateSampler</span><span class="p">([</span><span class="n">ks</span><span class="o">.</span><span class="n">b00</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.</span><span class="p">])</span>
+        <span class="n">model_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">source</span><span class="p">,</span> <span class="s2">&quot;p_left&quot;</span><span class="p">:</span> <span class="n">p_left</span><span class="p">,</span> <span class="s2">&quot;p_right&quot;</span><span class="p">:</span> <span class="n">p_right</span><span class="p">,</span> <span class="s2">&quot;num_positions&quot;</span><span class="p">:</span> <span class="n">num_positions</span><span class="p">,</span>
+                        <span class="s2">&quot;p_mid&quot;</span><span class="p">:</span> <span class="n">p_mid</span><span class="p">,</span> <span class="s2">&quot;t_clock&quot;</span><span class="p">:</span> <span class="n">t_clock</span><span class="p">,</span> <span class="s2">&quot;t_link&quot;</span><span class="p">:</span> <span class="n">t_link</span><span class="p">}</span>
+        <span class="n">timing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MPSDelayModel</span><span class="p">(</span><span class="o">**</span><span class="n">model_params</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">state_sampler</span><span class="o">=</span><span class="n">state_sampler</span><span class="p">,</span> <span class="n">timing_model</span><span class="o">=</span><span class="n">timing</span><span class="p">,</span> <span class="n">num_ports</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                         <span class="n">status</span><span class="o">=</span><span class="n">SourceStatus</span><span class="o">.</span><span class="n">OFF</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subcomponents</span><span class="p">[</span><span class="s2">&quot;internal_clock&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s2">&quot;timing_model&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="MPSSourceNode"><a class="viewcode-back" href="../../../progress/hardware/ep_source.html#progress.hardware.ep_source.MPSSourceNode">[docs]</a><span class="k">class</span> <span class="nc">MPSSourceNode</span><span class="p">(</span><span class="n">Node</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;This node simulates the whole Midpoint source (MPS) protocols stochastic generation of entanglement.</span>
+<span class="sd">        It keeps into account all the loss probabilities and only generates a pair when MPS would succeed</span>
+<span class="sd">        in generating one. It is a way to implement the MPS protocol in a lightweight fashion, while maintaining all of</span>
+<span class="sd">        its stochastic properties.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            The name of this node.</span>
+<span class="sd">        p_left : float</span>
+<span class="sd">            The probability of successfully latching the emitted qubit on the left with the components on that side.</span>
+<span class="sd">            It should keep into account the loss probability on the link and the probability of failure at the components,</span>
+<span class="sd">            which is due to frequency conversion and partial BSA in the case of standard MS,</span>
+<span class="sd">            or due to imperfect nDPD and absorption in the case of AFC-enhanced MS.</span>
+<span class="sd">        p_right : float, optional</span>
+<span class="sd">            The probability of successfully latching the emitted qubit on the right with the components on that side.</span>
+<span class="sd">            If ``None``, it is set equal to ``p_left``. Defaults to ``None``.</span>
+<span class="sd">        num_positions : int, optional</span>
+<span class="sd">            The number of modes of the repeaters&#39; quantum memories attached to the link. Defaults to 1.</span>
+<span class="sd">        p_mid : float, optional</span>
+<span class="sd">            The probability that the midpoint entangled pair source successfully emits a pair at a given clock cycle.</span>
+<span class="sd">            Defaults to 1.</span>
+<span class="sd">        t_clock : int or float, optional</span>
+<span class="sd">            The clock period of the MS protocols. Defaults to 1. [ns]</span>
+<span class="sd">        rng : :class:`~numpy.random.RandomState`, optional</span>
+<span class="sd">            The rng used in the stochastic generation of entangled pairs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">p_left</span><span class="p">,</span> <span class="n">p_right</span><span class="p">,</span> <span class="n">num_positions</span><span class="p">,</span> <span class="n">p_mid</span><span class="p">,</span> <span class="n">t_clock</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">port_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;qout0&quot;</span><span class="p">,</span> <span class="s2">&quot;qout1&quot;</span><span class="p">,</span> <span class="s2">&quot;c0&quot;</span><span class="p">,</span> <span class="s2">&quot;c1&quot;</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">port_names</span><span class="o">=</span><span class="n">port_names</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos_status_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;free&quot;</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_positions</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mps_params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;p_left&quot;</span><span class="p">:</span> <span class="n">p_left</span><span class="p">,</span> <span class="s2">&quot;p_right&quot;</span><span class="p">:</span> <span class="n">p_right</span><span class="p">,</span> <span class="s2">&quot;num_positions&quot;</span><span class="p">:</span> <span class="n">num_positions</span><span class="p">,</span>
+                           <span class="s2">&quot;p_mid&quot;</span><span class="p">:</span> <span class="n">p_mid</span><span class="p">,</span> <span class="s2">&quot;t_clock&quot;</span><span class="p">:</span> <span class="n">t_clock</span><span class="p">,</span> <span class="s2">&quot;rng&quot;</span><span class="p">:</span> <span class="n">rng</span><span class="p">}</span>
+        <span class="n">protocol</span> <span class="o">=</span> <span class="n">MPSSourceProtocol</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">protocol</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">init_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t_link</span><span class="p">):</span>
+        <span class="n">qsource</span> <span class="o">=</span> <span class="n">MPSSource</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_inner_src&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">mps_params</span><span class="p">,</span> <span class="n">t_link</span><span class="o">=</span><span class="n">t_link</span><span class="p">)</span>
+        <span class="n">qsource</span><span class="o">.</span><span class="n">output_meta</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># must be initialized</span>
+        <span class="n">qsource</span><span class="o">.</span><span class="n">output_meta</span><span class="p">[</span><span class="s2">&quot;time_sent&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">sim_time</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_subcomponent</span><span class="p">(</span><span class="n">qsource</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;qsource&quot;</span><span class="p">)</span>
+        <span class="n">qsource</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;qout0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">forward_output</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;qout0&quot;</span><span class="p">])</span>
+        <span class="n">qsource</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;qout1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">forward_output</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;qout1&quot;</span><span class="p">])</span>
+
+<div class="viewcode-block" id="MPSSourceNode.start"><a class="viewcode-back" href="../../../progress/hardware/ep_source.html#progress.hardware.ep_source.MPSSourceNode.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the status of the inner source to INTERNAL so that it starts producing entanglement.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subcomponents</span><span class="p">[</span><span class="s2">&quot;qsource&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">SourceStatus</span><span class="o">.</span><span class="n">INTERNAL</span></div>
+
+<div class="viewcode-block" id="MPSSourceNode.stop"><a class="viewcode-back" href="../../../progress/hardware/ep_source.html#progress.hardware.ep_source.MPSSourceNode.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the status of the inner source to OFF so that it stops producing entanglement.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subcomponents</span><span class="p">[</span><span class="s2">&quot;qsource&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">SourceStatus</span><span class="o">.</span><span class="n">OFF</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">status</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The status of the internal entangling quantum source.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`netsquid.components.qsource.SourceStatus`</span>
+<span class="sd">            The status of the source</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">subcomponents</span><span class="p">[</span><span class="s2">&quot;qsource&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">status</span>
+
+<div class="viewcode-block" id="MPSSourceNode.reset"><a class="viewcode-back" href="../../../progress/hardware/ep_source.html#progress.hardware.ep_source.MPSSourceNode.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">and_restart</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reset the status of the inner source. Should be called while the inner source is OFF.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        and_restart : bool, optional</span>
+<span class="sd">            If True, also restarts the inner source, i.e. it sets its status to INTERNAL. Defaults to True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">qsource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subcomponents</span><span class="p">[</span><span class="s2">&quot;qsource&quot;</span><span class="p">]</span>
+
+        <span class="n">qsource</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">and_restart</span><span class="p">:</span>
+            <span class="n">qsource</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">SourceStatus</span><span class="o">.</span><span class="n">INTERNAL</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Leonardo Bacciottini.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

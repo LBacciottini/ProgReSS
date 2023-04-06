@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>progress.sockets &mdash; ProgReSS alpha-1.0 documentation</title>
+      <link rel="stylesheet" href="../../static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../static/js/html5shiv.min.js"></script>
+    <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../static/documentation_options.js"></script>
+        <script src="../../static/doctools.js"></script>
+        <script src="../../static/sphinx_highlight.js"></script>
+    <script src="../../static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            ProgReSS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../progress/abstraction/abstraction.html">progress.abstraction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../progress/device.html">progress.device</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../progress/hardware/hardware.html">progress.hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../progress/logging.html">progress.progress_logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../progress/messaging/messaging.html">progress.messaging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../progress/pqnet/pqnet.html">progress.pqnet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../progress/sockets.html">progress.sockets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">ProgReSS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">progress.sockets</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for progress.sockets</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the classes that are used to represent sockets and tokens. Sockets are an internal abstraction</span>
+<span class="sd">that are used to represent qubits. Tokens are the external abstraction of qubits that is used at the NET layer.</span>
+<span class="sd">A token is created when Link Layer protocols signal the generation of a new entangled pair.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">import</span> <span class="nn">netsquid</span> <span class="k">as</span> <span class="nn">ns</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Socket&#39;</span><span class="p">,</span> <span class="s1">&#39;Token&#39;</span><span class="p">,</span> <span class="s1">&#39;TokenTable&#39;</span><span class="p">,</span> <span class="s1">&#39;TokenMessage&#39;</span><span class="p">]</span>
+
+
+<span class="c1"># Socket = namedtuple(&#39;Socket&#39;, [&#39;node&#39;, &#39;interface&#39;, &#39;idx&#39;])</span>
+
+<div class="viewcode-block" id="Socket"><a class="viewcode-back" href="../../progress/sockets.html#progress.sockets.Socket">[docs]</a><span class="k">class</span> <span class="nc">Socket</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A socket is an internal logical abstraction for an entangled qubit. The name derives from the fact that</span>
+<span class="sd">    the qubit is entangled with (at least) another qubit, and thus it represents one end of the entangling connection.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    node : int</span>
+<span class="sd">        The node the qubit is located on.</span>
+<span class="sd">    qnic : int</span>
+<span class="sd">        The interface the qubit is assigned on.</span>
+<span class="sd">    idx : int</span>
+<span class="sd">        The index of the qubit on the interface.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="s1">&#39;Socket&#39;</span>
+
+    <span class="n">_inner_tuple</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Socket&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;node&#39;</span><span class="p">,</span> <span class="s1">&#39;qnic&#39;</span><span class="p">,</span> <span class="s1">&#39;idx&#39;</span><span class="p">,</span> <span class="s1">&#39;created_at&#39;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">qnic</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inner_tuple</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">qnic</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">sim_time</span><span class="p">())</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">node</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">node</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">qnic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">qnic</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">idx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">idx</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">created_at</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">created_at</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">node</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">qnic</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">qnic</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">idx</span> <span class="ow">and</span> \
+               <span class="bp">self</span><span class="o">.</span><span class="n">created_at</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">created_at</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Socket(node=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="si">}</span><span class="s2">, interface=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">qnic</span><span class="si">}</span><span class="s2">, idx=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">idx</span><span class="si">}</span><span class="s2">, created_at=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">created_at</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">())</span></div>
+
+
+<span class="n">Token</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Token&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;socket&#39;</span><span class="p">,</span> <span class="s1">&#39;other_end&#39;</span><span class="p">,</span> <span class="s1">&#39;current_state&#39;</span><span class="p">,</span> <span class="s1">&#39;pct&#39;</span><span class="p">,</span> <span class="s1">&#39;purified&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;additional_info&#39;</span><span class="p">])</span>
+<span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A token is an external logical abstraction for an entangled qubit. It is used at the NET layer to manage quantum</span>
+<span class="sd">resources in a hardware-independent fashion.</span>
+
+<span class="sd">Parameters</span>
+<span class="sd">----------</span>
+<span class="sd">socket : :class:`~progress.sockets.Socket`</span>
+<span class="sd">    The local socket related to this token.</span>
+<span class="sd">other_end : :class:`~progress.sockets.Socket`</span>
+<span class="sd">    The other end of the entangled connection.</span>
+<span class="sd">current_state : int</span>
+<span class="sd">    The current state of the qubit (0 -&gt; :math:`\vert\beta_{00}\rangle`, 1 -&gt; :math:`\vert\beta_{01}\rangle`,</span>
+<span class="sd">    2 -&gt; :math:`\vert\beta_{10}\rangle`, 3 -&gt; :math:`\vert\beta_{11}\rangle`).</span>
+<span class="sd">pct : float</span>
+<span class="sd">    The Pair Coherence Timeout of the socket pair.</span>
+<span class="sd">purified : int</span>
+<span class="sd">    Whether or not the socket is purified. 0 -&gt; not purified, 1 -&gt; purified, &gt;1 -&gt; number of purification rounds.</span>
+<span class="sd">additional_info : dict[any, any]</span>
+<span class="sd">    Additional information about the socket.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="TokenMessage"><a class="viewcode-back" href="../../progress/sockets.html#progress.sockets.TokenMessage">[docs]</a><span class="k">class</span> <span class="nc">TokenMessage</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">Message</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A message containing a token. Used to transfer tokens from a module to another.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    token : :class:`~progress.sockets.Token`</span>
+<span class="sd">        The token to be transmitted along with the message.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">HEADER</span> <span class="o">=</span> <span class="s2">&quot;TOKEN MESSAGE&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="p">[</span><span class="n">token</span><span class="p">],</span> <span class="n">header</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">HEADER</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;TokenMessage(token=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="si">}</span><span class="s2">)&quot;</span></div>
+
+
+<span class="k">def</span> <span class="nf">have_same_ends</span><span class="p">(</span><span class="n">token1</span><span class="p">,</span> <span class="n">token2</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if two tokens represent sockets that are entangled among the same two devices.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    token1 : :class:`~progress.sockets.Token`</span>
+<span class="sd">        The first token.</span>
+<span class="sd">    token2 : :class:`~progress.sockets.Token`</span>
+<span class="sd">        The second token.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">token1</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">node</span> <span class="o">==</span> <span class="n">token2</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">node</span> <span class="ow">and</span> <span class="n">token1</span><span class="o">.</span><span class="n">other_end</span><span class="o">.</span><span class="n">node</span> <span class="o">==</span> <span class="n">token2</span><span class="o">.</span><span class="n">other_end</span><span class="o">.</span><span class="n">node</span>
+
+
+<div class="viewcode-block" id="TokenTable"><a class="viewcode-back" href="../../progress/sockets.html#progress.sockets.TokenTable">[docs]</a><span class="k">class</span> <span class="nc">TokenTable</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A table that stores tokens.</span>
+<span class="sd">    This is used to keep track of the tokens that are currently owned by a specific module.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_table</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="TokenTable.get_snapshot"><a class="viewcode-back" href="../../progress/sockets.html#progress.sockets.TokenTable.get_snapshot">[docs]</a>    <span class="k">def</span> <span class="nf">get_snapshot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a snapshot of the socket table.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list[:class:`~progress.sockets.Token`]</span>
+<span class="sd">            The list of tokens in the table.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="TokenTable.add_token"><a class="viewcode-back" href="../../progress/sockets.html#progress.sockets.TokenTable.add_token">[docs]</a>    <span class="k">def</span> <span class="nf">add_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a socket descriptor to the socket table.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        token : :class:`~progress.sockets.Token`</span>
+<span class="sd">            The token to add.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">token</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TokenTable.pop_token"><a class="viewcode-back" href="../../progress/sockets.html#progress.sockets.TokenTable.pop_token">[docs]</a>    <span class="k">def</span> <span class="nf">pop_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_end</span><span class="p">,</span> <span class="n">raise_error</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pop a token from the table identified by the local_end.</span>
+<span class="sd">        If the token is not found, a ValueError is raised.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        local_end : :class:`~progress.sockets.Socket`</span>
+<span class="sd">            The local end of the token to pop.</span>
+<span class="sd">        raise_error : bool</span>
+<span class="sd">            Whether to raise a ValueError if the token is not found. If False, the function will return None.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`~progress.sockets.Token`</span>
+<span class="sd">            The socket descriptor that was popped.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">descriptor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">descriptor</span><span class="o">.</span><span class="n">socket</span> <span class="o">==</span> <span class="n">local_end</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">descriptor</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">descriptor</span>
+        <span class="k">if</span> <span class="n">raise_error</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Token local end </span><span class="si">{</span><span class="n">local_end</span><span class="si">}</span><span class="s2"> not found.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="TokenTable.get_token"><a class="viewcode-back" href="../../progress/sockets.html#progress.sockets.TokenTable.get_token">[docs]</a>    <span class="k">def</span> <span class="nf">get_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_end</span><span class="p">,</span> <span class="n">raise_error</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a token from the table identified by the local_end. Does not remove it from the table.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        local_end : :class:`~progress.sockets.Socket`</span>
+<span class="sd">            The local end of the token to get.</span>
+<span class="sd">        raise_error : bool</span>
+<span class="sd">            Whether to raise a ValueError if the token is not found. If False, the function will return None.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`~progress.sockets.Token` or None</span>
+<span class="sd">            The token that was found. None if the token was not found and raise_error is False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">token</span><span class="o">.</span><span class="n">socket</span> <span class="o">==</span> <span class="n">local_end</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">token</span>
+        <span class="k">if</span> <span class="n">raise_error</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Token local end </span><span class="si">{</span><span class="n">local_end</span><span class="si">}</span><span class="s2"> not found.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="TokenTable.replace_token"><a class="viewcode-back" href="../../progress/sockets.html#progress.sockets.TokenTable.replace_token">[docs]</a>    <span class="k">def</span> <span class="nf">replace_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_end</span><span class="p">,</span> <span class="n">new_token</span><span class="p">,</span> <span class="n">raise_error</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Replace a token in the table identified by its local end.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        local_end : :class:`~progress.sockets.Socket`</span>
+<span class="sd">            The local end of the socket descriptor to replace.</span>
+<span class="sd">        new_token : :class:`~progress.sockets.Token`</span>
+<span class="sd">            The new descriptor to replace the old one with.</span>
+<span class="sd">        raise_error : bool</span>
+<span class="sd">            Whether to raise a ValueError if the socket is not found. If False, the function will return False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            Whether or not the socket was found and replaced.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">token</span><span class="o">.</span><span class="n">local_end</span> <span class="o">==</span> <span class="n">local_end</span><span class="p">:</span>
+
+                <span class="n">third_desc</span> <span class="o">=</span> <span class="n">Token</span><span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">local_end</span><span class="p">,</span> <span class="n">new_token</span><span class="o">.</span><span class="n">other_end</span><span class="p">,</span>
+                                   <span class="n">new_token</span><span class="o">.</span><span class="n">current_state</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">pct</span><span class="p">,</span> <span class="n">new_token</span><span class="o">.</span><span class="n">pct</span><span class="p">),</span>
+                                   <span class="n">new_token</span><span class="o">.</span><span class="n">purified</span><span class="p">,</span> <span class="n">new_token</span><span class="o">.</span><span class="n">additional_info</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">third_desc</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+            <span class="k">if</span> <span class="n">raise_error</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Token with local end </span><span class="si">{</span><span class="n">local_end</span><span class="si">}</span><span class="s2"> not found.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="TokenTable.collect_garbage"><a class="viewcode-back" href="../../progress/sockets.html#progress.sockets.TokenTable.collect_garbage">[docs]</a>    <span class="k">def</span> <span class="nf">collect_garbage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_time</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove all expired tokens from the token table.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        current_time : float</span>
+<span class="sd">            The current time in the simulation. [ns]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list[:class:`~progress.sockets.Token`]</span>
+<span class="sd">            The list of tokens that were removed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">to_remove</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">token</span><span class="o">.</span><span class="n">pct</span> <span class="o">&lt;=</span> <span class="n">current_time</span><span class="p">:</span>
+                <span class="n">to_remove</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">to_remove</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">to_remove</span></div>
+
+<div class="viewcode-block" id="TokenTable.get_target_token"><a class="viewcode-back" href="../../progress/sockets.html#progress.sockets.TokenTable.get_target_token">[docs]</a>    <span class="k">def</span> <span class="nf">get_target_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_end_node</span><span class="p">,</span> <span class="n">additional_info_filters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">policy</span><span class="o">=</span><span class="s2">&quot;LRTF&quot;</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a token having a specific other end node.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other_end_node : int or list[int]</span>
+<span class="sd">            The other end node of the token to get. if a list is provided, the first token</span>
+<span class="sd">            with a matching other end node is returned.</span>
+<span class="sd">        additional_info_filters : dict</span>
+<span class="sd">            A dictionary of filters to apply to the additional info of the token.</span>
+<span class="sd">        policy : str</span>
+<span class="sd">            The policy to use when selecting the socket.</span>
+<span class="sd">            Currently only &quot;LRTF&quot; (Longest Remaining Time First) is supported.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`~progress.sockets.Token` or None</span>
+<span class="sd">            The socket descriptor with the specified other end node. `None` if not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">policy</span> <span class="o">==</span> <span class="s2">&quot;LRTF&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_target_descriptor_LRTF</span><span class="p">(</span><span class="n">other_end_node</span><span class="p">,</span> <span class="n">additional_info_filters</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Policy not supported.&quot;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_target_descriptor_LRTF</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_end_node</span><span class="p">,</span> <span class="n">additional_info_filters</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the token having a specific other end node. In case of multiple choices, the one with the</span>
+<span class="sd">        highest pct is returned.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other_end_node : int or list[int]</span>
+<span class="sd">            The other end node of the token to get. if a list is provided, the first token</span>
+<span class="sd">            with a matching other end node is returned.</span>
+<span class="sd">        additional_info_filters : dict</span>
+<span class="sd">            A dictionary of filters to apply to the additional info of the token.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`progress.sockets.Token` or None</span>
+<span class="sd">            The token with the specified other end node. `None` if not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other_end_node</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">other_end_node</span> <span class="o">=</span> <span class="p">[</span><span class="n">other_end_node</span><span class="p">]</span>
+        <span class="c1"># Find the socket descriptor with the longest remaining time</span>
+        <span class="n">max_pct</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">picked_token</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_table</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">token</span><span class="o">.</span><span class="n">other_end</span><span class="o">.</span><span class="n">node</span> <span class="ow">in</span> <span class="n">other_end_node</span> <span class="ow">and</span> <span class="n">token</span><span class="o">.</span><span class="n">pct</span> <span class="o">&gt;=</span> <span class="n">max_pct</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">additional_info_filters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">discard</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">additional_info_filters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">token</span><span class="o">.</span><span class="n">additional_info</span> <span class="ow">or</span> <span class="n">token</span><span class="o">.</span><span class="n">additional_info</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
+                            <span class="n">discard</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="k">break</span>
+                    <span class="k">if</span> <span class="n">discard</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                <span class="n">max_pct</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">pct</span>
+                <span class="n">picked_token</span> <span class="o">=</span> <span class="n">token</span>
+        <span class="k">return</span> <span class="n">picked_token</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Leonardo Bacciottini.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

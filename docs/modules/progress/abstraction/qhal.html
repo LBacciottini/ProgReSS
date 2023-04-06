@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>progress.abstraction.qhal &mdash; ProgReSS alpha-1.0 documentation</title>
+      <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../static/js/html5shiv.min.js"></script>
+    <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../static/documentation_options.js"></script>
+        <script src="../../../static/doctools.js"></script>
+        <script src="../../../static/sphinx_highlight.js"></script>
+    <script src="../../../static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            ProgReSS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/abstraction/abstraction.html">progress.abstraction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/device.html">progress.device</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/hardware/hardware.html">progress.hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/logging.html">progress.progress_logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/messaging/messaging.html">progress.messaging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/pqnet/pqnet.html">progress.pqnet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/sockets.html">progress.sockets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">ProgReSS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">progress.abstraction.qhal</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for progress.abstraction.qhal</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the Quantum Hardware Abstraction Layer implementation.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+
+<span class="kn">import</span> <span class="nn">netsquid</span> <span class="k">as</span> <span class="nn">ns</span>
+
+<span class="kn">from</span> <span class="nn">progress.hardware.llps.llp</span> <span class="kn">import</span> <span class="n">LinkProtocol</span>
+<span class="kn">from</span> <span class="nn">progress.hardware.qhardware</span> <span class="kn">import</span> <span class="n">QuantumOperationsService</span>
+<span class="kn">from</span> <span class="nn">progress.sockets</span> <span class="kn">import</span> <span class="n">Token</span><span class="p">,</span> <span class="n">TokenMessage</span>
+<span class="kn">import</span> <span class="nn">progress.progress_logging</span> <span class="k">as</span> <span class="nn">log</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;QHAL&quot;</span><span class="p">,</span> <span class="s2">&quot;EntanglementHandlerProtocol&quot;</span><span class="p">,</span> <span class="s2">&quot;TokenOperationsService&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="QHAL"><a class="viewcode-back" href="../../../progress/abstraction/qhal.html#progress.abstraction.__init__.QHAL">[docs]</a><span class="k">class</span> <span class="nc">QHAL</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">Node</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Quantum Hardware Abstraction Layer of an SDQN device.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    device_id : int</span>
+<span class="sd">        The ID of the SDQN device (parent node)</span>
+<span class="sd">    name : str</span>
+<span class="sd">        The name of this node.</span>
+<span class="sd">    qhardware : :class:`~progress.hardware.qhardware.QHardware`</span>
+<span class="sd">        A reference to the QHardware placed in the same device (for easy access to its services).</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    qhardware : :class:`~progress.hardware.qhardware.QHardware`</span>
+<span class="sd">        A reference to the quantum hardware placed in the same device.</span>
+<span class="sd">    token_api_service : :class:`~progress.hardware.qhardware.QuantumOperationsService`</span>
+<span class="sd">        The token operations service of the QHardware. It is used to request quantum operations with a</span>
+<span class="sd">        hardware-independent interface.</span>
+<span class="sd">    entanglement_handler : :class:`~progress.abstraction.qhal.EntanglementHandlerProtocol`</span>
+<span class="sd">        The entanglement handler protocol of this QHAL. It is responsible for processing signals</span>
+<span class="sd">        sent by the link layer protocols and allocating tokens in the queues for the NET layer.</span>
+<span class="sd">    token_out_ports : list[:class:`netsquid.components.Port`]</span>
+<span class="sd">        A shortcut to the output ports of this module. Each port is used to send tokens to the NET layer from a</span>
+<span class="sd">        specific QNIC queue. The index of the port in the list is the index of the QNIC it is connected to.</span>
+<span class="sd">    socket_table : collections.deque</span>
+<span class="sd">        A table that keeps track of all tokens currently allocated. The table is implemented as a deque with a fixed</span>
+<span class="sd">        size.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+
+<span class="sd">    Ports:</span>
+<span class="sd">        - &quot;q_ops&quot; (input): The port on which the Physical layer sends responses and outcomes for quantum operations.</span>
+<span class="sd">        - &quot;new_entanglement&quot; (input): The port on which the link layer protocols send signals about new entanglement.</span>
+<span class="sd">        - &quot;tokens_ops&quot; (input): The port on which the NET layer sends requests for token operations.</span>
+<span class="sd">        - &quot;token_out_{i}&quot; (output): The port on which the QHAL sends tokens to the NET layer. The index of the port</span>
+<span class="sd">          is the index of the QNIC token queue it is connected to.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">device_id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">qhardware</span><span class="p">):</span>
+        <span class="n">ports</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;q_ops&quot;</span><span class="p">,</span> <span class="s2">&quot;new_entanglement&quot;</span><span class="p">,</span> <span class="s2">&quot;tokens_ops&quot;</span><span class="p">]</span>
+        <span class="n">ports</span> <span class="o">+=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;token_out_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">qhardware</span><span class="o">.</span><span class="n">num_qnics</span><span class="p">)]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">port_names</span><span class="o">=</span><span class="n">ports</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">token_out_ports</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;token_out_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">qhardware</span><span class="o">.</span><span class="n">num_qnics</span><span class="p">)]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">qhardware</span> <span class="o">=</span> <span class="n">qhardware</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A reference to the quantum hardware (:class:`~progress.hardware.QHardware`) placed in the same device.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_device_id</span> <span class="o">=</span> <span class="n">device_id</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">socket_table</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="n">qhardware</span><span class="o">.</span><span class="n">num_qnics</span><span class="o">*</span><span class="n">qhardware</span><span class="o">.</span><span class="n">num_qbits_qnic</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">token_api_service</span> <span class="o">=</span> <span class="n">TokenOperationsService</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;token_api_service_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_device_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entanglement_handler</span> <span class="o">=</span> <span class="n">EntanglementHandlerProtocol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;entanglement_handler_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_device_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Start the QHAL inner protocols.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">token_api_service</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entanglement_handler</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<div class="viewcode-block" id="QHAL.stop_entanglement"><a class="viewcode-back" href="../../../progress/abstraction/qhal.html#progress.abstraction.__init__.QHAL.stop_entanglement">[docs]</a>    <span class="k">def</span> <span class="nf">stop_entanglement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qnic</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stop the generation of entanglement in the given qnic.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        qnic : int</span>
+<span class="sd">            The qnic to stop the generation of entanglement.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qhardware</span><span class="o">.</span><span class="n">get_subscribed_llp</span><span class="p">(</span><span class="n">qnic</span><span class="p">)</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">LinkProtocol</span><span class="o">.</span><span class="n">req_stop_generation</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="QHAL.resume_entanglement"><a class="viewcode-back" href="../../../progress/abstraction/qhal.html#progress.abstraction.__init__.QHAL.resume_entanglement">[docs]</a>    <span class="k">def</span> <span class="nf">resume_entanglement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qnic</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resume the generation of entanglement in the given qnic.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        qnic : int</span>
+<span class="sd">            The qnic to resume the generation of entanglement.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qhardware</span><span class="o">.</span><span class="n">get_subscribed_llp</span><span class="p">(</span><span class="n">qnic</span><span class="p">)</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">LinkProtocol</span><span class="o">.</span><span class="n">req_resume_generation</span><span class="p">())</span></div></div>
+
+
+<div class="viewcode-block" id="EntanglementHandlerProtocol"><a class="viewcode-back" href="../../../progress/abstraction/qhal.html#progress.abstraction.__init__.EntanglementHandlerProtocol">[docs]</a><span class="k">class</span> <span class="nc">EntanglementHandlerProtocol</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">protocols</span><span class="o">.</span><span class="n">NodeProtocol</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Entanglement Handler&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="n">node</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EntanglementHandlerProtocol.run"><a class="viewcode-back" href="../../../progress/abstraction/qhal.html#progress.abstraction.__init__.EntanglementHandlerProtocol.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_port_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;new_entanglement&quot;</span><span class="p">])</span>
+            <span class="c1"># catch the entanglement info and create the socket</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;new_entanglement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">input_queue</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;new_entanglement&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rx_input</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The new entanglement message </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2"> should have two items.&quot;</span><span class="p">)</span>
+                <span class="n">local_end</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">other_end</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">socket_table</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">local_end</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">socket_table</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">socket_table</span><span class="o">.</span><span class="n">maxlen</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Socket table of Device </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">supercomponent</span><span class="o">.</span><span class="n">device_id</span><span class="si">}</span><span class="s2"> is full.&quot;</span><span class="p">)</span>
+
+                <span class="c1"># generate a token</span>
+                <span class="n">coherence_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qhardware</span><span class="o">.</span><span class="n">qproc_coherence_time</span>
+                <span class="k">if</span> <span class="n">coherence_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">token</span> <span class="o">=</span> <span class="n">Token</span><span class="p">(</span><span class="n">socket</span><span class="o">=</span><span class="n">local_end</span><span class="p">,</span> <span class="n">other_end</span><span class="o">=</span><span class="n">other_end</span><span class="p">,</span> <span class="n">pct</span><span class="o">=</span><span class="n">ns</span><span class="o">.</span><span class="n">sim_time</span><span class="p">()</span> <span class="o">+</span> <span class="n">coherence_time</span><span class="p">,</span>
+                                  <span class="n">purified</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">additional_info</span><span class="o">=</span><span class="p">{},</span> <span class="n">current_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">token</span> <span class="o">=</span> <span class="n">Token</span><span class="p">(</span><span class="n">socket</span><span class="o">=</span><span class="n">local_end</span><span class="p">,</span> <span class="n">other_end</span><span class="o">=</span><span class="n">other_end</span><span class="p">,</span> <span class="n">pct</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                  <span class="n">purified</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">additional_info</span><span class="o">=</span><span class="p">{},</span> <span class="n">current_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">tkn_msg</span> <span class="o">=</span> <span class="n">TokenMessage</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">)</span>
+
+                <span class="c1"># if there is no dag we free the token</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">supercomponent</span><span class="o">.</span><span class="n">dag</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">token_api_service</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">TokenOperationsService</span><span class="o">.</span><span class="n">req_free</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">))</span>
+                    <span class="k">continue</span>
+
+                <span class="c1"># send the token out for processing</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">token_out_ports</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">local_end</span><span class="o">.</span><span class="n">qnic</span><span class="p">[</span><span class="mi">4</span><span class="p">:])]</span><span class="o">.</span><span class="n">tx_output</span><span class="p">(</span><span class="n">tkn_msg</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="TokenOperationsService"><a class="viewcode-back" href="../../../progress/abstraction/qhal.html#progress.abstraction.__init__.TokenOperationsService">[docs]</a><span class="k">class</span> <span class="nc">TokenOperationsService</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">protocols</span><span class="o">.</span><span class="n">ServiceProtocol</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The Token Operations Service is a service protocol that handles the requests for token operations.</span>
+<span class="sd">    An instance is automatically loaded in each QHAL node.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The requests types exposed by this service (see Attributes) are very important as they compose the unified interface</span>
+<span class="sd">    for hardware-independent quantum operations.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    req_free : collections.namedtuple</span>
+<span class="sd">        Request to free a token from memory. See :meth:`~progress.abstraction.qhal.TokenOperationsService.req_free`.</span>
+<span class="sd">    req_swap : collections.namedtuple</span>
+<span class="sd">        Request to perform entanglement swapping on two tokens.</span>
+<span class="sd">        See :meth:`~progress.abstraction.qhal.TokenOperationsService.req_swap`.</span>
+<span class="sd">    req_dejmps : collections.namedtuple</span>
+<span class="sd">        Request to perform de-JMPs on a token. See :meth:`~progress.abstraction.qhal.TokenOperationsService.req_dejmps`.</span>
+<span class="sd">    req_qcirc : collections.namedtuple</span>
+<span class="sd">        Request to perform quantum circuit operations on a token.</span>
+<span class="sd">        See :meth:`~progress.abstraction.qhal.TokenOperationsService.req_qcirc`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        node : :class:`~progress.abstraction.qhal.QHAL`</span>
+<span class="sd">            The QHAL node.</span>
+<span class="sd">        name : str or None, optional</span>
+<span class="sd">            The name of the service protocol. If `None`, the name will be set to &quot;Token Operations Service&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">req_free</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;req_free&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;token&quot;</span><span class="p">])</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Request to free a token from memory.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        token (:class:`~progress.sockets.Token`): The token to free.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">req_swap</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;req_swap&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;token1&quot;</span><span class="p">,</span> <span class="s2">&quot;token2&quot;</span><span class="p">])</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Request to perform entanglement swapping on two tokens.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        id (int): The ID of the requesting module.</span>
+<span class="sd">        token1 (:class:`~progress.sockets.Token`): The first token to swap.</span>
+<span class="sd">        token2 (:class:`~progress.sockets.Token`): The second token to swap.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">req_dejmps</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;req_purify&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;token1&quot;</span><span class="p">,</span> <span class="s2">&quot;token2&quot;</span><span class="p">,</span> <span class="s2">&quot;role&quot;</span><span class="p">])</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Request to perform DEJMPS distillation on two tokens. The first one is the one distilled,</span>
+<span class="sd">    the second one is used as ancilla. The &quot;role&quot; field is used to determine which rotation to apply (pi/2 or -pi/2),</span>
+<span class="sd">    and can assume two values, either &#39;A&#39; (pi/2) or &#39;B&#39; (-pi/2).</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        id (int): The id of the requesting module.</span>
+<span class="sd">        token1 (:class:`~progress.sockets.Token`): The first token to distill.</span>
+<span class="sd">        token2 (:class:`~progress.sockets.Token`): The second token to distill.</span>
+<span class="sd">        role (str): The role of this device in the distillation. Can be either &#39;A&#39; or &#39;B&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">req_correct</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;req_correct&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;token&quot;</span><span class="p">])</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Request to correct a token. The token is in a custom Bell state, which is</span>
+<span class="sd">    represented by an integer between 0 and 3. The token is corrected to the Bell state</span>
+<span class="sd">    :math:`\vert \beta_{00} \rangle`.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        id (int): The id of the requesting module.</span>
+<span class="sd">        token (:class:`~progress.sockets.Token`): The token to correct.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">req_qcirc</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;req_qcirc&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;tokens&quot;</span><span class="p">,</span> <span class="s2">&quot;qcirc&quot;</span><span class="p">])</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Request to perform a generic quantum circuit on a list of tokens.</span>
+<span class="sd">    When the circuit is executed, the measurement outcomes are sent out from the port `tokens_ops`.</span>
+<span class="sd">    If some tokens are measures, they have to be freed afterwards with a `req_free` request.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        id (int): The id of the requesting module.</span>
+<span class="sd">        tokens (list of :class:`~progress.sockets.Token`): The list of tokens in input to the quantum operation.</span>
+<span class="sd">        qcirc (:class:`netsquid.components.qprocessor.QuantumProgram`): The quantum program to execute.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TokenOperationsService.token_has_socket"><a class="viewcode-back" href="../../../progress/abstraction/qhal.html#progress.abstraction.__init__.TokenOperationsService.token_has_socket">[docs]</a>    <span class="k">def</span> <span class="nf">token_has_socket</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">raise_error</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if a token is present in the socket table of the QHAL.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        token : :class:`~sdqn.sockets.Token`</span>
+<span class="sd">            The token to check.</span>
+<span class="sd">        raise_error : bool</span>
+<span class="sd">            If True, raise an error if the token is not present in the socket table. Default is True.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if the token is present in the socket table, False otherwise.</span>
+<span class="sd">            Only significant if `raise_error` is False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">token</span><span class="o">.</span><span class="n">socket</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">socket_table</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">raise_error</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The token </span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2"> is not present in the socket table of the QHAL.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="TokenOperationsService.free"><a class="viewcode-back" href="../../../progress/abstraction/qhal.html#progress.abstraction.__init__.TokenOperationsService.free">[docs]</a>    <span class="k">def</span> <span class="nf">free</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Free a token from memory. Also free the physical qubit.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        token : :class:`~sdqn.sockets.Token`</span>
+<span class="sd">            The token to free.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># DEBUG</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        # check consistency</span>
+<span class="sd">        if len(self.node.socket_table) &gt;= self.node.socket_table.maxlen * 4 / 5:</span>
+<span class="sd">            consistency = self._check_consistency()</span>
+<span class="sd">            if consistency != 0:</span>
+<span class="sd">                log.warning(f&quot;Consistency check failed with code {consistency}.&quot;, repeater_id=self.node.supercomponent.device_id)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qhardware</span><span class="o">.</span><span class="n">put_qop</span><span class="p">(</span><span class="n">QuantumOperationsService</span><span class="o">.</span><span class="n">req_free</span><span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">qnic</span><span class="p">,</span> <span class="n">token</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">idx</span><span class="p">))</span>
+        <span class="c1"># remove the token from the socket table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">socket_table</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">socket</span><span class="p">)</span>
+
+        <span class="sd">&quot;&quot;&quot; DEBUG</span>
+<span class="sd">        if len(self.node.socket_table) &gt;= self.node.socket_table.maxlen*4/5:</span>
+<span class="sd">            log.warning(f&quot;The socket table has {len(self.node.socket_table)} sockets out &quot;</span>
+<span class="sd">                        f&quot;of {self.node.socket_table.maxlen}.&quot;, repeater_id=self.node.supercomponent.device_id)</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+    <span class="k">def</span> <span class="nf">_handle_free</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">free</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_handle_swap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">token_a</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">token1</span>
+        <span class="n">token_b</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">token2</span>
+
+        <span class="n">q_request</span> <span class="o">=</span> <span class="n">QuantumOperationsService</span><span class="o">.</span><span class="n">req_swap</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">token_a</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">qnic</span><span class="p">,</span> <span class="n">token_a</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span>
+                                                      <span class="n">token_b</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">qnic</span><span class="p">,</span> <span class="n">token_b</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">idx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qhardware</span><span class="o">.</span><span class="n">put_qop</span><span class="p">(</span><span class="n">q_request</span><span class="p">)</span>
+
+        <span class="c1"># wait for the result</span>
+        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_port_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;q_ops&quot;</span><span class="p">])</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;q_ops&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rx_input</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">request</span><span class="o">.</span><span class="n">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_response</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="c1"># remove the tokens from the socket table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">socket_table</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">token_a</span><span class="o">.</span><span class="n">socket</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">socket_table</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">token_b</span><span class="o">.</span><span class="n">socket</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_handle_dejmps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">token_a</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">token1</span>
+        <span class="n">token_b</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">token2</span>
+
+        <span class="n">q_request</span> <span class="o">=</span> <span class="n">QuantumOperationsService</span><span class="o">.</span><span class="n">req_dejmps</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">token_a</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">qnic</span><span class="p">,</span> <span class="n">token_a</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span>
+                                                        <span class="n">token_b</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">qnic</span><span class="p">,</span> <span class="n">token_b</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">idx</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">role</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qhardware</span><span class="o">.</span><span class="n">put_qop</span><span class="p">(</span><span class="n">q_request</span><span class="p">)</span>
+
+        <span class="c1"># wait for the result</span>
+        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_port_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;q_ops&quot;</span><span class="p">])</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;q_ops&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rx_input</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">request</span><span class="o">.</span><span class="n">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_response</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="c1"># remove the ancilla from the socket table</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">socket_table</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">token_b</span><span class="o">.</span><span class="n">socket</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_handle_correct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">token</span>
+
+        <span class="n">q_request</span> <span class="o">=</span> <span class="n">QuantumOperationsService</span><span class="o">.</span><span class="n">req_correct</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">token</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">qnic</span><span class="p">,</span> <span class="n">token</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">idx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qhardware</span><span class="o">.</span><span class="n">put_qop</span><span class="p">(</span><span class="n">q_request</span><span class="p">)</span>
+
+        <span class="c1"># wait for the result</span>
+        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_port_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;q_ops&quot;</span><span class="p">])</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;q_ops&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rx_input</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">request</span><span class="o">.</span><span class="n">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_response</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_handle_qcirc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">tokens</span>
+
+        <span class="n">q_request</span> <span class="o">=</span> <span class="n">QuantumOperationsService</span><span class="o">.</span><span class="n">req_qcirc</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="p">[(</span><span class="n">t</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">qnic</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">socket</span><span class="o">.</span><span class="n">idx</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">],</span>
+                                                       <span class="n">request</span><span class="o">.</span><span class="n">qcirc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qhardware</span><span class="o">.</span><span class="n">put_qop</span><span class="p">(</span><span class="n">q_request</span><span class="p">)</span>
+
+        <span class="c1"># wait for the result</span>
+        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_port_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;q_ops&quot;</span><span class="p">])</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;q_ops&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rx_input</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">request</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Received message with id </span><span class="si">{</span><span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> but expected </span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_response</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_check_consistency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Debug function to check if the socket table is consistent with the qhardware: it checks that the number of</span>
+<span class="sd">        sockets in the socket table is equal to the number of qubits allocated in the link layer protocols</span>
+<span class="sd">        subscribed to the qhardware.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The difference between the number of sockets in the socket table and the number of qubits allocated in the</span>
+<span class="sd">            link layer protocols.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># get the number of qubits allocated in the link layer protocols</span>
+        <span class="n">num_qubits</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">qnic</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qhardware</span><span class="o">.</span><span class="n">num_qnics</span><span class="p">):</span>
+            <span class="n">llp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qhardware</span><span class="o">.</span><span class="n">get_subscribed_llp</span><span class="p">(</span><span class="n">qnic</span><span class="p">)</span>
+            <span class="c1"># count the number of non None elements in llp._qubits_status</span>
+            <span class="n">num_qubits</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">llp</span><span class="o">.</span><span class="n">_qubits_status</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">socket_table</span><span class="p">)</span> <span class="o">!=</span> <span class="n">num_qubits</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The socket table has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">socket_table</span><span class="p">)</span><span class="si">}</span><span class="s2"> sockets but the qhardware has &quot;</span>
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">num_qubits</span><span class="si">}</span><span class="s2"> qubits allocated in the link layer protocols.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">socket_table</span><span class="p">)</span> <span class="o">-</span> <span class="n">num_qubits</span>
+
+
+<div class="viewcode-block" id="TokenOperationsService.send_response"><a class="viewcode-back" href="../../../progress/abstraction/qhal.html#progress.abstraction.__init__.TokenOperationsService.send_response">[docs]</a>    <span class="k">def</span> <span class="nf">send_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">request</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sends a response to the port `tokens_ops`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;TOKEN OPS RESPONSE&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">+=</span> <span class="s2">&quot; REQ &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">Message</span><span class="p">(</span><span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">items</span><span class="o">=</span><span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">request</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s1">&#39;tokens_ops&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tx_output</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Token Operations Service&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="n">node</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="c1"># We will use a queue for requests</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">deque</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_new_req_signal</span> <span class="o">=</span> <span class="s2">&quot;New request in queue&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_signal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_new_req_signal</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_id</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_request</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">req_free</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_free</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_request</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">req_qcirc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_qcirc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_request</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">req_correct</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_correct</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_request</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">req_dejmps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_dejmps</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_request</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">req_swap</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_swap</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TokenOperationsService.handle_request"><a class="viewcode-back" href="../../../progress/abstraction/qhal.html#progress.abstraction.__init__.TokenOperationsService.handle_request">[docs]</a>    <span class="k">def</span> <span class="nf">handle_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">identifier</span><span class="p">,</span> <span class="n">start_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Schedule the request on the queue.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        request :</span>
+<span class="sd">            The object representing the request.</span>
+<span class="sd">        identifier : str</span>
+<span class="sd">            The identifier for this request.</span>
+<span class="sd">        start_time : float, optional</span>
+<span class="sd">            The time at which the request can be executed. Default current simulation time. [ns]</span>
+<span class="sd">        kwargs : dict, optional</span>
+<span class="sd">            Additional arguments which can be set by the service.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            The dictionary with additional arguments.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method is called after</span>
+<span class="sd">        :meth:`~netsquid.protocols.serviceprotocol.ServiceProtocol.put` which</span>
+<span class="sd">        does the type checking etc.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">start_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">sim_time</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">start_time</span><span class="p">,</span> <span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)))</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        # DEBUG</span>
+<span class="sd">        # check that the queue is not longer than 20 requests</span>
+<span class="sd">        if len(self.queue) &gt; 20:</span>
+<span class="sd">            log.warning(f&quot;Queue of requests for {self.name} has {len(self.queue)} requests: {self.queue}. &quot;, repeater_id=self.node.supercomponent.device_id)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_signal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_new_req_signal</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">kwargs</span></div>
+
+<div class="viewcode-block" id="TokenOperationsService.run"><a class="viewcode-back" href="../../../progress/abstraction/qhal.html#progress.abstraction.__init__.TokenOperationsService.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait for a new request signal, then run the requests one by one.</span>
+
+<span class="sd">        Assumes request handlers are generators and not functions.</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        See :meth:`netsquid.protocols.Protocol.run`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_req_signal</span><span class="p">)</span>
+            <span class="c1"># log.warning(f&quot;Hey, you, you are finally awake! The queue has {len(self.queue)} requests!&quot;, repeater_id=self.node.supercomponent.device_id)</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">start_time</span><span class="p">,</span> <span class="p">(</span><span class="n">handler_id</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">start_time</span> <span class="o">&gt;</span> <span class="n">ns</span><span class="o">.</span><span class="n">sim_time</span><span class="p">():</span>
+                    <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_timer</span><span class="p">(</span><span class="n">end_time</span><span class="o">=</span><span class="n">start_time</span><span class="p">)</span>
+                <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_handlers</span><span class="p">[</span><span class="n">handler_id</span><span class="p">]</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="n">request</span>
+                <span class="n">gen</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">gen</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">yield from</span> <span class="n">gen</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Leonardo Bacciottini.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

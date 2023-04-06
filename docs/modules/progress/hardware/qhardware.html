@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>progress.hardware.qhardware &mdash; ProgReSS alpha-1.0 documentation</title>
+      <link rel="stylesheet" href="../../../static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../static/graphviz.css" type="text/css" />
+    <link rel="shortcut icon" href="../../../static/favicon.ico"/>
+  <!--[if lt IE 9]>
+    <script src="../../../static/js/html5shiv.min.js"></script>
+    <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../static/documentation_options.js"></script>
+        <script src="../../../static/doctools.js"></script>
+        <script src="../../../static/sphinx_highlight.js"></script>
+    <script src="../../../static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            ProgReSS
+              <img src="../../../static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/abstraction/abstraction.html">progress.abstraction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/device.html">progress.device</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/hardware/hardware.html">progress.hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/logging.html">progress.progress_logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/messaging/messaging.html">progress.messaging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/pqnet/pqnet.html">progress.pqnet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../progress/sockets.html">progress.sockets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">ProgReSS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">progress.hardware.qhardware</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for progress.hardware.qhardware</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module implements the quantum hardware (the Physical layer) of a quantum network device.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span><span class="p">,</span> <span class="n">deque</span>
+
+<span class="kn">import</span> <span class="nn">netsquid</span> <span class="k">as</span> <span class="nn">ns</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">from</span> <span class="nn">progress.hardware.llps.llp</span> <span class="kn">import</span> <span class="n">LinkProtocol</span>
+<span class="kn">import</span> <span class="nn">progress.progress_logging</span> <span class="k">as</span> <span class="nn">log</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;get_processor&#39;</span><span class="p">,</span> <span class="s1">&#39;QHardware&#39;</span><span class="p">,</span> <span class="s1">&#39;QuantumOperationsService&#39;</span><span class="p">]</span>
+
+<span class="n">INSTR_Rx</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">IGate</span><span class="p">(</span><span class="s2">&quot;Rx_gate&quot;</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">qubits</span><span class="o">.</span><span class="n">operators</span><span class="o">.</span><span class="n">create_rotation_op</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Pi/2 rotation around the x-axis</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">INSTR_RxC</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">IGate</span><span class="p">(</span><span class="s2">&quot;RxC_gate&quot;</span><span class="p">,</span> <span class="n">ns</span><span class="o">.</span><span class="n">qubits</span><span class="o">.</span><span class="n">operators</span><span class="o">.</span><span class="n">create_rotation_op</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">conjugate</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">-Pi/2 rotation around the x-axis</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="get_processor"><a class="viewcode-back" href="../../../progress/hardware/qhardware.html#progress.hardware.qhardware.get_processor">[docs]</a><span class="k">def</span> <span class="nf">get_processor</span><span class="p">(</span><span class="n">num_positions</span><span class="p">,</span> <span class="n">coherence_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">one_qbit_noise</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">two_qbit_noise</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">two_qbit_p_err</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">meas_p_err</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">instr_duration</span><span class="o">=</span><span class="mf">0.</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Get an operational quantum processor</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    num_positions : int</span>
+<span class="sd">        The number of qubits in the quantum memory of this processor.</span>
+<span class="sd">    coherence_time : int or None, optional</span>
+<span class="sd">        The coherence time of the quantum memory. It is the time after which the fidelity of the qubit state</span>
+<span class="sd">          drops more than 5%. [ns]</span>
+<span class="sd">    one_qbit_noise : :class:`netsquid.models.model.Model`, None, optional</span>
+<span class="sd">        The noise model of one qubit instructions of this processor.</span>
+<span class="sd">    two_qbit_noise : :class:`netsquid.models.model.Model`, None, optional</span>
+<span class="sd">        The noise model of two qubit instructions of this processor.</span>
+<span class="sd">    two_qbit_p_err : float, optional</span>
+<span class="sd">        The probability of error of two qubit instructions of this processor. The error means that the instruction</span>
+<span class="sd">        depolarizes the qubits.</span>
+<span class="sd">        If `two_qbit_noise` is not None, this parameter is ignored.</span>
+<span class="sd">    meas_p_err : float, optional</span>
+<span class="sd">        The probability of error of CBS measurement instruction of this processor. The error means that the instruction</span>
+<span class="sd">        depolarizes the qubit right before the measurement.</span>
+<span class="sd">    instr_duration : float, optional</span>
+<span class="sd">        The duration of each instruction of this processor. Defaults to 0. [ns]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    :class:`netsquid.components.qprocessor.QuantumProcessor`</span>
+<span class="sd">        The quantum processor, ready to use.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">two_qbit_noise</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">two_qbit_noise</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">DepolarNoiseModel</span><span class="p">(</span><span class="n">depolar_rate</span><span class="o">=</span><span class="n">two_qbit_p_err</span><span class="p">,</span> <span class="n">time_independent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">meas_noise</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">DepolarNoiseModel</span><span class="p">(</span><span class="n">depolar_rate</span><span class="o">=</span><span class="n">meas_p_err</span><span class="p">,</span> <span class="n">time_independent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">phys_instructions</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">PhysicalInstruction</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">INSTR_X</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">instr_duration</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                          <span class="n">q_noise_model</span><span class="o">=</span><span class="n">one_qbit_noise</span><span class="p">),</span>
+        <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">PhysicalInstruction</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">INSTR_Z</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">instr_duration</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                          <span class="n">q_noise_model</span><span class="o">=</span><span class="n">one_qbit_noise</span><span class="p">),</span>
+        <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">PhysicalInstruction</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">INSTR_CX</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">instr_duration</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                          <span class="n">q_noise_model</span><span class="o">=</span><span class="n">two_qbit_noise</span><span class="p">),</span>
+        <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">PhysicalInstruction</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">INSTR_H</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">instr_duration</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                          <span class="n">q_noise_model</span><span class="o">=</span><span class="n">one_qbit_noise</span><span class="p">),</span>
+        <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">PhysicalInstruction</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">INSTR_INIT</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">instr_duration</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                          <span class="n">q_noise_model</span><span class="o">=</span><span class="n">one_qbit_noise</span><span class="p">),</span>
+        <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">PhysicalInstruction</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">INSTR_MEASURE_BELL</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">instr_duration</span><span class="p">,</span><span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                            <span class="n">q_noise_model</span><span class="o">=</span><span class="n">two_qbit_noise</span><span class="p">,</span> <span class="n">apply_q_noise_after</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">PhysicalInstruction</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">INSTR_MEASURE</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">instr_duration</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                            <span class="n">q_noise_model</span><span class="o">=</span><span class="n">meas_noise</span><span class="p">,</span> <span class="n">apply_q_noise_after</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+        <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">PhysicalInstruction</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">INSTR_ROT_Y</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">instr_duration</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                          <span class="n">q_noise_model</span><span class="o">=</span><span class="n">one_qbit_noise</span><span class="p">),</span>
+        <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">PhysicalInstruction</span><span class="p">(</span><span class="n">INSTR_Rx</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">instr_duration</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                          <span class="n">q_noise_model</span><span class="o">=</span><span class="n">one_qbit_noise</span><span class="p">),</span>
+        <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">PhysicalInstruction</span><span class="p">(</span><span class="n">INSTR_RxC</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">instr_duration</span><span class="p">,</span> <span class="n">parallel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                          <span class="n">q_noise_model</span><span class="o">=</span><span class="n">one_qbit_noise</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">coherence_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">qproc</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">QuantumProcessor</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;QuantumProcessor&quot;</span><span class="p">,</span>
+                                               <span class="n">num_positions</span><span class="o">=</span><span class="n">num_positions</span><span class="p">,</span>
+                                               <span class="n">phys_instructions</span><span class="o">=</span><span class="n">phys_instructions</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Used to apply an initial imperfection to the qubits (F_0 =~ 0.98)</span>
+        <span class="n">models</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;qin_noise_model&#39;</span><span class="p">:</span> <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">DepolarNoiseModel</span><span class="p">(</span><span class="n">depolar_rate</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span>
+                                                                     <span class="n">time_independent</span><span class="o">=</span><span class="kc">True</span><span class="p">)}</span>
+
+        <span class="n">mem_noise_model</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">DephaseNoiseModel</span><span class="p">(</span><span class="n">dephase_rate</span><span class="o">=-</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">0.98</span><span class="p">)</span><span class="o">*</span><span class="mf">1e9</span> <span class="o">/</span> <span class="n">coherence_time</span><span class="p">)</span>
+        <span class="c1"># mem_noise_model = DephaseNoiseModel(dephase_rate=10.0)</span>
+
+        <span class="n">qproc</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">QuantumProcessor</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;QuantumProcessor&quot;</span><span class="p">,</span>
+                                               <span class="n">num_positions</span><span class="o">=</span><span class="n">num_positions</span><span class="p">,</span>
+                                               <span class="n">mem_noise_models</span><span class="o">=</span><span class="p">[</span><span class="n">mem_noise_model</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_positions</span><span class="p">,</span>
+                                               <span class="n">phys_instructions</span><span class="o">=</span><span class="n">phys_instructions</span><span class="p">)</span>
+        <span class="n">qproc</span><span class="o">.</span><span class="n">models</span><span class="p">[</span><span class="s1">&#39;qin_noise_model&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">models</span><span class="p">[</span><span class="s1">&#39;qin_noise_model&#39;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">qproc</span></div>
+
+
+<div class="viewcode-block" id="QHardware"><a class="viewcode-back" href="../../../progress/hardware/qhardware.html#progress.hardware.qhardware.QHardware">[docs]</a><span class="k">class</span> <span class="nc">QHardware</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">Node</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This node contains the quantum hardware of a Quantum Internet node, including the quantum processor and the QNICS.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        The name of this Repeater</span>
+<span class="sd">    num_qnics : int, optional</span>
+<span class="sd">        The number of QNICS of this device. Defaults to 2.</span>
+<span class="sd">    num_qbits_qnic : int, optional</span>
+<span class="sd">        The number of physical qubits assigned to each QNIC of this device. Defaults to 1.</span>
+<span class="sd">    qproc_params : dict[str, any] or None, optional</span>
+<span class="sd">        The parameters of the quantum processor of this device. See :func:`~progress.hardware.qhardware.get_processor`</span>
+<span class="sd">        for details. If `None`, a default processor is created. Defaults to `None`. The field `num_positions` can be</span>
+<span class="sd">        omitted, as it is set to `num_qnics * num_qbits_qnic`.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    qproc_params : dict[str, any]</span>
+<span class="sd">        The parameters of the quantum processor of this device.</span>
+<span class="sd">    num_qnics : int</span>
+<span class="sd">        The number of QNICS of this device.</span>
+<span class="sd">    num_qbits_qnic : int</span>
+<span class="sd">        The number of physical qubits assigned to each QNIC of this device.</span>
+<span class="sd">    qmemory : :class:`netsquid.components.qprocessor.QuantumProcessor`</span>
+<span class="sd">        The quantum processor of this device.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Ports:</span>
+
+<span class="sd">        - &quot;qnic{0..[num_qnics-1]}&quot; (in/out): The QNICS of this device.</span>
+<span class="sd">          These ports are forwarded to the &quot;q{i}&quot; ports of the quantum device.</span>
+<span class="sd">        - &quot;q_ops&quot; (output): Used to send out responses and outcomes for requested quantum operations.</span>
+<span class="sd">        - &quot;new_entanglements&quot; (output): Used to signal to the outside (typically to the QHAL)</span>
+<span class="sd">          that a new entangled qubit is available.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">num_qnics</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_qbits_qnic</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">qproc_params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">ports</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;qnic</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_qnics</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;q_ops&quot;</span><span class="p">,</span> <span class="s2">&quot;new_entanglements&quot;</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">port_names</span><span class="o">=</span><span class="n">ports</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qproc_params</span> <span class="o">=</span> <span class="n">qproc_params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_qnics</span> <span class="o">=</span> <span class="n">num_qnics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_qbits_qnic</span> <span class="o">=</span> <span class="n">num_qbits_qnic</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">qproc_coherence_time</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">qproc_params</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">qproc_coherence_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qproc_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;coherence_time&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_llp_subscriptions</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_qnics</span><span class="p">)]</span>
+
+        <span class="k">if</span> <span class="n">qproc_params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">qproc_params</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">qproc_params</span><span class="p">[</span><span class="s1">&#39;num_positions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">num_qnics</span> <span class="o">*</span> <span class="n">num_qbits_qnic</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">qmemory</span> <span class="o">=</span> <span class="n">get_processor</span><span class="p">(</span><span class="o">**</span><span class="n">qproc_params</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qops_service</span> <span class="o">=</span> <span class="n">QuantumOperationsService</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;qops_service&quot;</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qops_service</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<div class="viewcode-block" id="QHardware.put_qop"><a class="viewcode-back" href="../../../progress/hardware/qhardware.html#progress.hardware.qhardware.QHardware.put_qop">[docs]</a>    <span class="k">def</span> <span class="nf">put_qop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Submit a quantum operation request. The response is sent through the port &quot;q_ops&quot; of the node.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        request: namedtuple</span>
+<span class="sd">            The request to be submitted. See :class:`~progress.hardware.qhardware.QuantumOperationRequest` for details.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qops_service</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">request</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="QHardware.get_subscribed_llp"><a class="viewcode-back" href="../../../progress/hardware/qhardware.html#progress.hardware.qhardware.QHardware.get_subscribed_llp">[docs]</a>    <span class="k">def</span> <span class="nf">get_subscribed_llp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qnic</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the Link Layer protocol subscribed to the given QNIC.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        qnic : int or str</span>
+<span class="sd">            The QNIC to get the subscribed link protocol from. Can be either the qnic&#39;s name or its index.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :class:`~progress.hardware.llps.llp.LinkProtocol` or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># get the qnic as an integer</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">qnic</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">qnic</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">qnic</span><span class="p">[</span><span class="mi">4</span><span class="p">:])</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_llp_subscriptions</span><span class="p">[</span><span class="n">qnic</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="QHardware.subscribe_llp"><a class="viewcode-back" href="../../../progress/hardware/qhardware.html#progress.hardware.qhardware.QHardware.subscribe_llp">[docs]</a>    <span class="k">def</span> <span class="nf">subscribe_llp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qnic</span><span class="p">,</span> <span class="n">llp</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Subscribe a link layer protocol to the given QNIC.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        qnic : int or str</span>
+<span class="sd">            The QNIC to subscribe the link protocol to. Can be either the qnic&#39;s name or its index.</span>
+
+<span class="sd">        llp : :class:`~progress.hardware.llps.llp.LinkProtocol`</span>
+<span class="sd">            The link layer protocol to subscribe.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># get the qnic as an integer</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">qnic</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">qnic</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">qnic</span><span class="p">[</span><span class="mi">4</span><span class="p">:])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_llp_subscriptions</span><span class="p">[</span><span class="n">qnic</span><span class="p">]</span> <span class="o">=</span> <span class="n">llp</span></div>
+
+<div class="viewcode-block" id="QHardware.map_info_to_qubit"><a class="viewcode-back" href="../../../progress/hardware/qhardware.html#progress.hardware.qhardware.QHardware.map_info_to_qubit">[docs]</a>    <span class="k">def</span> <span class="nf">map_info_to_qubit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qnic</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Maps the qnic and the index of the qubit to the position in the quantum processor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">qnic</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">qnic</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_qbits_qnic</span> <span class="o">+</span> <span class="n">idx</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">qnic</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">qnic</span><span class="p">[</span><span class="mi">4</span><span class="p">:])</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_qbits_qnic</span> <span class="o">+</span> <span class="n">idx</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The qnic must be either an integer or a string.&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="QuantumOperationsService"><a class="viewcode-back" href="../../../progress/hardware/qhardware.html#progress.hardware.qhardware.QuantumOperationsService">[docs]</a><span class="k">class</span> <span class="nc">QuantumOperationsService</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">protocols</span><span class="o">.</span><span class="n">ServiceProtocol</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This protocol is used to request quantum operations to the quantum processor.</span>
+<span class="sd">    It sends the measurement outcomes (if present) out from the port `q_ops` of the quantum hardware.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    node : :class:`~netsquid.node.Node`</span>
+<span class="sd">        The component to which the service is attached.</span>
+<span class="sd">    name : str or None, optional</span>
+<span class="sd">        The name of the service, for labelling purposes. Defaults to `None`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">req_free</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;req_free&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;qnic&quot;</span><span class="p">,</span> <span class="s2">&quot;idx&quot;</span><span class="p">])</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Request to free a qubit from the quantum processor at a specified position.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        qnic (int or str): The qnic to which the qubit is assigned.</span>
+<span class="sd">        idx (int): The index of the qubit relative to the qnic.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">req_swap</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;req_swap&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;qnic1&quot;</span><span class="p">,</span> <span class="s2">&quot;idx1&quot;</span><span class="p">,</span> <span class="s2">&quot;qnic2&quot;</span><span class="p">,</span> <span class="s2">&quot;idx2&quot;</span><span class="p">])</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Request to perform entanglement swapping on two qubits in the quantum processor.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        id (int): The id of the request.</span>
+<span class="sd">        qnic1 (int or str): The qnic to which the first qubit is assigned.</span>
+<span class="sd">        idx1 (int): The index of the first qubit relative to the qnic.</span>
+<span class="sd">        qnic2 (int or str): The qnic to which the second qubit is assigned.</span>
+<span class="sd">        idx2 (int): The index of the second qubit relative to the qnic.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">req_dejmps</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;req_purify&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;qnic1&quot;</span><span class="p">,</span> <span class="s2">&quot;idx1&quot;</span><span class="p">,</span> <span class="s2">&quot;qnic2&quot;</span><span class="p">,</span> <span class="s2">&quot;idx2&quot;</span><span class="p">,</span> <span class="s2">&quot;role&quot;</span><span class="p">])</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Request to perform DEJMPS distillation on two qubits in the quantum processor. The first one is the one distilled,</span>
+<span class="sd">    the second one is used as ancilla. The &quot;role&quot; field is used to determine which rotation to apply (pi/2 or -pi/2),</span>
+<span class="sd">    and can assume two values, either &#39;A&#39; (pi/2) or &#39;B&#39; (-pi/2).</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        id (int): The id of the request.</span>
+<span class="sd">        qnic1 (int or str): The qnic to which the first qubit is assigned.</span>
+<span class="sd">        idx1 (int): The index of the first qubit relative to the qnic.</span>
+<span class="sd">        qnic2 (int or str): The qnic to which the second qubit is assigned.</span>
+<span class="sd">        idx2 (int): The index of the second qubit relative to the qnic.</span>
+<span class="sd">        role (str): The role of this device in the distillation. Can be either &#39;A&#39; or &#39;B&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">req_correct</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;req_correct&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;qnic1&quot;</span><span class="p">,</span> <span class="s2">&quot;idx1&quot;</span><span class="p">,</span> <span class="s2">&quot;cur_state&quot;</span><span class="p">])</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Request to correct a qubit in the quantum processor. The qubit is in the state specified by `cur_state`, which is</span>
+<span class="sd">    an integer between 0 and 3 indicating the Bell state. The qubit is corrected to the Bell state</span>
+<span class="sd">    :math:`\vert \beta_{00} \rangle`.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        id (int): The id of the request.</span>
+<span class="sd">        qnic1 (int or str): The qnic to which the qubit is assigned.</span>
+<span class="sd">        idx1 (int): The index of the qubit relative to the qnic.</span>
+<span class="sd">        cur_state (int): The current state of the qubit. Can be either 0, 1, 2 or 3.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">req_qcirc</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;req_qcirc&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;qubits_map&quot;</span><span class="p">,</span> <span class="s2">&quot;qcirc&quot;</span><span class="p">])</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Request to perform a generic quantum circuit on a set of qubits in the quantum processor.</span>
+<span class="sd">    When the circuit is executed, the measurement outcomes are sent out from the port `q_ops`.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters:</span>
+<span class="sd">        id (int): The id of the request.</span>
+<span class="sd">        qubits_map (list of tuples): A list of tuples, each one containing the qnic and the index of the qubit</span>
+<span class="sd">            relative to the qnic.</span>
+<span class="sd">        qcirc (QuantumProgram): The quantum program to execute.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="QuantumOperationsService.handle_request"><a class="viewcode-back" href="../../../progress/hardware/qhardware.html#progress.hardware.qhardware.QuantumOperationsService.handle_request">[docs]</a>    <span class="k">def</span> <span class="nf">handle_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">identifier</span><span class="p">,</span> <span class="n">start_time</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Schedule the request on the queue.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        request :</span>
+<span class="sd">            The object representing the request.</span>
+<span class="sd">        identifier : str</span>
+<span class="sd">            The identifier for this request.</span>
+<span class="sd">        start_time : float, optional</span>
+<span class="sd">            The time at which the request can be executed. Default current simulation time. [ns]</span>
+<span class="sd">        kwargs : dict, optional</span>
+<span class="sd">            Additional arguments which can be set by the service.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            The dictionary with additional arguments.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method is called after</span>
+<span class="sd">        :meth:`netsquid.protocols.serviceprotocol.ServiceProtocol.put` which</span>
+<span class="sd">        does the type checking etc.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">start_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">sim_time</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">start_time</span><span class="p">,</span> <span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_signal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_new_req_signal</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">kwargs</span></div>
+
+<div class="viewcode-block" id="QuantumOperationsService.run"><a class="viewcode-back" href="../../../progress/hardware/qhardware.html#progress.hardware.qhardware.QuantumOperationsService.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;Wait for a new request signal, then run the requests one by one.</span>
+
+<span class="sd">        Assumes request handlers are generators and not functions.</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        See :meth:`~netsquid.protocols.Protocol.run`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_req_signal</span><span class="p">)</span>
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">start_time</span><span class="p">,</span> <span class="p">(</span><span class="n">handler_id</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">start_time</span> <span class="o">&gt;</span> <span class="n">ns</span><span class="o">.</span><span class="n">sim_time</span><span class="p">():</span>
+                    <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_timer</span><span class="p">(</span><span class="n">end_time</span><span class="o">=</span><span class="n">start_time</span><span class="p">)</span>
+                <span class="n">func</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_handlers</span><span class="p">[</span><span class="n">handler_id</span><span class="p">]</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="n">request</span>
+                <span class="n">gen</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">gen</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">yield from</span> <span class="n">gen</span></div>
+
+<div class="viewcode-block" id="QuantumOperationsService.CorrectProgram"><a class="viewcode-back" href="../../../progress/hardware/qhardware.html#progress.hardware.qhardware.QuantumOperationsService.CorrectProgram">[docs]</a>    <span class="k">class</span> <span class="nc">CorrectProgram</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">QuantumProgram</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Quantum processor program that applies corrections to restore the |beta00&gt; state.&quot;&quot;&quot;</span>
+        <span class="n">default_num_qubits</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">curr_state</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">def</span> <span class="nf">set_corrections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_state</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">curr_state</span> <span class="o">=</span> <span class="n">current_state</span>
+
+<div class="viewcode-block" id="QuantumOperationsService.CorrectProgram.program"><a class="viewcode-back" href="../../../progress/hardware/qhardware.html#progress.hardware.qhardware.QuantumOperationsService.CorrectProgram.program">[docs]</a>        <span class="k">def</span> <span class="nf">program</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="n">q1</span><span class="p">,</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_qubit_indices</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">curr_state</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">curr_state</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">instructions</span><span class="o">.</span><span class="n">INSTR_X</span><span class="p">,</span> <span class="n">q1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">curr_state</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">curr_state</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">instructions</span><span class="o">.</span><span class="n">INSTR_Z</span><span class="p">,</span> <span class="n">q1</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div></div>
+
+<div class="viewcode-block" id="QuantumOperationsService.free"><a class="viewcode-back" href="../../../progress/hardware/qhardware.html#progress.hardware.qhardware.QuantumOperationsService.free">[docs]</a>    <span class="k">def</span> <span class="nf">free</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qnic</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Free the qubit on the given socket.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        qnic : str</span>
+<span class="sd">            The qnic identifier.</span>
+<span class="sd">        idx : int</span>
+<span class="sd">            The index of the qubit on the qnic.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        # DEBUG</span>
+<span class="sd">        log.info(&quot;Freeing qubit on qnic %s, index %d&quot; % (qnic, idx),</span>
+<span class="sd">                 repeater_id=self.node.supercomponent.device_id,</span>
+<span class="sd">                 protocol=&quot;QHardware&quot;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">link_protocol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">get_subscribed_llp</span><span class="p">(</span><span class="n">qnic</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">link_protocol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No link protocol subscribed to the given qnic.&quot;</span><span class="p">)</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="n">LinkProtocol</span><span class="o">.</span><span class="n">req_free</span><span class="p">(</span><span class="n">idx</span><span class="o">=</span><span class="n">idx</span><span class="p">)</span>
+        <span class="n">link_protocol</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        response = self.res_free(&#39;Done&#39;)</span>
+<span class="sd">        self.send_response(response)</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+    <span class="k">def</span> <span class="nf">_handle_free</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle a free request.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">free</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">qnic</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">idx</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_handle_qcirc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle a quantum circuit request.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">positions</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">map_info_to_qubit</span><span class="p">(</span><span class="n">qnic</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span> <span class="k">for</span> <span class="n">qnic</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">qubits_map</span><span class="p">]</span>
+        <span class="n">qcirc</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">qcirc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qproc</span><span class="o">.</span><span class="n">execute_program</span><span class="p">(</span><span class="n">program</span><span class="o">=</span><span class="n">qcirc</span><span class="p">,</span> <span class="n">qubit_mapping</span><span class="o">=</span><span class="n">positions</span><span class="p">,</span> <span class="n">error_on_fail</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_program</span><span class="p">(</span><span class="n">processor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">qproc</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">qcirc</span><span class="o">.</span><span class="n">output</span>
+
+        <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_response</span><span class="p">(</span><span class="s1">&#39;Done&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_response</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_handle_correct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">cur_state</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">cur_state</span>
+        <span class="n">positions</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">map_info_to_qubit</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">qnic1</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">idx1</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">correct_program</span><span class="o">.</span><span class="n">set_corrections</span><span class="p">(</span><span class="n">cur_state</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qproc</span><span class="o">.</span><span class="n">execute_program</span><span class="p">(</span><span class="n">program</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">correct_program</span><span class="p">,</span> <span class="n">qubit_mapping</span><span class="o">=</span><span class="n">positions</span><span class="p">,</span> <span class="n">error_on_fail</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_program</span><span class="p">(</span><span class="n">processor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">qproc</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_response</span><span class="p">(</span><span class="s1">&#39;Done&#39;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_setup_dejmps_program</span><span class="p">(</span><span class="n">conj_rotation</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set up the DEJMPS quantum program.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        conj_rotation : bool</span>
+<span class="sd">            Whether to apply the conjugate of the rotation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dejmp_program : :class:`~netsquid.programs.Program`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">INSTR_ROT</span> <span class="o">=</span> <span class="n">INSTR_Rx</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">conj_rotation</span> <span class="k">else</span> <span class="n">INSTR_RxC</span>
+        <span class="n">prog</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">QuantumProgram</span><span class="p">(</span><span class="n">num_qubits</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">q1</span><span class="p">,</span> <span class="n">q2</span> <span class="o">=</span> <span class="n">prog</span><span class="o">.</span><span class="n">get_qubit_indices</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">prog</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">INSTR_ROT</span><span class="p">,</span> <span class="p">[</span><span class="n">q1</span><span class="p">])</span>
+        <span class="n">prog</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">INSTR_ROT</span><span class="p">,</span> <span class="p">[</span><span class="n">q2</span><span class="p">])</span>
+        <span class="n">prog</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">instructions</span><span class="o">.</span><span class="n">INSTR_CX</span><span class="p">,</span> <span class="p">[</span><span class="n">q1</span><span class="p">,</span> <span class="n">q2</span><span class="p">])</span>
+        <span class="n">prog</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">instructions</span><span class="o">.</span><span class="n">INSTR_MEASURE</span><span class="p">,</span> <span class="n">q2</span><span class="p">,</span> <span class="n">output_key</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">prog</span>
+
+    <span class="k">def</span> <span class="nf">_handle_dejmps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle a DEJMPS distillation request. It automatically frees measured qubit at the end.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">role</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">role</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span>
+            <span class="c1"># pi/2 rotation</span>
+            <span class="n">prog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_dejmps_program</span><span class="p">(</span><span class="n">conj_rotation</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">role</span> <span class="o">==</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span>
+            <span class="c1"># -pi/2 rotation</span>
+            <span class="n">prog</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setup_dejmps_program</span><span class="p">(</span><span class="n">conj_rotation</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The role must be either &#39;A&#39; or &#39;B&#39;.&quot;</span><span class="p">)</span>
+        <span class="n">positions</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">map_info_to_qubit</span><span class="p">(</span><span class="n">qnic</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+                     <span class="k">for</span> <span class="n">qnic</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="p">[(</span><span class="n">request</span><span class="o">.</span><span class="n">qnic1</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">idx1</span><span class="p">),</span> <span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">qnic2</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">idx2</span><span class="p">)]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qproc</span><span class="o">.</span><span class="n">execute_program</span><span class="p">(</span><span class="n">program</span><span class="o">=</span><span class="n">prog</span><span class="p">,</span> <span class="n">qubit_mapping</span><span class="o">=</span><span class="n">positions</span><span class="p">,</span> <span class="n">error_on_fail</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_program</span><span class="p">(</span><span class="n">processor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">qproc</span><span class="p">)</span>
+
+        <span class="n">outcome</span> <span class="o">=</span> <span class="n">prog</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;m&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># free the ancilla</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">free</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">qnic2</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">idx2</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_response</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_handle_swap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+
+        <span class="n">positions</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">map_info_to_qubit</span><span class="p">(</span><span class="n">qnic</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+                     <span class="k">for</span> <span class="n">qnic</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="p">[(</span><span class="n">request</span><span class="o">.</span><span class="n">qnic1</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">idx1</span><span class="p">),</span> <span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">qnic2</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">idx2</span><span class="p">)]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qproc</span><span class="o">.</span><span class="n">execute_program</span><span class="p">(</span><span class="n">program</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_es_program</span><span class="p">,</span> <span class="n">qubit_mapping</span><span class="o">=</span><span class="n">positions</span><span class="p">,</span> <span class="n">error_on_fail</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_program</span><span class="p">(</span><span class="n">processor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">qproc</span><span class="p">)</span>
+
+        <span class="n">bell_result</span><span class="p">,</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_es_program</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="s2">&quot;m&quot;</span><span class="p">]</span>
+
+        <span class="c1"># free the swapped qubits</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">free</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">qnic1</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">idx1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">free</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">qnic2</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">idx2</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_response</span><span class="p">(</span><span class="n">bell_result</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+<div class="viewcode-block" id="QuantumOperationsService.send_response"><a class="viewcode-back" href="../../../progress/hardware/qhardware.html#progress.hardware.qhardware.QuantumOperationsService.send_response">[docs]</a>    <span class="k">def</span> <span class="nf">send_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sends a response to the port `q_ops`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;Q OP RESP&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">+=</span> <span class="s2">&quot; REQ &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">Message</span><span class="p">(</span><span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">items</span><span class="o">=</span><span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="n">response</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s1">&#39;q_ops&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tx_output</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Quantum Operations Service&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="n">node</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="c1"># We will use a queue for requests</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span> <span class="o">=</span> <span class="n">deque</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_new_req_signal</span> <span class="o">=</span> <span class="s2">&quot;New request in queue&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_signal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_new_req_signal</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_id</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">qproc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qmemory</span>
+
+        <span class="c1"># save the entanglement swapping program</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_es_program</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">QuantumProgram</span><span class="p">(</span><span class="n">num_qubits</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">q1</span><span class="p">,</span> <span class="n">q2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_es_program</span><span class="o">.</span><span class="n">get_qubit_indices</span><span class="p">(</span><span class="n">num_qubits</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_es_program</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">instructions</span><span class="o">.</span><span class="n">INSTR_MEASURE_BELL</span><span class="p">,</span> <span class="p">[</span><span class="n">q1</span><span class="p">,</span> <span class="n">q2</span><span class="p">],</span> <span class="n">output_key</span><span class="o">=</span><span class="s2">&quot;m&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">correct_program</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">CorrectProgram</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_request</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">req_free</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_free</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_request</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">req_qcirc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_qcirc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_request</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">req_correct</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_correct</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_request</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">req_dejmps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_dejmps</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_request</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">req_swap</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_swap</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Leonardo Bacciottini.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

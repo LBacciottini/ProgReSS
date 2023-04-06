@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>progress.hardware.llps.mps &mdash; ProgReSS alpha-1.0 documentation</title>
+      <link rel="stylesheet" href="../../../../static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../static/js/html5shiv.min.js"></script>
+    <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../static/documentation_options.js"></script>
+        <script src="../../../../static/doctools.js"></script>
+        <script src="../../../../static/sphinx_highlight.js"></script>
+    <script src="../../../../static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            ProgReSS
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../progress/abstraction/abstraction.html">progress.abstraction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../progress/device.html">progress.device</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../progress/hardware/hardware.html">progress.hardware</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../progress/logging.html">progress.progress_logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../progress/messaging/messaging.html">progress.messaging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../progress/pqnet/pqnet.html">progress.pqnet</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../progress/sockets.html">progress.sockets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">ProgReSS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">progress.hardware.llps.mps</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for progress.hardware.llps.mps</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module implements the Midpoint source (MPS) Link Layer protocol.</span>
+<span class="sd">It also provides a :class:`~progress.mps.protocols.mps_protocol.MPSSourceProtocol` which is a</span>
+<span class="sd">:class:`netsquid.protocols.nodeprotocols.NodeProtocol` determining the behavior of the Entangled Photon Source (EPS)</span>
+<span class="sd">in the middle of the physical link between the two nodes.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">netsquid.components</span> <span class="kn">import</span> <span class="n">Message</span><span class="p">,</span> <span class="n">SourceStatus</span>
+<span class="kn">from</span> <span class="nn">netsquid.protocols.nodeprotocols</span> <span class="kn">import</span> <span class="n">NodeProtocol</span>
+<span class="kn">import</span> <span class="nn">progress.progress_logging</span> <span class="k">as</span> <span class="nn">qilog</span>
+<span class="kn">import</span> <span class="nn">netsquid</span> <span class="k">as</span> <span class="nn">ns</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;MPSProtocol&quot;</span><span class="p">,</span> <span class="s2">&quot;MPSSourceProtocol&quot;</span><span class="p">]</span>
+
+<span class="kn">from</span> <span class="nn">progress.hardware.llps.llp</span> <span class="kn">import</span> <span class="n">LinkProtocol</span>
+
+
+<div class="viewcode-block" id="MPSProtocol"><a class="viewcode-back" href="../../../../progress/hardware/llps/mps.html#progress.hardware.llps.__init__.MPSProtocol">[docs]</a><span class="k">class</span> <span class="nc">MPSProtocol</span><span class="p">(</span><span class="n">LinkProtocol</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This protocol simulates the Midpoint source (MPS) protocol on the link interface of a node.</span>
+<span class="sd">    An independent instance of this protocols must be started on a node for each link on which MPS protocols is</span>
+<span class="sd">    activated.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    qnic : str</span>
+<span class="sd">        The port name on which the protocol will run.</span>
+<span class="sd">    num_positions : int</span>
+<span class="sd">        The number of qubits available for the link layer protocol.</span>
+<span class="sd">    node : :class:`~qi_simulation.repeater.Repeater` or None, optional</span>
+<span class="sd">        The node on which this protocols will run. If `None`, it must be set before starting the protocol and the</span>
+<span class="sd">        link layer protocol must be manually subscribed to the node through the method</span>
+<span class="sd">        :meth:`~qi_simulation.repeater.Repeater.subscribe_link_protocol`.</span>
+<span class="sd">    other_node_info : tuple or None, optional</span>
+<span class="sd">        A two-elements tuple where the first is the neighbor node id (int), and the second is the name of its attached</span>
+<span class="sd">        interface (str). This info is used to generate a :class:`~qi_simulation.sockets.SocketDescriptor` from each</span>
+<span class="sd">        qubit. If None, it must be set before the protocol is started.</span>
+<span class="sd">    name : str, optional</span>
+<span class="sd">        The name of the instance, defaults to the class name.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_positions</span><span class="p">,</span> <span class="n">qnic</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">other_node_info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qubits_status</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_alert_shown</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_started_message_displayed</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">num_positions</span><span class="p">,</span> <span class="n">qnic</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">other_node_info</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MPSProtocol.start"><a class="viewcode-back" href="../../../../progress/hardware/llps/mps.html#progress.hardware.llps.__init__.MPSProtocol.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Start this protocol on a specified link of this node.</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        See :meth:`netsquid.protocols.Protocol.start` for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qubits_status</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_positions</span><span class="p">)]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_allocate_qubit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qubits_status</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">qilog</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Repeater tried to allocate non-empty position </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+                          <span class="n">repeater_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">supercomponent</span><span class="o">.</span><span class="n">device_id</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="c1"># count how many qubits are allocated</span>
+        <span class="n">allocated</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qubits_status</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">q</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">allocated</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">allocated</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_positions</span><span class="p">:</span>
+            <span class="n">qilog</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Attention. All qubits on interface </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_qnic</span><span class="si">}</span><span class="s2"> are allocated.&quot;</span><span class="p">,</span>
+                          <span class="n">repeater_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">supercomponent</span><span class="o">.</span><span class="n">device_id</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alert_shown</span> <span class="ow">and</span> <span class="n">allocated</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_positions</span><span class="o">/</span><span class="mi">5</span><span class="p">:</span>
+            <span class="n">qilog</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;More than 4/5 of the qubits on interface </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_qnic</span><span class="si">}</span><span class="s2"> are allocated. Possible&quot;</span>
+                          <span class="sa">f</span><span class="s2">&quot; Bottleneck.&quot;</span><span class="p">,</span>
+                          <span class="n">repeater_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">supercomponent</span><span class="o">.</span><span class="n">device_id</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_alert_shown</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qubits_status</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">ns</span><span class="o">.</span><span class="n">sim_time</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_deallocate_qubit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qubits_status</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">qilog</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Repeater tried to deallocate empty position </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+                          <span class="n">repeater_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">supercomponent</span><span class="o">.</span><span class="n">device_id</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qubits_status</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="MPSProtocol.run"><a class="viewcode-back" href="../../../../progress/hardware/llps/mps.html#progress.hardware.llps.__init__.MPSProtocol.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        See :meth:`netsquid.protocols.Protocol.run`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_qnic</span><span class="p">]</span>
+
+        <span class="c1"># init phase</span>
+        <span class="n">init_res</span> <span class="o">=</span> <span class="n">InitMPSMessage</span><span class="p">()</span>
+        <span class="n">port</span><span class="o">.</span><span class="n">tx_output</span><span class="p">(</span><span class="n">init_res</span><span class="p">)</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">wait_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_port_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_qnic</span><span class="p">])</span>
+            <span class="n">wait_timer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_timer</span><span class="p">(</span><span class="n">duration</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+            <span class="n">ev_expr</span> <span class="o">=</span> <span class="k">yield</span> <span class="n">wait_msg</span> <span class="o">|</span> <span class="n">wait_timer</span>
+            <span class="k">if</span> <span class="n">ev_expr</span><span class="o">.</span><span class="n">first_term</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="n">qilog</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MPS Protocol on interface </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_qnic</span><span class="si">}</span><span class="s2"> has started.&quot;</span><span class="p">,</span>
+                           <span class="n">repeater_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">supercomponent</span><span class="o">.</span><span class="n">device_id</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_handle_incoming_qubit</span><span class="p">(</span><span class="n">ev_expr</span><span class="o">.</span><span class="n">first_term</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># the timer triggered, we send the init again</span>
+                <span class="c1"># qilog.info(f&quot;triggering on {self._interface}&quot;)</span>
+                <span class="n">init_res</span> <span class="o">=</span> <span class="n">InitMPSMessage</span><span class="p">()</span>
+                <span class="n">port</span><span class="o">.</span><span class="n">tx_output</span><span class="p">(</span><span class="n">init_res</span><span class="p">)</span>
+        <span class="c1"># end of init phase</span>
+
+        <span class="n">wait_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_port_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_qnic</span><span class="p">])</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">ev_expr</span> <span class="o">=</span> <span class="k">yield</span> <span class="n">wait_msg</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_handle_incoming_qubit</span><span class="p">(</span><span class="n">ev_expr</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_handle_incoming_qubit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_expr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        In this high level abstraction of MPS protocol, the entangling source pre-computes which qubit pairs</span>
+<span class="sd">        will make it to the destination and only sends those pairs. This method handles the incoming qubit pairs from</span>
+<span class="sd">        the source.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_qnic</span><span class="p">]</span><span class="o">.</span><span class="n">rx_input</span><span class="p">(</span><span class="n">event</span><span class="o">=</span><span class="n">event_expr</span><span class="o">.</span><span class="n">triggered_events</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">qubit</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        # DEBUG</span>
+<span class="sd">        counter = 0</span>
+<span class="sd">        for qubit_status in self._qubits_status:</span>
+<span class="sd">            if qubit_status is None:</span>
+<span class="sd">                counter += 1</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            # DEBUG</span>
+<span class="sd">            if (self.node.ID == 0 or self.node.ID == 1) and self._interface == &quot;q0&quot;:</span>
+<span class="sd">                qilog.debug(f&quot;Entanglement generated on link {self._interface} at position {idx}.&quot;</span>
+<span class="sd">                              f&quot;There are {counter}/{self._num_positions} free qubits on this interface.&quot;,</span>
+<span class="sd">                           repeater_id=self.node.ID, protocol=self.name)</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+
+            <span class="k">if</span> <span class="n">idx</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># Then this is just a notification that no pair was generated in the last round. Ignore it.</span>
+                <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                qilog.debug(f&quot;No pair in last round on link {self._link_index}&quot;,</span>
+<span class="sd">                           repeater_id=self.node.ID, protocol=self.name)</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+                <span class="k">return</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_allocate_qubit</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">qmemory</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">qubit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">map_info_to_qubit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_qnic</span><span class="p">,</span> <span class="n">idx</span><span class="p">))</span>
+
+            <span class="c1"># we create a socket for the qubit and we deliver to the stack engine:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">deliver_new_socket</span><span class="p">(</span><span class="n">idx</span><span class="o">=</span><span class="n">idx</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MPSProtocol.free"><a class="viewcode-back" href="../../../../progress/hardware/llps/mps.html#progress.hardware.llps.__init__.MPSProtocol.free">[docs]</a>    <span class="k">def</span> <span class="nf">free</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">idx</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_deallocate_qubit</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_qnic</span><span class="p">]</span><span class="o">.</span><span class="n">tx_output</span><span class="p">(</span><span class="n">FreeQubitMessage</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="n">idx</span><span class="p">))</span>
+
+        <span class="c1"># qilog.debug(f&quot;Qubit {idx} freed on link {self._interface}&quot;, repeater_id=self.node.ID, protocol=self.name)</span>
+
+        <span class="sd">&quot;&quot;&quot; No one uses this response, so we can ignore it.</span>
+<span class="sd">        res = res_free(content=&quot;Done&quot;)</span>
+<span class="sd">        self.send_response(res)</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+    <span class="k">def</span> <span class="nf">_handle_stop_generation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">StopGenerationMessage</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_qnic</span><span class="p">]</span><span class="o">.</span><span class="n">tx_output</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_handle_resume_generation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">ResumeGenerationMessage</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qubits_status</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_num_positions</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_qnic</span><span class="p">]</span><span class="o">.</span><span class="n">tx_output</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MPSSourceProtocol"><a class="viewcode-back" href="../../../../progress/hardware/llps/mps.html#progress.hardware.llps.__init__.MPSSourceProtocol">[docs]</a><span class="k">class</span> <span class="nc">MPSSourceProtocol</span><span class="p">(</span><span class="n">NodeProtocol</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This protocol is run at the mid-point source of a link and is used to handle &#39;Reset Qubit&#39; messages.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_num_positions</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="n">node</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MPSSourceProtocol.start"><a class="viewcode-back" href="../../../../progress/hardware/llps/mps.html#progress.hardware.llps.__init__.MPSSourceProtocol.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        See :meth:`netsquid.protocols.Protocol.start`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="MPSSourceProtocol.run"><a class="viewcode-back" href="../../../../progress/hardware/llps/mps.html#progress.hardware.llps.__init__.MPSSourceProtocol.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># at the beginning we send the init message:</span>
+        <span class="n">init_msg</span> <span class="o">=</span> <span class="n">InitMPSMessage</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;c0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tx_output</span><span class="p">(</span><span class="n">init_msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;c1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">tx_output</span><span class="p">(</span><span class="n">init_msg</span><span class="p">)</span>
+
+        <span class="c1"># and we wait for the init messages to be received by both sides:</span>
+        <span class="n">received</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">wait_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_port_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;c0&quot;</span><span class="p">])</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_port_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;c1&quot;</span><span class="p">])</span>
+            <span class="n">ev_expr</span> <span class="o">=</span> <span class="k">yield</span> <span class="n">wait_msg</span>
+            <span class="k">if</span> <span class="n">ev_expr</span><span class="o">.</span><span class="n">first_term</span><span class="o">.</span><span class="n">value</span> <span class="ow">and</span> <span class="n">received</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;c0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rx_input</span><span class="p">(</span><span class="n">event</span><span class="o">=</span><span class="n">ev_expr</span><span class="o">.</span><span class="n">triggered_events</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">InitMPSMessage</span><span class="p">):</span>
+                    <span class="n">received</span> <span class="o">=</span> <span class="s2">&quot;c0&quot;</span>
+            <span class="k">elif</span> <span class="n">ev_expr</span><span class="o">.</span><span class="n">second_term</span><span class="o">.</span><span class="n">value</span> <span class="ow">and</span> <span class="n">received</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;c1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rx_input</span><span class="p">(</span><span class="n">event</span><span class="o">=</span><span class="n">ev_expr</span><span class="o">.</span><span class="n">triggered_events</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">InitMPSMessage</span><span class="p">):</span>
+                    <span class="n">received</span> <span class="o">=</span> <span class="s2">&quot;c1&quot;</span>
+            <span class="k">elif</span> <span class="n">ev_expr</span><span class="o">.</span><span class="n">first_term</span><span class="o">.</span><span class="n">value</span> <span class="ow">and</span> <span class="n">received</span> <span class="o">==</span> <span class="s2">&quot;c1&quot;</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;c0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rx_input</span><span class="p">(</span><span class="n">event</span><span class="o">=</span><span class="n">ev_expr</span><span class="o">.</span><span class="n">triggered_events</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">InitMPSMessage</span><span class="p">):</span>
+                    <span class="n">t_link</span> <span class="o">=</span> <span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">sim_time</span><span class="p">()</span> <span class="o">-</span> <span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="mi">2</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">init_source</span><span class="p">(</span><span class="n">t_link</span><span class="p">)</span>
+                    <span class="k">break</span>
+            <span class="k">elif</span> <span class="n">ev_expr</span><span class="o">.</span><span class="n">second_term</span><span class="o">.</span><span class="n">value</span> <span class="ow">and</span> <span class="n">received</span> <span class="o">==</span> <span class="s2">&quot;c0&quot;</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;c1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rx_input</span><span class="p">(</span><span class="n">event</span><span class="o">=</span><span class="n">ev_expr</span><span class="o">.</span><span class="n">triggered_events</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">InitMPSMessage</span><span class="p">):</span>
+                    <span class="n">t_link</span> <span class="o">=</span> <span class="p">(</span><span class="n">ns</span><span class="o">.</span><span class="n">sim_time</span><span class="p">()</span> <span class="o">-</span> <span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="mi">2</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">init_source</span><span class="p">(</span><span class="n">t_link</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+        <span class="c1"># now we can start the source:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">wait_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_port_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;c0&quot;</span><span class="p">])</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">await_port_input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;c1&quot;</span><span class="p">])</span>
+            <span class="n">ev_expr</span> <span class="o">=</span> <span class="k">yield</span> <span class="n">wait_msg</span>
+
+            <span class="k">if</span> <span class="n">ev_expr</span><span class="o">.</span><span class="n">first_term</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;c0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">input_queue</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;c0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rx_input</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">FreeQubitMessage</span><span class="p">):</span>
+                        <span class="n">position</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">pos_status_list</span><span class="p">[</span><span class="n">position</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;busy&quot;</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">pos_status_list</span><span class="p">[</span><span class="n">position</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;free_left&quot;</span>
+                        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">pos_status_list</span><span class="p">[</span><span class="n">position</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;free_right&quot;</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">pos_status_list</span><span class="p">[</span><span class="n">position</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;free&quot;</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">StopGenerationMessage</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">ResumeGenerationMessage</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">SourceStatus</span><span class="o">.</span><span class="n">OFF</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">and_restart</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">ev_expr</span><span class="o">.</span><span class="n">second_term</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;c1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">input_queue</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">ports</span><span class="p">[</span><span class="s2">&quot;c1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rx_input</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">FreeQubitMessage</span><span class="p">):</span>
+                        <span class="n">position</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">pos_status_list</span><span class="p">[</span><span class="n">position</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;busy&quot;</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">pos_status_list</span><span class="p">[</span><span class="n">position</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;free_right&quot;</span>
+                        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">pos_status_list</span><span class="p">[</span><span class="n">position</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;free_left&quot;</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">pos_status_list</span><span class="p">[</span><span class="n">position</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;free&quot;</span>
+
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">StopGenerationMessage</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">ResumeGenerationMessage</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">SourceStatus</span><span class="o">.</span><span class="n">OFF</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">node</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">and_restart</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
+
+
+<span class="k">class</span> <span class="nc">StopGenerationMessage</span><span class="p">(</span><span class="n">Message</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This message is sent by repeaters to notify the MPS source that it has to stop generating entanglement.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;MPS SOURCE STOP GENERATION&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Stop&quot;</span><span class="p">],</span> <span class="n">header</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">ResumeGenerationMessage</span><span class="p">(</span><span class="n">Message</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This message is sent by repeaters to notify the MPS source that it has to resume generating entanglement.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;MPS SOURCE RESUME GENERATION&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Resume&quot;</span><span class="p">],</span> <span class="n">header</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">FreeQubitMessage</span><span class="p">(</span><span class="n">Message</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This message is sent by a components to notify the MPS source that a position is now free on that end.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;MPS FREE QUBIT&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="p">[</span><span class="n">position</span><span class="p">],</span> <span class="n">header</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">position</span><span class="p">))</span>
+
+
+<span class="k">class</span> <span class="nc">InitMPSMessage</span><span class="p">(</span><span class="n">Message</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This message is sent by the MPS source to initialize MPS on components nodes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;MPS INIT&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Add here more parameters if needed</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="p">[</span><span class="n">ns</span><span class="o">.</span><span class="n">sim_time</span><span class="p">()],</span> <span class="n">header</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">)</span>
+
+
+<span class="c1"># parameters set to comply with simulations in https://arxiv.org/abs/1910.08227v2</span>
+<span class="n">optimistic_parameters_v1</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;p_mid&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;t_clock&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;N_value&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;p_photon&quot;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span> <span class="s2">&quot;p_bsa&quot;</span><span class="p">:</span> <span class="mf">0.53</span><span class="p">}</span>
+<span class="n">optimistic_parameters_v2</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;p_mid&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s2">&quot;t_clock&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;N_value&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;p_photon&quot;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span> <span class="s2">&quot;p_bsa&quot;</span><span class="p">:</span> <span class="mf">0.53</span><span class="p">}</span>
+<span class="n">optimistic_parameters_v3</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;p_mid&quot;</span><span class="p">:</span> <span class="mf">0.02</span><span class="p">,</span> <span class="s2">&quot;t_clock&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;N_value&quot;</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;p_photon&quot;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span> <span class="s2">&quot;p_bsa&quot;</span><span class="p">:</span> <span class="mf">0.53</span><span class="p">}</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Leonardo Bacciottini.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
