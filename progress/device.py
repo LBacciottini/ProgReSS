@@ -46,7 +46,7 @@ class QNetworkDevice(ns.nodes.Node):
     -----
     The device architecture is composed of the following layers (bottom-up):
         - Physical layer: The quantum hardware (quantum memory, processor, QNICs, etc.)
-        - Link Layer Protocols: The clasical control protocols to generate robust entanglement over each QNIC.
+        - Link Layer Protocols: The classical control protocols to generate robust entanglement over each QNIC.
         - Quantum Hardware Abstraction Layer: The QHAL (see :class:`~progress.abstraction.qhal.QHAL`). It abstracts the
           quantum hardware resources and provides a unified interface for the NET layer.
         - NET layer: The NET layer is responsible for processing link-generated entanglement and delivering long-range
