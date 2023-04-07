@@ -196,10 +196,10 @@ class TDRCollector:
         fig, ax = plt.subplots()
         for ctrl_dist in self.in_band_ctrl_dists:
             ax.errorbar(self.state_periods, df[f"in_band_{ctrl_dist}_mean"], yerr=df[f"in_band_{ctrl_dist}_conf"],
-                        label=f"Tctrl = {ctrl_dist} km")
+                        label=f"ΔTctrl = {ctrl_dist/2e3} ms")
         for ctrl_dist in self.out_of_band_ctrl_dists:
             ax.errorbar(self.state_periods, df[f"out_of_band_{ctrl_dist}_mean"], yerr=df[f"out_of_band_{ctrl_dist}_conf"],
-                        label=f"Tctrl = variable (+{ctrl_dist} km)")
+                        label=f"ΔTctrl = variable (+{ctrl_dist/2e3} ms)")
 
         # add markers to the lines
         for line in ax.get_lines():
@@ -215,8 +215,7 @@ class TDRCollector:
         # add grid lines
         ax.grid()
 
-
-        ax.set_xlabel("Network state duration [ms]")
+        ax.set_xlabel("Avg Requirements duration [ms]")
         ax.set_ylabel("Token Delivery Ratio")
         ax.set_title("Token Delivery Ratio")
 

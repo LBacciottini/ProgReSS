@@ -98,9 +98,13 @@ class FidelityMetricsCollector:
 
         # filter out rows whose type is not 'freed_token'
         fidelities = dataframe[dataframe['type'] == 'freed_token']
+        # reformat time from ns to ms
+        fidelities['time'] = fidelities['time'] / 1000000
 
         # filter out rows whose type is not 'new_scenario'
         scenarios = dataframe[dataframe['type'] == 'new_scenario']
+        # reformat time from ns to ms
+        scenarios['time'] = scenarios['time'] / 1000000
 
         # create a plot with time on the x-axis and fidelity on the y-axis, where scenarios are marked by
         # changing the backgorund color of the area for the x-axis interval of the scenario
@@ -124,15 +128,15 @@ class FidelityMetricsCollector:
         # create a new dataframe where each entry has a field 'time' and a field 'throughput', where throughput is
         # the number of tokens that were freed in the time interval between 'time' - window_size and 'time' divided
         # by the window size
-        window_size = 1e7
-        step_size = 100000
+        window_size = 10  # ms
+        step_size = 0.1  # ms
         throughput = pd.DataFrame(columns=['time', 'throughput'])
         next_time = fidelities['time'].min() + window_size
         max_time = fidelities['time'].max()
         while next_time < max_time:
             row = pd.DataFrame(
                 {'time': [next_time],
-                 'throughput': [fidelities[(fidelities['time'] > next_time - window_size) & (fidelities['time'] < next_time)]['fid_sq'].count() * 1e9 / window_size]
+                 'throughput': [fidelities[(fidelities['time'] > next_time - window_size) & (fidelities['time'] < next_time)]['fid_sq'].count() * 1e3 / window_size]
                 }
             )
             throughput = pd.concat([throughput, row],
@@ -150,7 +154,7 @@ class FidelityMetricsCollector:
         # set the color of the y-axis label to red
         ax2.yaxis.label.set_color('r')
 
-        ax.set_xlabel('Time [ns]')
+        ax.set_xlabel('Time [ms]')
         ax.set_ylabel('Fidelity (squared)')
         ax.set_title('Fidelity and throughput of end nodes A-C entanglement')
         ax.grid(True)
@@ -215,9 +219,13 @@ class AggregateMetricsCollector:
 
         # filter out rows whose type is not 'freed_token'
         fidelities = dataframe[dataframe['type'] == 'freed_token']
+        # reformat time from ns to ms
+        fidelities['time'] = fidelities['time'] * 1e-6
 
         # filter out rows whose type is not 'new_scenario'
         scenarios = dataframe[dataframe['type'] == 'new_scenario']
+        # reformat time from ns to ms
+        scenarios['time'] = scenarios['time'] * 1e-6
 
         # add a field to fidelities that contains the current scenario and its starting time
         fidelities['scenario'] = 0
@@ -227,8 +235,8 @@ class AggregateMetricsCollector:
             fidelities.loc[fidelities['slot_id'] == row['topology_id'], 'slot_start_time'] = row['time']
 
         # get a column containing fidelities for scenarios (0,1) and a column containing fidelities for scenarios (2,3)
-        fidelities_01 = fidelities[fidelities['scenario'] == 0]['fid_sq']
-        fidelities_23 = fidelities[fidelities['scenario'] == 2]['fid_sq']
+        fidelities_01 = fidelities[(fidelities['scenario'] == 0) | (fidelities['scenario'] == 1)]['fid_sq']
+        fidelities_23 = fidelities[(fidelities['scenario'] == 2) | (fidelities['scenario'] == 3)]['fid_sq']
         
         # get a column containing response times for scenarios (0,1) and a column containing response times for scenarios (2,3)
         # to do so, we first get the first time a token is freed for each scenario_slot by grouping by scenario_start_time and taking the minimum time
@@ -249,15 +257,25 @@ class AggregateMetricsCollector:
         ax[1].boxplot([response_times_01, response_times_23], labels=['High Fidelity', 'Low Fidelity'],
                       sym="", whis=[5, 95])
         ax[1].set_title('Latency for A-C entanglement')
-        ax[1].set_ylabel('Latency [ns]')
+        ax[1].set_ylabel('Latency [ms]')
 
         ax[0].title.set_fontsize(17)
-        ax[0].xaxis.label.set_fontsize(14)
-        ax[0].yaxis.label.set_fontsize(14)
+        ax[0].yaxis.label.set_fontsize(15)
 
         ax[1].title.set_fontsize(17)
-        ax[1].xaxis.label.set_fontsize(14)
-        ax[1].yaxis.label.set_fontsize(14)
+        ax[1].yaxis.label.set_fontsize(15)
+
+        # set labels size for both boxplots
+        for tick in ax[0].get_xticklabels():
+            tick.set_fontsize(15)
+        for tick in ax[1].get_xticklabels():
+            tick.set_fontsize(15)
+
+        # do the same for the y axis
+        for tick in ax[0].get_yticklabels():
+            tick.set_fontsize(13)
+        for tick in ax[1].get_yticklabels():
+            tick.set_fontsize(13)
 
         # resize the two box plots to fit the figure size
         fig.tight_layout()
