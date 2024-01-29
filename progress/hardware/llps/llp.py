@@ -78,6 +78,11 @@ class LinkProtocol(ABC, ServiceProtocol):
     effect.
     """
 
+    req_send_message_to_source = namedtuple("req_send_message_to_source", ["message"])
+    r"""
+    Request this protocol to send a specified message to the source of the entanglement.
+    """
+
     def __init__(self, num_positions, qnic, node=None, other_node_info=None, name=None):
         r"""
         Initialize the link protocol.
@@ -87,6 +92,7 @@ class LinkProtocol(ABC, ServiceProtocol):
         self.register_request(self.req_free, self.free)
         self.register_request(self.req_stop_generation, self._handle_stop_generation)
         self.register_request(self.req_resume_generation, self._handle_resume_generation)
+        self.register_request(self.req_send_message_to_source, self._handle_send_message_to_source)
 
 
         self._num_positions = num_positions
@@ -115,12 +121,23 @@ class LinkProtocol(ABC, ServiceProtocol):
         """
         pass
 
+    def _handle_send_message_to_source(self, request):
+        msg = request.message
+        self.node.ports[self._qnic].tx_output(msg)
+
     @abstractmethod
     def free(self, request):
         r"""
         This method is called when upper layers want to free a qubit for a new entanglement.
         """
         pass
+
+    def send_message_to_source(self, message):
+        r"""
+        This method is called when upper layers want to send a message to the source of the entanglement,
+        which is placed in the middle of the link and may act as a link controller.
+        """
+        self.put(self.req_send_message_to_source(message))
 
     def deliver_new_socket(self, idx):
         r"""

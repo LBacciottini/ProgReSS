@@ -105,6 +105,19 @@ class QHAL(ns.nodes.Node):
         """
         self.qhardware.get_subscribed_llp(qnic).put(LinkProtocol.req_resume_generation())
 
+    def send_message_to_link_controller(self, qnic, message):
+        """
+        Send a message to the link controller of the given qnic.
+
+        Parameters
+        ----------
+        qnic : int
+            The qnic of the link on which the link controller to send the message acts.
+        message : :class:`netsquid.components.message.Message`
+            The message to send.
+        """
+        self.qhardware.get_subscribed_llp(qnic).send_message_to_source(message)
+
 
 class EntanglementHandlerProtocol(ns.protocols.NodeProtocol):
     def __init__(self, node, name=None):
