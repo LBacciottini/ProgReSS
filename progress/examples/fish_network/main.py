@@ -36,24 +36,26 @@ if __name__ == '__main__':
         print(f"Controller distance: {cd}, TDR: {tdr_s}")
     print(results)
     """
+    """
     executor = TDRCollector(in_band_ctrl_dists=in_band_controller_dists,
                             out_of_band_ctrl_dists=out_of_band_controller_dists,
                             state_periods=avg_periods,
                             repetitions=repetitions)
     # executor.run()
     executor.collect()
+    """
 
     ns.set_qstate_formalism(ns.QFormalism.DM)
     log.log_to_console(level=logging.INFO)
     tdr_s = []
     ns.sim_reset()
     ns.set_random_state(seed=seeds[0])
-    avg_period = 0.0512
+    avg_period = 0.0032
     cd = 15
     network, data_collector, fid_collector, agg_collector = get_topology(avg_scenario_period=avg_period,
                                                                          controller_dist=cd,
                                                                          out_of_band=False)
-    stats = ns.sim_run(end_time=1024000000)
+    stats = ns.sim_run(end_time=2048000000)
     partial, total = data_collector.get_counts()
     print(f"Controller distance: {cd}, avg period: {avg_period}, TDR: {partial/total}")
     fid_collector.plot_fidelity(sample_dots=True)

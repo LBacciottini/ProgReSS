@@ -218,7 +218,7 @@ class DAGFactory:
         return DAG(modules.copy(), self._edges.copy())
 
 
-class DAGMessagesSwitch(ns.components.Switch):
+class DAGMessagesSwitch(ns.components.switch.Switch):
     r"""
     This class abstracts a virtual switch that routes incoming messages to the correct module in the DAG
     using `module_id` as routing key. It also acts as a multiplexer for all outgoing messages from
